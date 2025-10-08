@@ -2,7 +2,7 @@ import { NavLink } from "react-router";
 
 const Navbar = () => {
   return (
-    <div className="sticky top-0 bg-white flex w-full justify-between max-w-6xl mx-auto py-3">
+    <div className="sticky top-0 bg-white z-50 flex w-full justify-between max-w-6xl mx-auto py-3">
       <div>
         <img src="/images/logo_navbar.png" className="w-24" />
       </div>
