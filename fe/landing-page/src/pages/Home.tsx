@@ -35,12 +35,12 @@ function Home() {
           </div>
           <div className="flex gap-[9px]">
             <h1 className="text-[#FFB835] font-runestars">
-              <span className="text-shadow-[1px_0_0_#6E0112,-1px_0_0_#6E0112,0_1px_0_#6E0112,0_-1px_0_#6E0112,1px_1px_0_#6E0112,-1px_-1px_0_#6E0112,1px_-1px_0_#6E0112,-1px_1px_0_#6E0112,2px_2px_0_#6E0112,-2px_-2px_0_#6E0112,2px_-2px_0_#6E0112,-2px_2px_0_#6E0112,3px_3px_0_#6E0112,-3px_-3px_0_#6E0112,3px_-3px_0_#6E0112,-3px_3px_0_#6E0112,4px_4px_0_#6E0112,-4px_-4px_0_#6E0112,4px_-4px_0_#6E0112,-4px_4px_0_#6E0112] font-bold text-5xl text-[#FFC04D]">
+              <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-bold text-5xl text-[#FFC04D]">
                 RAGAM KULINER,
               </span>
             </h1>
             <h1 className="text-[#6E0112] font-runestars">
-              <span className="text-shadow-[1px_0_0_white,-1px_0_0_white,0_1px_0_white,0_-1px_0_white,1px_1px_0_white,-1px_-1px_0_white,1px_-1px_0_white,-1px_1px_0_white,2px_2px_0_white,-2px_-2px_0_white,2px_-2px_0_white,-2px_2px_0_white,3px_3px_0_white,-3px_-3px_0_white,3px_-3px_0_white,-3px_3px_0_white,4px_4px_0_white,-4px_-4px_0_white,4px_-4px_0_white,-4px_4px_0_white] font-extrabold text-5xl text-[#6E0112]">
+              <span className="text-shadow-[0_0_6px_white,1px_0_0_white,2px_0_0_white,-1px_0_0_white,-2px_0_0_white,0_1px_0_white,0_2px_0_white,0_-1px_0_white,0_-2px_0_white,1px_1px_0_white,2px_2px_0_white,-1px_-1px_0_white,-2px_-2px_0_white,1px_-1px_0_white,2px_-2px_0_white,-1px_1px_0_white,-2px_2px_0_white] font-extrabold text-5xl text-[#6E0112]">
                 SATU CERITA
               </span>
             </h1>
