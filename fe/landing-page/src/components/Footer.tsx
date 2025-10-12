@@ -9,16 +9,19 @@ const Footer: React.FC = () => {
         <div className="relative overflow-hidden rounded-xl bg-[#9C0000] p-8 sm:p-10 lg:p-16">
           <div className="pointer-events-none absolute inset-0 z-0 bg-[url('/images/dots.png')] bg-contain bg-center bg-repeat-x opacity-20" />
           <div className="relative z-10 max-w-6xl">
-            <div className="flex flex-col items-center gap-8 text-center lg:flex-row lg:items-center lg:justify-between lg:text-left">
+            <div className="flex flex-col items-center gap-8 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-xl">
                 <h2 className="font-jakarta text-2xl font-medium text-white sm:text-3xl">
                   Setiap interaksi adalah awal dari hubungan yang bermakna.
                 </h2>
+                <p className="max-w-sm font-jakarta text-sm text-[#FFC3C3] sm:text-base lg:hidden mt-4">
+                  Kami terbuka untuk kerja sama strategis, dari kemitraan bisnis hingga kolaborasi kreatif.
+                </p>
                 <button className="mt-8 rounded-xl bg-white py-3 px-6 font-jakarta text-sm font-medium transition-all hover:bg-opacity-90 lg:mt-10">
                   Hubungi Kami
                 </button>
               </div>
-              <p className="max-w-sm font-jakarta text-sm text-[#FFC3C3] sm:text-base">
+              <p className="max-w-sm font-jakarta text-sm text-[#FFC3C3] sm:text-base lg:block hidden">
                 Kami terbuka untuk kerja sama strategis, dari kemitraan bisnis hingga kolaborasi kreatif.
               </p>
             </div>
@@ -37,9 +40,9 @@ const Footer: React.FC = () => {
       </div>
 
       {/* Footer Links */}
-      <div className="container mx-auto max-w-6xl px-6 md:px-10">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
-          <div className="flex flex-col gap-8 md:col-span-2">
+      <div className="container mx-auto max-w-6xl px-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="flex flex-col gap-8 md:col-span-2 justify-between">
             <img src="/images/enggal_white.png" className="w-32 md:w-40" alt="Enggal Group" />
             <div className="flex flex-col gap-4">
               <h1 className="font-jakarta text-lg font-bold text-white md:text-xl">Headoffice Location</h1>
@@ -81,7 +84,7 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
-          <div className="flex flex-col justify-between gap-8 text-center md:text-left">
+          <div className="flex flex-col justify-between gap-2 text-center md:text-left">
             <div>
               <h3 className="mb-4 font-jakarta text-lg font-bold text-white">Kontak Kami</h3>
               <ul className="space-y-4 font-jakarta text-sm font-light text-[#CECECE] md:space-y-6 md:text-base">
@@ -89,19 +92,19 @@ const Footer: React.FC = () => {
                   <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M18 0H2C0.9 0 0.00999999 0.9 0.00999999 2L0 14C0 15.1 0.9 16 2 16H18C19.1 16 20 15.1 20 14V2C20 0.9 19.1 0 18 0ZM17.6 4.25L10.53 8.67C10.21 8.87 9.79 8.87 9.47 8.67L2.4 4.25C2.15 4.09 2 3.82 2 3.53C2 2.96 2.61 2.6 3.09 2.87L10 7L16.91 2.87C17.39 2.6 18 2.96 18 3.53C18 3.82 17.85 4.09 17.6 4.25Z" fill="#CECECE" />
                   </svg>
-                  <p className="font-jakarta text-sm text-[#CECECE] md:text-base">contact@enggal.id</p>
+                  <p className="font-jakarta text-sm text-[#CECECE]">contact@enggal.id</p>
                 </li>
                 <li className="flex items-center justify-center gap-4 md:justify-start">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M4.35239 0C4.52703 2.47136e-06 4.69849 0.0467401 4.84898 0.135363C4.99947 0.223986 5.1235 0.351265 5.2082 0.503992L6.40506 2.65991C6.48223 2.79898 6.52434 2.95476 6.52775 3.11377C6.53117 3.27278 6.49577 3.43023 6.42463 3.57248L5.27181 5.8791C5.27181 5.8791 5.60601 7.59708 7.00447 8.99602C8.40341 10.3945 10.1155 10.7233 10.1155 10.7233L12.4217 9.56999C12.564 9.49876 12.7215 9.46332 12.8806 9.46673C13.0397 9.47014 13.1956 9.51231 13.3347 9.58956L15.4975 10.7923C15.6499 10.8771 15.7768 11.0012 15.8651 11.1516C15.9535 11.3019 16.0001 11.4732 16 11.6476V14.1299C16 15.3943 14.8256 16.3073 13.6278 15.9032C11.1675 15.0728 7.34845 13.4923 4.92782 11.0717C2.50768 8.65106 0.926706 4.83246 0.0968311 2.3717C-0.307342 1.17435 0.605717 0 1.8701 0H4.35239Z" fill="#CECECE" />
                   </svg>
-                  <p className="font-jakarta text-sm text-[#CECECE] md:text-base">+62-813-1389-4340 (Partnership)</p>
+                  <p className="font-jakarta text-sm text-[#CECECE]">+62-813-1389-4340 (Partnership)</p>
                 </li>
                 <li className="flex items-center justify-center gap-4 md:justify-start">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M4.35239 0C4.52703 2.47136e-06 4.69849 0.0467401 4.84898 0.135363C4.99947 0.223986 5.1235 0.351265 5.2082 0.503992L6.40506 2.65991C6.48223 2.79898 6.52434 2.95476 6.52775 3.11377C6.53117 3.27278 6.49577 3.43023 6.42463 3.57248L5.27181 5.8791C5.27181 5.8791 5.60601 7.59708 7.00447 8.99602C8.40341 10.3945 10.1155 10.7233 10.1155 10.7233L12.4217 9.56999C12.564 9.49876 12.7215 9.46332 12.8806 9.46673C13.0397 9.47014 13.1956 9.51231 13.3347 9.58956L15.4975 10.7923C15.6499 10.8771 15.7768 11.0012 15.8651 11.1516C15.9535 11.3019 16.0001 11.4732 16 11.6476V14.1299C16 15.3943 14.8256 16.3073 13.6278 15.9032C11.1675 15.0728 7.34845 13.4923 4.92782 11.0717C2.50768 8.65106 0.926706 4.83246 0.0968311 2.3717C-0.307342 1.17435 0.605717 0 1.8701 0H4.35239Z" fill="#CECECE" />
                   </svg>
-                  <p className="font-jakarta text-sm text-[#CECECE] md:text-base">+62-813-1389-4340 (Partnership)</p>
+                  <p className="font-jakarta text-sm text-[#CECECE]">+62-813-1389-4410 (Customer Care)</p>
                 </li>
               </ul>
             </div>

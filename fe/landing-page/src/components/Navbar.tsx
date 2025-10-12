@@ -4,7 +4,7 @@ import { NavLink } from "react-router";
 const PRIMARY_LINKS = [
   { label: "Home", to: "/", isAnchor: false },
   { label: "Tentang", to: "/#tentang", isAnchor: true },
-  { label: "Brand", to: "/brand", isAnchor: false },
+  { label: "Brand", to: "/#brand", isAnchor: true },
   { label: "Berita", to: "/berita", isAnchor: false },
   { label: "Promo", to: "/promo", isAnchor: false },
 ];
@@ -48,16 +48,16 @@ const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <a href="/" className="flex items-center" onClick={closeMobileMenu}>
+      <div className="mx-auto flex max-w-6xl items-center px-6 ">
+        <a href="/" className="flex items-center mr-auto" onClick={closeMobileMenu}>
           <img src="/images/logo_navbar.png" className="w-24" alt="Enggal Group" />
         </a>
 
-        <nav className="hidden items-center gap-16 uppercase font-runestars lg:flex">
+        <nav className="hidden items-center gap-8 uppercase font-runestars lg:flex text-lg">
           {PRIMARY_LINKS.map(({ label, to, isAnchor }) => renderLink(label, to, isAnchor))}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 ml-8">
           <button
             type="button"
             onClick={toggleMobileMenu}
