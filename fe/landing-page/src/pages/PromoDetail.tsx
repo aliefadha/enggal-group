@@ -2,7 +2,7 @@ import PromoCard from '../components/PromoCard';
 
 function PromoDetail() {
     return (
-        <div className="w-full max-w-5xl mx-auto flex flex-col gap-y-10">
+        <div className="w-full container px-24 mx-auto flex flex-col gap-y-10">
             <div className="flex justify-start items-center gap-10">
                 <a href="/" className="font-jakarta text-[#727272]">Home</a>
                 <span className="text-[#727272]">
@@ -57,7 +57,7 @@ function PromoDetail() {
                 </div>
             </div>
             <div>
-                <div className="relative mb-10">
+                <div className="relative my-10">
                     <div className="mb-2">
                         <svg width="67" height="19" viewBox="0 0 67 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M2 16.0267C11 9.36005 28.5 -2.17329 26.5 5.02671C24.5 12.2267 21 15.36 19.5 16.0267C27.3333 9.6934 42.7 -1.37323 41.5 5.02671C40.3 11.4267 37.6667 15.0267 36.5 16.0267C45.8333 8.69338 63.6 -3.77329 60 5.02671C56.4 13.8267 61.5 16.0267 64.5 16.0267" stroke="#FFB835" stroke-width="4" stroke-linecap="round" />

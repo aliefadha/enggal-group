@@ -81,7 +81,7 @@ function Berita() {
           </div>
           <div className="my-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 md:gap-y-16">
             {Array.from({ length: 6 }, (_, i) => i + 1).map((item: number) => (
-              <div className="bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm " key={item}>
+              <div className="bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm cursor-pointer transition-transform" key={item} onClick={() => window.location.href = `/berita/${item}`}>
                 <div className="m-4">
                   <div className="relative rounded-lg overflow-hidden">
                     <img src="/images/berita_1.png" alt="Bakso Malang" className="w-full h-[200px] sm:h-[250px] md:h-[300px] object-cover" />
@@ -94,7 +94,13 @@ function Berita() {
                   <h2 className="text-[#1E1E1E] font-bold text-base md:text-lg mb-3 md:mb-6 line-clamp-2">Bakso Malang Enggal Resmi Hadir di Lippo Cikarang bersama Anwar BAB</h2>
                   <div className="text-[#9B9B9B] text-sm md:text-base">
                     Kabar gembira untuk para pecinta kuliner! Bakso...
-                    <a href="#" className="text-[#9C0000] font-bold hover:underline ml-1">Baca Selengkapnya</a>
+                    <a
+                      href={`/berita/${item}`}
+                      className="text-[#9C0000] font-bold hover:underline ml-1"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Baca Selengkapnya
+                    </a>
                   </div>
                 </div>
               </div>

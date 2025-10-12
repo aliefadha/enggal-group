@@ -107,7 +107,7 @@ function Promo() {
               {/* Brand Filter Dropdown */}
               <div className="relative">
                 <div
-                  className="inline-flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 gap-2 cursor-pointer hover:bg-gray-50"
+                  className="inline-flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 gap-2 cursor-pointer hover:bg-gray-50 z-50"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
                   <svg width="16" height="19" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -136,7 +136,7 @@ function Promo() {
 
                 {/* Dropdown Menu */}
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 py-1 border border-gray-200">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 py-1 border border-gray-200">
                     {brands.map((brand) => (
                       <div
                         key={brand.id}
@@ -153,7 +153,7 @@ function Promo() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-20 gap-y-16 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-20 gap-y-16 relative">
             {filteredPromos.length > 0 ? (
               filteredPromos.map((promo) => (
                 <PromoCard
