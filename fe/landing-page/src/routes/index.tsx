@@ -4,6 +4,7 @@ import Brand from "../pages/Brand";
 import Berita from "../pages/Berita";
 import Promo from "../pages/Promo";
 import Career from "../pages/Career";
+import PromoDetail from "../pages/PromoDetail";
 
 export function AppRoutes() {
   return (
@@ -12,6 +13,7 @@ export function AppRoutes() {
       <Route path="/brand" element={<Brand />} />,
       <Route path="/berita" element={<Berita />} />,
       <Route path="/promo" element={<Promo />} />,
+      <Route path="/promo/:id" element={<PromoDetail />} />,
       <Route path="/career" element={<Career />} />,
     </Routes>
   );

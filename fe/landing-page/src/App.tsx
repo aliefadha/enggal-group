@@ -4,7 +4,7 @@ import { AppRoutes } from "./routes";
 
 function App() {
   return (
-    <div className="gap-y-10 flex flex-col">
+    <div className="flex flex-col">
       <Navbar />
       <AppRoutes />
       <Footer />

@@ -39,7 +39,6 @@ function Career() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
       <section className="relative bg-[#F9F9F9] py-16 md:py-24">
         <div className="absolute inset-0 z-0 pointer-events-none bg-[url('/images/dots.png')] bg-center bg-cover bg-no-repeat opacity-20"></div>
         <div className="container mx-auto max-w-6xl relative ">
