@@ -202,14 +202,19 @@ function Promo() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-20 gap-y-16 relative z-10">
             {filteredPromos.length > 0 ? (
               filteredPromos.map((promo) => (
-                <PromoCard
+                <div
                   key={promo.id}
-                  id={promo.id}
-                  title={promo.title}
-                  description={promo.description}
-                  validUntil={promo.validUntil}
-                  image={promo.image}
-                />
+                  className="cursor-pointer"
+                  onClick={() => (window.location.href = "/promo/1")}
+                >
+                  <PromoCard
+                    id={promo.id}
+                    title={promo.title}
+                    description={promo.description}
+                    validUntil={promo.validUntil}
+                    image={promo.image}
+                  />
+                </div>
               ))
             ) : (
               <div className="col-span-3 py-10 text-center">

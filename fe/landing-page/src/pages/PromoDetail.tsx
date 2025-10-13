@@ -163,53 +163,65 @@ function PromoDetail() {
           </div>
           <div className="flex flex-col gap-y-16 my-16">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-20 gap-y-16 relative z-10">
-              <PromoCard
-                id="promo1"
-                title="Promo Spesial"
-                description="Diskon 30% untuk pembelian roti kedua"
-                validUntil="15 November 2026"
-                image="/images/promo.png"
-              />
+              <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
+                <PromoCard
+                  id="promo1"
+                  title="Promo Spesial"
+                  description="Diskon 30% untuk pembelian roti kedua"
+                  validUntil="15 November 2026"
+                  image="/images/promo.png"
+                />
+              </div>
 
-              <PromoCard
-                id="promo2"
-                title="Bakso Malang"
-                description="Beli 2 porsi bakso, gratis 1 es teh"
-                validUntil="20 Desember 2026"
-                image="/images/promo.png"
-              />
+              <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
+                <PromoCard
+                  id="promo2"
+                  title="Bakso Malang"
+                  description="Beli 2 porsi bakso, gratis 1 es teh"
+                  validUntil="20 Desember 2026"
+                  image="/images/promo.png"
+                />
+              </div>
 
-              <PromoCard
-                id="promo3"
-                title="Mie Ayam Spesial"
-                description="Diskon 25% untuk pembelian paket keluarga"
-                validUntil="5 Januari 2027"
-                image="/images/promo.png"
-              />
+              <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
+                <PromoCard
+                  id="promo3"
+                  title="Mie Ayam Spesial"
+                  description="Diskon 25% untuk pembelian paket keluarga"
+                  validUntil="5 Januari 2027"
+                  image="/images/promo.png"
+                />
+              </div>
 
-              <PromoCard
-                id="promo4"
-                title="Sate Ayam"
-                description="Beli 10 tusuk, gratis 5 tusuk"
-                validUntil="10 Februari 2027"
-                image="/images/promo.png"
-              />
+              <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
+                <PromoCard
+                  id="promo4"
+                  title="Sate Ayam"
+                  description="Beli 10 tusuk, gratis 5 tusuk"
+                  validUntil="10 Februari 2027"
+                  image="/images/promo.png"
+                />
+              </div>
 
-              <PromoCard
-                id="promo5"
-                title="Nasi Goreng"
-                description="Diskon 40% untuk pembelian kedua"
-                validUntil="18 Maret 2027"
-                image="/images/promo.png"
-              />
+              <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
+                <PromoCard
+                  id="promo5"
+                  title="Nasi Goreng"
+                  description="Diskon 40% untuk pembelian kedua"
+                  validUntil="18 Maret 2027"
+                  image="/images/promo.png"
+                />
+              </div>
 
-              <PromoCard
-                id="promo6"
-                title="Soto Ayam"
-                description="Gratis kerupuk untuk setiap pembelian"
-                validUntil="22 April 2027"
-                image="/images/promo.png"
-              />
+              <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
+                <PromoCard
+                  id="promo6"
+                  title="Soto Ayam"
+                  description="Gratis kerupuk untuk setiap pembelian"
+                  validUntil="22 April 2027"
+                  image="/images/promo.png"
+                />
+              </div>
             </div>
             <div className="mx-auto">
               <a
@@ -227,4 +239,3 @@ function PromoDetail() {
 }
 
 export default PromoDetail;
-

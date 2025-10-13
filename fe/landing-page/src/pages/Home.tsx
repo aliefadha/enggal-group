@@ -211,8 +211,8 @@ function Home() {
                 </span>
               </h1>
               <div className="flex items-center relative">
-                <h1 className="text-white font-runestars">
-                  <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-5xl">
+                <h1 className="text-[#6E0112] font-runestars">
+                  <span className="text-shadow-[0_0_6px_#fff,1px_0_0_#fff,2px_0_0_#fff,-1px_0_0_#fff,-2px_0_0_#fff,0_1px_0_#fff,0_2px_0_#fff,0_-1px_0_#fff,0_-2px_0_#fff,1px_1px_0_#fff,2px_2px_0_#fff,-1px_-1px_0_#fff,-2px_-2px_0_#fff,1px_-1px_0_#fff,2px_-2px_0_#fff,-1px_1px_0_#fff,-2px_2px_0_#fff] font-extrabold text-5xl">
                     SATU CERITA
                   </span>
                 </h1>
@@ -529,7 +529,6 @@ function Home() {
           </div>
         </div>
 
-        {/* Right side - Text content */}
         <div className="w-full lg:w-7/12 flex flex-col justify-center bg-[#F7F7F7F8] p-4 lg:p-6 rounded-xl">
           <div className="flex items-start justify-start mb-4">
             <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
@@ -592,7 +591,7 @@ function Home() {
         </div>
       </div>
 
-      <div className="py-10 flex justify-between max-w-6xl container px-4 w-full mx-auto">
+      <section id="tentang" className="pt-10 flex justify-between max-w-6xl container px-4 w-full mx-auto">
         <div className="flex flex-col items-start justify-start w-full lg:w-1/4">
           <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
           <h2 className="font-runestars mb-2">
@@ -663,9 +662,141 @@ function Home() {
             </div>
           </div>
         </div>
+      </section>
+
+      <div className="bg-[#FFB835] relative overflow-hidden">
+        <div className="absolute -top-2 -right-1">
+          <img src="/images/map-corner.png" className="w-full h-auto z-0" />
+        </div>
+        <div className="absolute -bottom-6 -left-4">
+          <img src="/images/map-corner.png" className="w-full h-auto z-0 rotate-180" />
+        </div>
+        <div className="absolute -bottom-6 -right-4">
+          <svg width="396" height="252" viewBox="0 0 396 252" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 245C41.5254 218.997 91.7225 172.201 117.379 124.436M117.379 124.436C135.815 90.1147 141.58 55.2927 119.757 27.3245C65.4806 -42.2352 43.8104 85.9707 117.379 124.436ZM117.379 124.436C132.244 132.208 150.998 136.316 174.156 134.389C284.374 125.217 361.437 82.2396 389 64.8768" stroke="#EA9800" stroke-width="14" stroke-linecap="round" />
+          </svg>
+
+        </div>
+        <div className="max-w-6xl container px-4 w-full mx-auto relative z-10">
+          <div className="flex justify-between w-full">
+            <div className="flex flex-col items-start justify-start w-full lg:w-1/3">
+              <div className="bg-[#9C0000] p-4 rounded-xl my-10 relative">
+                <div className="pointer-events-none absolute inset-0  bg-[url('/images/dots.png')] bg-cover bg-center bg-repeat-x opacity-20" />
+                <h2 className="font-runestars text-[#FFB835] mb-2 text-3xl">
+                  Visi
+                </h2>
+                <p className="font-jakarta font-semibold text-white text-sm">
+                  Menjadi F&B group terkemuka di Indonesia yang nyaman untuk semua kalangan.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col w-7/12">
+              <div className="flex items-stretch gap-8">
+                <div className="flex flex-col items-center justify-start">
+                  <div className="h-24 w-0.5 bg-white"></div>
+                  <div className="w-3 h-3 bg-[#9C0000]"></div>
+                </div>
+                <div className="flex flex-col gap-y-6 w-full mt-20">
+                  <h1 className="font-bold font-jakarta text-xl text-[#9C0000]">2025</h1>
+                  <h1 className="font-runestars">
+                    <span className="text-shadow-[0_0_6px_#fff,1px_0_0_#fff,2px_0_0_#fff,-1px_0_0_#fff,-2px_0_0_#fff,0_1px_0_#fff,0_2px_0_#fff,0_-1px_0_#fff,0_-2px_0_#fff,1px_1px_0_#fff,2px_2px_0_#fff,-1px_-1px_0_#fff,-2px_-2px_0_#fff,1px_-1px_0_#fff,2px_-2px_0_#fff,-1px_1px_0_#fff,-2px_2px_0_#fff] font-extrabold text-4xl">
+                      MELANGKAH LEBIH JAUH
+                    </span>
+                  </h1>
+                </div>
+                <div>
+                  <p className="font-jakarta font-medium text-[#3F2900] mt-24 text-xs">Grup restoran yang kasih pengalaman kuliner terbaik untuk kamu yang datang.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex py-20">
+            <div>
+              <img src="/images/map.png" className="w-5/6 h-auto" />
+            </div>
+            <div>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                {/* 2 Tahun */}
+                <div className="bg-white rounded-lg p-6 flex items-start gap-x-6">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-800 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <span className="text-4xl text-[#1E1E1E] font-runestars">2</span>
+                    <p className="font-jakarta text-[#585858]">Tahun</p>
+                  </div>
+                </div>
+
+                {/* 8 Brand */}
+                <div className="bg-white rounded-lg p-6 flex items-start gap-x-6">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-800 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <span className="text-4xl text-[#1E1E1E] font-runestars">8</span>
+                    <p className="font-jakarta text-[#585858]">Brand</p>
+                  </div>
+                </div>
+
+                {/* 12 Kota */}
+                <div className="bg-white rounded-lg p-6 flex items-start gap-x-6">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-800 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-6a1 1 0 00-1-1H9a1 1 0 00-1 1v6a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <span className="text-4xl text-[#1E1E1E] font-runestars">12</span>
+                    <p className="font-jakarta text-[#585858]">Kota</p>
+                  </div>
+                </div>
+
+                {/* 24 Outlet */}
+                <div className="bg-white rounded-lg p-6 flex items-start gap-x-6">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-800 rounded-full flex items-center justify-center">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <span className="text-4xl text-[#1E1E1E] font-runestars">24</span>
+                    <p className="font-jakarta text-[#585858]">Outlet</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 10.000.000+ Makanan Tersajikan */}
+              <div className="bg-white rounded-lg p-6 flex items-start gap-x-6">
+                <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-800 rounded-full flex items-center justify-center">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-4">
+                  <span className="text-4xl text-[#1E1E1E] font-runestars">10.000.000+</span>
+                  <p className="font-jakarta text-[#585858]">Makanan Tersajikan</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="py-10 flex flex-col gap-y-10 max-w-6xl container px-4 w-full mx-auto">
+      <section id="brand" className="py-10 flex flex-col gap-y-10 max-w-6xl container px-4 w-full mx-auto">
         <div className="flex justify-between w-full items-center">
           <div className="flex flex-col gap-y-4 items-start justify-start w-full lg:w-1/3">
             <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
@@ -786,7 +917,7 @@ function Home() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <div className="py-8 md:py-10 flex flex-col gap-y-8 md:gap-y-10 max-w-6xl container px-4 w-full mx-auto">
         <div className="flex flex-col lg:flex-row justify-between w-full items-start lg:items-center gap-6 lg:gap-4">
@@ -855,11 +986,10 @@ function Home() {
                   {brands.map((brand) => (
                     <div
                       key={brand.id}
-                      className={`px-4 py-2 text-xs md:text-sm cursor-pointer hover:bg-gray-100 ${
-                        selectedBrand === brand.id
-                          ? "bg-gray-50 font-medium text-[#9C0000]"
-                          : ""
-                      }`}
+                      className={`px-4 py-2 text-xs md:text-sm cursor-pointer hover:bg-gray-100 ${selectedBrand === brand.id
+                        ? "bg-gray-50 font-medium text-[#9C0000]"
+                        : ""
+                        }`}
                       onClick={() => handleBrandSelect(brand.id)}
                     >
                       {brand.name}
@@ -918,11 +1048,10 @@ function Home() {
                   {cities.map((city) => (
                     <div
                       key={city.id}
-                      className={`px-4 py-2 text-xs md:text-sm cursor-pointer hover:bg-gray-100 ${
-                        selectedCity === city.id
-                          ? "bg-gray-50 font-medium text-[#9C0000]"
-                          : ""
-                      }`}
+                      className={`px-4 py-2 text-xs md:text-sm cursor-pointer hover:bg-gray-100 ${selectedCity === city.id
+                        ? "bg-gray-50 font-medium text-[#9C0000]"
+                        : ""
+                        }`}
                       onClick={() => handleCitySelect(city.id)}
                     >
                       {city.name}
@@ -1101,7 +1230,7 @@ function Home() {
           </div>
         </div>
       </div>
-    </section>
+    </section >
   );
 }
 
