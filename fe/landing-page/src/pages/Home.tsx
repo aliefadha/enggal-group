@@ -1,9 +1,8 @@
-import { useState } from 'react';
-import vectorLine from '../assets/images/vector_line.svg';
-import TeamCard from '../components/TeamCard';
+import { useState } from "react";
+import vectorLine from "../assets/images/vector_line.svg";
+import TeamCard from "../components/TeamCard";
 
 function Home() {
-
   const [selectedBrand, setSelectedBrand] = useState<string>("all");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [selectedCity, setSelectedCity] = useState<string>("all");
@@ -41,19 +40,21 @@ function Home() {
       id: 1,
       city: "BANDUNG",
       name: "Bakso Malang Enggal",
-      address: "Jl. Gatot Subroto, Lkr. Sel., Kec. Lengkong, Kota Bandung, Jawa Barat 40263",
+      address:
+        "Jl. Gatot Subroto, Lkr. Sel., Kec. Lengkong, Kota Bandung, Jawa Barat 40263",
       hours: "10:00 - 20:00",
       image: "/images/outlet.png",
-      cityId: "bandung"
+      cityId: "bandung",
     },
     {
       id: 2,
       city: "JAKARTA",
       name: "Enggal Bakery",
-      address: "Jl. Sudirman No. 123, Kec. Tanah Abang, Jakarta Pusat, DKI Jakarta 10220",
+      address:
+        "Jl. Sudirman No. 123, Kec. Tanah Abang, Jakarta Pusat, DKI Jakarta 10220",
       hours: "08:00 - 22:00",
       image: "/images/outlet.png",
-      cityId: "jakarta"
+      cityId: "jakarta",
     },
     {
       id: 3,
@@ -62,17 +63,18 @@ function Home() {
       address: "Jl. Pemuda No. 45, Kec. Genteng, Surabaya, Jawa Timur 60271",
       hours: "09:00 - 21:00",
       image: "/images/outlet.png",
-      cityId: "surabaya"
+      cityId: "surabaya",
     },
     {
       id: 4,
       city: "MEDAN",
       name: "Enggal Resto",
-      address: "Jl. Imam Bonjol No. 67, Kec. Medan Petisah, Medan, Sumatera Utara 20154",
+      address:
+        "Jl. Imam Bonjol No. 67, Kec. Medan Petisah, Medan, Sumatera Utara 20154",
       hours: "11:00 - 23:00",
       image: "/images/outlet.png",
-      cityId: "medan"
-    }
+      cityId: "medan",
+    },
   ];
 
   // Team members data
@@ -83,7 +85,7 @@ function Home() {
       position: "CEO",
       image: "/images/ceo.png",
       linkedinUrl: "https://linkedin.com/in/muhammad-firdan",
-      instagramUrl: "https://instagram.com/muhammad.firdan"
+      instagramUrl: "https://instagram.com/muhammad.firdan",
     },
     {
       id: 2,
@@ -91,7 +93,7 @@ function Home() {
       position: "COO",
       image: "/images/ceo.png",
       linkedinUrl: "https://linkedin.com/in/sarah-wijaya",
-      instagramUrl: "https://instagram.com/sarah.wijaya"
+      instagramUrl: "https://instagram.com/sarah.wijaya",
     },
     {
       id: 3,
@@ -99,7 +101,7 @@ function Home() {
       position: "Head of Marketing",
       image: "/images/ceo.png",
       linkedinUrl: "https://linkedin.com/in/ahmad-rahman",
-      instagramUrl: "https://instagram.com/ahmad.rahman"
+      instagramUrl: "https://instagram.com/ahmad.rahman",
     },
     {
       id: 4,
@@ -107,7 +109,7 @@ function Home() {
       position: "Head of Marketing",
       image: "/images/ceo.png",
       linkedinUrl: "https://linkedin.com/in/ahmad-rahman",
-      instagramUrl: "https://instagram.com/ahmad.rahman"
+      instagramUrl: "https://instagram.com/ahmad.rahman",
     },
     {
       id: 5,
@@ -115,8 +117,8 @@ function Home() {
       position: "Head of Marketing",
       image: "/images/ceo.png",
       linkedinUrl: "https://linkedin.com/in/ahmad-rahman",
-      instagramUrl: "https://instagram.com/ahmad.rahman"
-    }
+      instagramUrl: "https://instagram.com/ahmad.rahman",
+    },
   ];
 
   const handleBrandSelect = (brandId: string) => {
@@ -130,7 +132,7 @@ function Home() {
   };
 
   return (
-    <section className=''>
+    <section className="">
       <div className="flex gap-2 py-10 max-w-6xl container px-4 w-full mx-auto">
         <div className="relative bg-[#A71D28] h-[650px] w-full lg:w-1/2  flex items-start justify-center rounded-md overflow-hidden">
           <div className="absolute inset-0 z-0 pointer-events-none bg-[url('/images/dots.png')] bg-center bg-cover bg-no-repeat opacity-20"></div>
@@ -406,30 +408,56 @@ function Home() {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 py-8 lg:py-16 max-w-6xl container px-4 w-full mx-auto">
-        <div className="w-full lg:w-1/2 relative">
-          <div className="bg-[#FFB835] rounded-md relative h-full min-h-[350px] sm:min-h-[400px] lg:min-h-[450px] xl:min-h-[500px] overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 py-8 lg:py-16 max-w-6xl container px-8 w-full mx-auto">
+        <div className="w-full lg:w-4/12 relative">
+          <div className="bg-[#FFB835] rounded-md relative h-full ">
             <div className="absolute inset-0 z-10 pointer-events-none bg-[url('/images/dots_spaced.png')] bg-left bg-contain bg-no-repeat opacity-30"></div>
-            <div className='absolute inset-0 w-full h-full'>
-              <svg className="w-full h-auto max-w-[350px] sm:max-w-[396px]" viewBox="0 0 396 252" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7 245C41.5254 218.997 91.7225 172.201 117.379 124.436M117.379 124.436C135.815 90.1147 141.58 55.2927 119.757 27.3245C65.4806 -42.2352 43.8104 85.9707 117.379 124.436ZM117.379 124.436C132.244 132.208 150.998 136.316 174.156 134.389C284.374 125.217 361.437 82.2396 389 64.8768" stroke="#EA9800" strokeWidth="14" strokeLinecap="round" />
+            <div className="absolute inset-0 w-full h-full">
+              <svg
+                className="w-full h-auto max-w-[350px] sm:max-w-[396px]"
+                viewBox="0 0 396 252"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7 245C41.5254 218.997 91.7225 172.201 117.379 124.436M117.379 124.436C135.815 90.1147 141.58 55.2927 119.757 27.3245C65.4806 -42.2352 43.8104 85.9707 117.379 124.436ZM117.379 124.436C132.244 132.208 150.998 136.316 174.156 134.389C284.374 125.217 361.437 82.2396 389 64.8768"
+                  stroke="#EA9800"
+                  strokeWidth="14"
+                  strokeLinecap="round"
+                />
               </svg>
             </div>
-            <div className='absolute right-4 sm:right-8 top-1/4'>
-              <svg className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21.2297 0.649999C22.6759 -0.917554 25.2435 0.56486 24.6091 2.6011L21.5918 12.2855C21.362 13.0228 21.5774 13.8266 22.1451 14.3503L29.6003 21.2286C31.1679 22.6748 29.6855 25.2424 27.6492 24.608L17.9649 21.5907C17.2275 21.3609 16.4237 21.5763 15.9 22.1439L9.02174 29.5992C7.57552 31.1668 5.00789 29.6843 5.64232 27.6481L8.65965 17.9637C8.8894 17.2264 8.67403 16.4226 8.10637 15.8989L0.651107 9.02063C-0.916446 7.57441 0.565968 5.00678 2.60221 5.64121L12.2866 8.65854C13.024 8.88829 13.8277 8.67292 14.3515 8.10526L21.2297 0.649999Z" fill="white" />
+            <div className="absolute right-4 sm:right-8 top-1/4">
+              <svg
+                className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8"
+                viewBox="0 0 31 31"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M21.2297 0.649999C22.6759 -0.917554 25.2435 0.56486 24.6091 2.6011L21.5918 12.2855C21.362 13.0228 21.5774 13.8266 22.1451 14.3503L29.6003 21.2286C31.1679 22.6748 29.6855 25.2424 27.6492 24.608L17.9649 21.5907C17.2275 21.3609 16.4237 21.5763 15.9 22.1439L9.02174 29.5992C7.57552 31.1668 5.00789 29.6843 5.64232 27.6481L8.65965 17.9637C8.8894 17.2264 8.67403 16.4226 8.10637 15.8989L0.651107 9.02063C-0.916446 7.57441 0.565968 5.00678 2.60221 5.64121L12.2866 8.65854C13.024 8.88829 13.8277 8.67292 14.3515 8.10526L21.2297 0.649999Z"
+                  fill="white"
+                />
               </svg>
             </div>
-            <div className='absolute left-4 sm:left-8 top-1/4'>
-              <svg className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21.2277 0.649999C22.6739 -0.917554 25.2416 0.56486 24.6072 2.6011L21.5898 12.2855C21.3601 13.0228 21.5754 13.8266 22.1431 14.3503L29.5984 21.2286C31.1659 22.6748 29.6835 25.2424 27.6473 24.608L17.9629 21.5907C17.2255 21.3609 16.4217 21.5763 15.898 22.1439L9.01979 29.5992C7.57356 31.1668 5.00594 29.6843 5.64036 27.6481L8.6577 17.9637C8.88744 17.2264 8.67207 16.4226 8.10441 15.8989L0.649154 9.02063C-0.918399 7.57441 0.564015 5.00678 2.60026 5.64121L12.2846 8.65854C13.022 8.88829 13.8258 8.67292 14.3495 8.10526L21.2277 0.649999Z" fill="white" />
+            <div className="absolute left-4 sm:left-8 top-1/4">
+              <svg
+                className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8"
+                viewBox="0 0 31 31"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M21.2277 0.649999C22.6739 -0.917554 25.2416 0.56486 24.6072 2.6011L21.5898 12.2855C21.3601 13.0228 21.5754 13.8266 22.1431 14.3503L29.5984 21.2286C31.1659 22.6748 29.6835 25.2424 27.6473 24.608L17.9629 21.5907C17.2255 21.3609 16.4217 21.5763 15.898 22.1439L9.01979 29.5992C7.57356 31.1668 5.00594 29.6843 5.64036 27.6481L8.6577 17.9637C8.88744 17.2264 8.67207 16.4226 8.10441 15.8989L0.649154 9.02063C-0.918399 7.57441 0.564015 5.00678 2.60026 5.64121L12.2846 8.65854C13.022 8.88829 13.8258 8.67292 14.3495 8.10526L21.2277 0.649999Z"
+                  fill="white"
+                />
               </svg>
             </div>
-            <div className="flex items-end justify-center h-full px-4 sm:px-8">
+            <div className="flex items-end justify-center h-full">
               <img
                 src="/images/ceo.png"
                 alt="Enggal Group CEO"
-                className="relative z-10 w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[380px] xl:max-w-[420px] h-auto object-contain"
+                className="relative z-10 h-5/6 w-auto object-cover"
               />
             </div>
 
@@ -447,7 +475,12 @@ function Home() {
                   fill="#FFB835"
                 />
               </svg>
-              <span className='font-bold mr-1 sm:mr-2 text-lg sm:text-xl lg:text-2xl'>25 <sup className='font-normal text-xs sm:text-sm lg:text-base'>Outlet</sup></span>
+              <span className="font-bold mr-1 sm:mr-2 text-lg sm:text-xl lg:text-2xl">
+                25{" "}
+                <sup className="font-normal text-xs sm:text-sm lg:text-base">
+                  Outlet
+                </sup>
+              </span>
             </div>
 
             <div className="absolute bottom-1/3 sm:bottom-1/4 -right-3 sm:-right-6 z-20 bg-[#A71D28] text-white px-3 sm:px-6 py-2 sm:py-4 rounded-md flex items-center shadow-lg">
@@ -464,7 +497,12 @@ function Home() {
                   fill="#FFB835"
                 />
               </svg>
-              <span className='font-bold mr-1 sm:mr-2 text-lg sm:text-xl lg:text-2xl'>8 <sup className='font-normal text-xs sm:text-sm lg:text-base'>Brand</sup></span>
+              <span className="font-bold mr-1 sm:mr-2 text-lg sm:text-xl lg:text-2xl">
+                8{" "}
+                <sup className="font-normal text-xs sm:text-sm lg:text-base">
+                  Brand
+                </sup>
+              </span>
             </div>
 
             <div className="absolute bottom-4 sm:bottom-6 -left-3 sm:-left-6 z-20 bg-[#A71D28] text-white px-3 sm:px-6 py-2 sm:py-4 rounded-md flex items-center shadow-lg">
@@ -481,43 +519,71 @@ function Home() {
                   fill="#FFB835"
                 />
               </svg>
-              <span className='font-bold mr-1 sm:mr-2 text-lg sm:text-xl lg:text-2xl'>12 <sup className='font-normal text-xs sm:text-sm lg:text-base'>Kota Besar</sup></span>
+              <span className="font-bold mr-1 sm:mr-2 text-lg sm:text-xl lg:text-2xl">
+                12{" "}
+                <sup className="font-normal text-xs sm:text-sm lg:text-base">
+                  Kota Besar
+                </sup>
+              </span>
             </div>
           </div>
         </div>
 
         {/* Right side - Text content */}
-        <div className="w-full lg:w-1/2 flex flex-col justify-center bg-[#F7F7F7F8] p-4 lg:p-6 rounded-xl">
+        <div className="w-full lg:w-7/12 flex flex-col justify-center bg-[#F7F7F7F8] p-4 lg:p-6 rounded-xl">
           <div className="flex items-start justify-start mb-4">
             <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
           </div>
-          <h2 className="font-runestars mb-4 lg:mb-6">
+          <h2 className="font-runestars mb-4">
             <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-2xl md:text-3xl lg:text-4xl text-white">
               Menyatukan Orang Lewat Meja Makan
             </span>
           </h2>
 
           <p className="text-[#4D3200] font-jakarta mb-6 lg:mb-8 italic text-sm lg:text-base">
-            Kami percaya bahwa makanan tidak hanya soal rasa, tetapi juga pengalaman. Enggal
-            Group hadir untuk menyatukan orang-orang lewat kuliner dari meja makan. Dengan
-            berbagai inovasi dan pelayanan prima, kami berkomitmen untuk terus berkembang
-            dan menjadi bagian dari cerita kuliner Indonesia.
+            Kami percaya bahwa makanan tidak hanya soal rasa, tetapi juga
+            pengalaman. Enggal Group hadir untuk menyatukan orang-orang lewat
+            kuliner dari meja makan. Dengan berbagai inovasi dan pelayanan
+            prima, kami berkomitmen untuk terus berkembang dan menjadi bagian
+            dari cerita kuliner Indonesia.
           </p>
 
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full sm:w-2/3 py-2 px-4 bg-white rounded-lg gap-4 sm:gap-0">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full sm:w-3/4 py-2 px-4 bg-white rounded-lg gap-4 sm:gap-0">
             <div className="flex flex-col items-start">
-              <h3 className="text-[#303030] font-jakarta text-xl font-semibold">Muhammad Firdan</h3>
+              <h3 className="text-[#303030] font-jakarta text-sm lg:text-lg font-semibold">
+                Muhammad Firdan
+              </h3>
               <p className="text-[#666666] font-jakarta">Enggal Group CEO</p>
             </div>
 
             <div className="flex gap-x-3 items-center">
-              <a href="https://linkedin.com" className="bg-[#FFB835] hover:bg-[#A71D28] hover:text-white text-[#A71D28] p-2 rounded-md transition-colors flex items-center justify-center w-10 h-10">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
+              <a
+                href="https://linkedin.com"
+                className="bg-[#FFB835] hover:bg-[#A71D28] hover:text-white text-[#A71D28] p-2 rounded-md transition-colors flex items-center justify-center w-10 h-10"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5"
+                >
                   <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
                 </svg>
               </a>
-              <a href="https://instagram.com" className="bg-[#FFB835] hover:bg-[#A71D28] hover:text-white text-[#A71D28] p-2 rounded-md transition-colors flex items-center justify-center w-10 h-10">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
+              <a
+                href="https://instagram.com"
+                className="bg-[#FFB835] hover:bg-[#A71D28] hover:text-white text-[#A71D28] p-2 rounded-md transition-colors flex items-center justify-center w-10 h-10"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5"
+                >
                   <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z" />
                 </svg>
               </a>
@@ -526,8 +592,81 @@ function Home() {
         </div>
       </div>
 
+      <div className="py-10 flex justify-between max-w-6xl container px-4 w-full mx-auto">
+        <div className="flex flex-col items-start justify-start w-full lg:w-1/4">
+          <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
+          <h2 className="font-runestars mb-2">
+            <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl md:text-4xl text-white whitespace-nowrap">
+              Cerita Kami
+            </span>
+          </h2>
+          <p className="font-jakarta font-medium ">
+            Dari Bakso Prasmanan Pertama di Indonesia hingga Multi-brand Kuliner
+            untuk Semua Kalangan
+          </p>
+        </div>
+        <div className="flex flex-col w-7/12">
+          <div className="flex items-stretch gap-8">
+            <div className="flex flex-col items-center justify-center h-full">
+              <div className="w-3 h-3 bg-[#9C0000]"></div>
+              <div className="h-full w-0.5 bg-[#FFB835]"></div>
+            </div>
+            <div className="flex flex-col gap-y-10 w-full pb-16 mb-16 border-b-2 border-dashed border-[#CDCDCD]">
+              <p className="text-[#9C0000] font-jakarta font-bold text-xl">
+                2008
+              </p>
+              <div className="flex justify-between">
+                <h1 className="font-runestars text-2xl">LAHIRNYA PERJALANAN</h1>
+                <p className="font-jakarta text-sm max-w-[250px]">
+                  Awal mula Enggal Group dimulai dari Bakso Malang Enggal tahun
+                  di Palembang.
+                </p>
+              </div>
+              <div className="flex justify-between gap-4">
+                <img
+                  src="/images/2008.jpg"
+                  className="w-[250px] rounded-md object-cover"
+                />
+                <img
+                  src="/images/2008.jpg"
+                  className="w-[250px] rounded-md object-cover"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex items-stretch gap-8">
+            <div className="flex flex-col items-center justify-center h-full">
+              <div className="w-3 h-3 bg-[#9C0000]"></div>
+              <div className="h-full w-0.5 bg-[#FFB835]"></div>
+            </div>
+            <div className="flex flex-col gap-y-10 w-full pb-16 mb-16 border-b-2 border-dashed border-[#CDCDCD]">
+              <p className="text-[#9C0000] font-jakarta font-bold text-xl">
+                2008
+              </p>
+              <div className="flex justify-between">
+                <h1 className="font-runestars text-2xl">LAHIRNYA PERJALANAN</h1>
+                <p className="font-jakarta text-sm max-w-[250px]">
+                  Awal mula Enggal Group dimulai dari Bakso Malang Enggal tahun
+                  di Palembang.
+                </p>
+              </div>
+              <div className="flex justify-between gap-4">
+                <img
+                  src="/images/2008.jpg"
+                  className="w-[250px] rounded-md object-cover"
+                />
+                <img
+                  src="/images/2008.jpg"
+                  className="w-[250px] rounded-md object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="py-10 flex flex-col gap-y-10 max-w-6xl container px-4 w-full mx-auto">
-        <div className='flex justify-between w-full items-center'>
+        <div className="flex justify-between w-full items-center">
           <div className="flex flex-col gap-y-4 items-start justify-start w-full lg:w-1/3">
             <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
             <h2 className="font-runestars">
@@ -536,14 +675,27 @@ function Home() {
               </span>
             </h2>
             <p className="font-jakarta font-medium ">
-              Dari Bakso Prasmanan Pertama di Indonesia hingga Multi-brand Kuliner untuk Semua Kalangan
+              Dari Bakso Prasmanan Pertama di Indonesia hingga Multi-brand
+              Kuliner untuk Semua Kalangan
             </p>
           </div>
-          <svg className='hidden lg:block' width="277" height="51" viewBox="0 0 277 51" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 45.3986C44.8398 22.3284 122.032 -15.2383 112.081 19.0567C99.6433 61.9255 194.208 -19.9674 179.902 18.5727C165.597 57.1129 280.454 -15.7692 270.515 13.105" stroke="#FFB835" stroke-width="10" stroke-linecap="round" />
+          <svg
+            className="hidden lg:block"
+            width="277"
+            height="51"
+            viewBox="0 0 277 51"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 45.3986C44.8398 22.3284 122.032 -15.2383 112.081 19.0567C99.6433 61.9255 194.208 -19.9674 179.902 18.5727C165.597 57.1129 280.454 -15.7692 270.515 13.105"
+              stroke="#FFB835"
+              stroke-width="10"
+              stroke-linecap="round"
+            />
           </svg>
         </div>
-        <div className='lg:flex justify-center gap-x-8 hidden'>
+        <div className="lg:flex justify-center gap-x-8 hidden">
           <div className="bg-white border border-[#D9D9D9] rounded-md w-1/2 flex-1">
             <div className="grid grid-cols-3 h-full">
               <div className="border border-gray-100 flex items-center justify-center aspect-square bg-white">
@@ -611,18 +763,23 @@ function Home() {
               </div>
             </div>
           </div>
-          <div className='w-1/2 flex-1 flex flex-col'>
-            <img src="/images/brand_image.jpg" className="w-full object-cover rounded-t-xl flex-1" />
+          <div className="w-1/2 flex-1 flex flex-col">
+            <img
+              src="/images/brand_image.jpg"
+              className="w-full object-cover rounded-t-xl flex-1"
+            />
             <div className="p-4 bg-[#FFB835] flex items-center rounded-b-xl">
               <img
                 src="/images/bakso_malang.png"
                 className="max-w-24 aspect-square object-contain"
                 alt="Bakso Malang Enggal"
               />
-              <div className='mx-2 w-1 bg-[#EA9800] h-12'></div>
+              <div className="mx-2 w-1 bg-[#EA9800] h-12"></div>
               <div>
-                <h1 className='font-jakarta font-bold text-xl text-[#A71D28]'>Bakso Malang</h1>
-                <p className='font-jakarta text-[#845600]'>
+                <h1 className="font-jakarta font-bold text-xl text-[#A71D28]">
+                  Bakso Malang
+                </h1>
+                <p className="font-jakarta text-[#845600]">
                   Bakso Prasmanan Pertama di Indonesia
                 </p>
               </div>
@@ -632,9 +789,13 @@ function Home() {
       </div>
 
       <div className="py-8 md:py-10 flex flex-col gap-y-8 md:gap-y-10 max-w-6xl container px-4 w-full mx-auto">
-        <div className='flex flex-col lg:flex-row justify-between w-full items-start lg:items-center gap-6 lg:gap-4'>
+        <div className="flex flex-col lg:flex-row justify-between w-full items-start lg:items-center gap-6 lg:gap-4">
           <div className="flex flex-col gap-3 md:gap-4 items-start justify-start w-full lg:w-1/3">
-            <img src={vectorLine} alt="Decorative line" className="w-12 h-4 md:w-16 md:h-5" />
+            <img
+              src={vectorLine}
+              alt="Decorative line"
+              className="w-12 h-4 md:w-16 md:h-5"
+            />
             <h2 className="font-runestars">
               <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-2xl sm:text-3xl md:text-4xl text-white">
                 Our Outlet
@@ -694,10 +855,11 @@ function Home() {
                   {brands.map((brand) => (
                     <div
                       key={brand.id}
-                      className={`px-4 py-2 text-xs md:text-sm cursor-pointer hover:bg-gray-100 ${selectedBrand === brand.id
-                        ? "bg-gray-50 font-medium text-[#9C0000]"
-                        : ""
-                        }`}
+                      className={`px-4 py-2 text-xs md:text-sm cursor-pointer hover:bg-gray-100 ${
+                        selectedBrand === brand.id
+                          ? "bg-gray-50 font-medium text-[#9C0000]"
+                          : ""
+                      }`}
                       onClick={() => handleBrandSelect(brand.id)}
                     >
                       {brand.name}
@@ -756,10 +918,11 @@ function Home() {
                   {cities.map((city) => (
                     <div
                       key={city.id}
-                      className={`px-4 py-2 text-xs md:text-sm cursor-pointer hover:bg-gray-100 ${selectedCity === city.id
-                        ? "bg-gray-50 font-medium text-[#9C0000]"
-                        : ""
-                        }`}
+                      className={`px-4 py-2 text-xs md:text-sm cursor-pointer hover:bg-gray-100 ${
+                        selectedCity === city.id
+                          ? "bg-gray-50 font-medium text-[#9C0000]"
+                          : ""
+                      }`}
                       onClick={() => handleCitySelect(city.id)}
                     >
                       {city.name}
@@ -774,9 +937,15 @@ function Home() {
         {/* Outlet Cards Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {outlets
-            .filter(outlet => selectedCity === "all" || outlet.cityId === selectedCity)
+            .filter(
+              (outlet) =>
+                selectedCity === "all" || outlet.cityId === selectedCity,
+            )
             .map((outlet) => (
-              <div key={outlet.id} className="bg-[#F7F7F7F8] rounded-lg overflow-hidden shadow-sm">
+              <div
+                key={outlet.id}
+                className="bg-[#F7F7F7F8] rounded-lg overflow-hidden"
+              >
                 <div className="flex flex-col sm:flex-row">
                   {/* Image Section */}
                   <div className="w-full sm:w-1/3 h-48 sm:h-auto px-3 py-4 sm:px-4 sm:py-6">
@@ -845,8 +1014,21 @@ function Home() {
                       </button>
                       <button className="text-[#9C0000] hover:underline px-3 py-2 sm:px-4 sm:py-2 rounded-md font-jakarta font-medium transition-colors flex items-center justify-center sm:justify-start gap-1 text-xs sm:text-sm w-full sm:w-auto">
                         Lihat di Maps
-                        <svg className='ml-1 sm:ml-2' width="16" height="12" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M1 7.02637L17 7.02637M17 7.02637L11 13.0264M17 7.02637L11 1.02637" stroke="#9C0000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <svg
+                          className="ml-1 sm:ml-2"
+                          width="16"
+                          height="12"
+                          viewBox="0 0 18 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M1 7.02637L17 7.02637M17 7.02637L11 13.0264M17 7.02637L11 1.02637"
+                            stroke="#9C0000"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -857,18 +1039,37 @@ function Home() {
         </div>
       </div>
 
-      <div className='bg-[#F7F7F7] py-20 w-full relative'>
-        <div className='absolute right-0 top-0'>
-          <svg width="205" height="298" viewBox="0 0 205 298" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M367.758 221.883C326.907 207.765 260.055 192.258 206.104 197.649M206.104 197.649C167.338 201.523 135.232 216.187 124.219 249.909C96.827 333.779 215.28 280.158 206.104 197.649ZM206.104 197.649C204.25 180.977 197.185 163.126 182.653 144.992C113.493 58.6849 34.8059 18.7585 5.01042 5.59044" stroke="#E0E0E0" stroke-width="10" stroke-linecap="round" />
+      <div className="bg-[#F7F7F7] py-20 w-full relative">
+        <div className="absolute right-0 top-0">
+          <svg
+            width="205"
+            height="298"
+            viewBox="0 0 205 298"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M367.758 221.883C326.907 207.765 260.055 192.258 206.104 197.649M206.104 197.649C167.338 201.523 135.232 216.187 124.219 249.909C96.827 333.779 215.28 280.158 206.104 197.649ZM206.104 197.649C204.25 180.977 197.185 163.126 182.653 144.992C113.493 58.6849 34.8059 18.7585 5.01042 5.59044"
+              stroke="#E0E0E0"
+              stroke-width="10"
+              stroke-linecap="round"
+            />
           </svg>
         </div>
 
-        <div className='absolute right-1/12 top-1/12'>
-          <svg width="51" height="51" viewBox="0 0 51 51" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M1.03047 9.06456C-1.94401 4.63935 3.14854 -0.746291 7.7331 1.97616L22.2053 10.5702C23.8655 11.5561 25.945 11.4979 27.5476 10.4207L41.5167 1.03114C45.9419 -1.94333 51.3276 3.14921 48.6051 7.73377L40.0111 22.206C39.0252 23.8662 39.0834 25.9457 40.1606 27.5482L49.5502 41.5174C52.5246 45.9426 47.4321 51.3283 42.8475 48.6058L28.3753 40.0118C26.7151 39.0259 24.6356 39.0841 23.0331 40.1612L9.06388 49.5508C4.63868 52.5253 -0.746966 47.4328 1.97548 42.8482L10.5695 28.376C11.5554 26.7157 11.4972 24.6363 10.4201 23.0337L1.03047 9.06456Z" fill="#E0E0E0" />
+        <div className="absolute right-1/12 top-1/12">
+          <svg
+            width="51"
+            height="51"
+            viewBox="0 0 51 51"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1.03047 9.06456C-1.94401 4.63935 3.14854 -0.746291 7.7331 1.97616L22.2053 10.5702C23.8655 11.5561 25.945 11.4979 27.5476 10.4207L41.5167 1.03114C45.9419 -1.94333 51.3276 3.14921 48.6051 7.73377L40.0111 22.206C39.0252 23.8662 39.0834 25.9457 40.1606 27.5482L49.5502 41.5174C52.5246 45.9426 47.4321 51.3283 42.8475 48.6058L28.3753 40.0118C26.7151 39.0259 24.6356 39.0841 23.0331 40.1612L9.06388 49.5508C4.63868 52.5253 -0.746966 47.4328 1.97548 42.8482L10.5695 28.376C11.5554 26.7157 11.4972 24.6363 10.4201 23.0337L1.03047 9.06456Z"
+              fill="#E0E0E0"
+            />
           </svg>
-
         </div>
 
         <div className="flex flex-col gap-y-4 items-center justify-center w-full mx-auto max-w-md text-center mb-16">
