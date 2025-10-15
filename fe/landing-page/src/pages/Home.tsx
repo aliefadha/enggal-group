@@ -136,7 +136,7 @@ function Home() {
       <div className="flex gap-2 py-10 max-w-6xl container px-4 w-full mx-auto">
         <div className="relative bg-[#A71D28] h-[650px] w-full lg:w-1/2  flex items-start justify-center rounded-md overflow-hidden">
           <div className="absolute inset-0 z-0 pointer-events-none bg-[url('/images/dots.png')] bg-center bg-cover bg-no-repeat opacity-20"></div>
-          <div className="absolute top-0 left-0 z-10">
+          <div className="absolute top-0 left-0 z-10 hidden md:block">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="269"
@@ -408,7 +408,7 @@ function Home() {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 py-8 lg:py-16 max-w-6xl container px-8 w-full mx-auto">
+      <div className="flex flex-col md:flex-row gap-10 md:gap-16 py-8 md:py-16 max-w-6xl container px-4 md:px-8 w-full mx-auto">
         <div className="w-full lg:w-4/12 relative">
           <div className="bg-[#FFB835] rounded-md relative h-full ">
             <div className="absolute inset-0 z-10 pointer-events-none bg-[url('/images/dots_spaced.png')] bg-left bg-contain bg-no-repeat opacity-30"></div>
@@ -592,7 +592,7 @@ function Home() {
       </div>
 
       <section id="tentang" className="pt-10 flex justify-between max-w-6xl container px-4 w-full mx-auto">
-        <div className="flex flex-col items-start justify-start w-full lg:w-1/4">
+        <div className="hidden md:flex flex-col items-start justify-start w-full md:w-1/4">
           <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
           <h2 className="font-runestars mb-2">
             <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl md:text-4xl text-white whitespace-nowrap">
@@ -604,19 +604,19 @@ function Home() {
             untuk Semua Kalangan
           </p>
         </div>
-        <div className="flex flex-col w-7/12">
+        <div className="flex flex-col w-full lg:w-7/12">
           <div className="flex items-stretch gap-8">
             <div className="flex flex-col items-center justify-center h-full">
               <div className="w-3 h-3 bg-[#9C0000]"></div>
               <div className="h-full w-0.5 bg-[#FFB835]"></div>
             </div>
-            <div className="flex flex-col gap-y-10 w-full pb-16 mb-16 border-b-2 border-dashed border-[#CDCDCD]">
+            <div className="flex flex-col gap-y-4 xl:gap-y-10 w-full pb-10 mb-10 md:pb-16 md:mb-16 border-b-2 border-dashed border-[#CDCDCD]">
               <p className="text-[#9C0000] font-jakarta font-bold text-xl">
                 2008
               </p>
-              <div className="flex justify-between">
+              <div className="block lg:flex justify-between">
                 <h1 className="font-runestars text-2xl">LAHIRNYA PERJALANAN</h1>
-                <p className="font-jakarta text-sm max-w-[250px]">
+                <p className="font-jakarta text-sm lg:max-w-[250px]">
                   Awal mula Enggal Group dimulai dari Bakso Malang Enggal tahun
                   di Palembang.
                 </p>
@@ -624,11 +624,11 @@ function Home() {
               <div className="flex justify-between gap-4">
                 <img
                   src="/images/2008.jpg"
-                  className="w-[250px] rounded-md object-cover"
+                  className="w-[100px] md:w-[250px] rounded-md object-cover"
                 />
                 <img
                   src="/images/2008.jpg"
-                  className="w-[250px] rounded-md object-cover"
+                  className="w-[100px] md:w-[250px] rounded-md object-cover"
                 />
               </div>
             </div>
@@ -638,13 +638,13 @@ function Home() {
               <div className="w-3 h-3 bg-[#9C0000]"></div>
               <div className="h-full w-0.5 bg-[#FFB835]"></div>
             </div>
-            <div className="flex flex-col gap-y-10 w-full pb-16 mb-16 border-b-2 border-dashed border-[#CDCDCD]">
+            <div className="flex flex-col gap-y-4 xl:gap-y-10 w-full pb-10 mb-10 md:pb-16 md:mb-16 border-b-2 border-dashed border-[#CDCDCD]">
               <p className="text-[#9C0000] font-jakarta font-bold text-xl">
                 2008
               </p>
-              <div className="flex justify-between">
+              <div className="block lg:flex justify-between">
                 <h1 className="font-runestars text-2xl">LAHIRNYA PERJALANAN</h1>
-                <p className="font-jakarta text-sm max-w-[250px]">
+                <p className="font-jakarta text-sm lg:max-w-[250px]">
                   Awal mula Enggal Group dimulai dari Bakso Malang Enggal tahun
                   di Palembang.
                 </p>
@@ -652,11 +652,11 @@ function Home() {
               <div className="flex justify-between gap-4">
                 <img
                   src="/images/2008.jpg"
-                  className="w-[250px] rounded-md object-cover"
+                  className="w-[100px] md:w-[250px] rounded-md object-cover"
                 />
                 <img
                   src="/images/2008.jpg"
-                  className="w-[250px] rounded-md object-cover"
+                  className="w-[100px] md:w-[250px] rounded-md object-cover"
                 />
               </div>
             </div>
@@ -665,13 +665,13 @@ function Home() {
       </section>
 
       <div className="bg-[#FFB835] relative overflow-hidden">
-        <div className="absolute -top-2 -right-1">
+        <div className="absolute -top-2 -right-1 hidden md:block">
           <img src="/images/map-corner.png" className="w-full h-auto z-0" />
         </div>
         <div className="absolute -bottom-6 -left-4">
           <img src="/images/map-corner.png" className="w-full h-auto z-0 rotate-180" />
         </div>
-        <div className="absolute -bottom-6 -right-4">
+        <div className="absolute -bottom-6 -right-4 hidden md:block">
           <svg width="396" height="252" viewBox="0 0 396 252" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7 245C41.5254 218.997 91.7225 172.201 117.379 124.436M117.379 124.436C135.815 90.1147 141.58 55.2927 119.757 27.3245C65.4806 -42.2352 43.8104 85.9707 117.379 124.436ZM117.379 124.436C132.244 132.208 150.998 136.316 174.156 134.389C284.374 125.217 361.437 82.2396 389 64.8768" stroke="#EA9800" stroke-width="14" stroke-linecap="round" />
           </svg>
@@ -679,7 +679,7 @@ function Home() {
         </div>
         <div className="max-w-6xl container px-4 w-full mx-auto relative z-10">
           <div className="flex justify-between w-full">
-            <div className="flex flex-col items-start justify-start w-full lg:w-1/3">
+            <div className="hidden lg:flex flex-col items-start justify-start w-full lg:w-1/3">
               <div className="bg-[#9C0000] p-4 rounded-xl my-10 relative">
                 <div className="pointer-events-none absolute inset-0  bg-[url('/images/dots.png')] bg-cover bg-center bg-repeat-x opacity-20" />
                 <h2 className="font-runestars text-[#FFB835] mb-2 text-3xl">
@@ -690,32 +690,34 @@ function Home() {
                 </p>
               </div>
             </div>
-            <div className="flex flex-col w-7/12">
+            <div className="flex flex-col w-full lg:w-7/12">
               <div className="flex items-stretch gap-8">
                 <div className="flex flex-col items-center justify-start">
                   <div className="h-24 w-0.5 bg-white"></div>
                   <div className="w-3 h-3 bg-[#9C0000]"></div>
                 </div>
-                <div className="flex flex-col gap-y-6 w-full mt-20">
-                  <h1 className="font-bold font-jakarta text-xl text-[#9C0000]">2025</h1>
-                  <h1 className="font-runestars">
-                    <span className="text-shadow-[0_0_6px_#fff,1px_0_0_#fff,2px_0_0_#fff,-1px_0_0_#fff,-2px_0_0_#fff,0_1px_0_#fff,0_2px_0_#fff,0_-1px_0_#fff,0_-2px_0_#fff,1px_1px_0_#fff,2px_2px_0_#fff,-1px_-1px_0_#fff,-2px_-2px_0_#fff,1px_-1px_0_#fff,2px_-2px_0_#fff,-1px_1px_0_#fff,-2px_2px_0_#fff] font-extrabold text-4xl">
-                      MELANGKAH LEBIH JAUH
-                    </span>
-                  </h1>
-                </div>
-                <div>
-                  <p className="font-jakarta font-medium text-[#3F2900] mt-24 text-xs">Grup restoran yang kasih pengalaman kuliner terbaik untuk kamu yang datang.</p>
+                <div className="block md:flex">
+                  <div className="flex flex-col gap-y-2 md:gap-y-6 w-full mt-20">
+                    <h1 className="font-bold font-jakarta text-xl text-[#9C0000]">2025</h1>
+                    <h1 className="font-runestars">
+                      <span className="text-shadow-[0_0_6px_#fff,1px_0_0_#fff,2px_0_0_#fff,-1px_0_0_#fff,-2px_0_0_#fff,0_1px_0_#fff,0_2px_0_#fff,0_-1px_0_#fff,0_-2px_0_#fff,1px_1px_0_#fff,2px_2px_0_#fff,-1px_-1px_0_#fff,-2px_-2px_0_#fff,1px_-1px_0_#fff,2px_-2px_0_#fff,-1px_1px_0_#fff,-2px_2px_0_#fff] font-extrabold text-2xl md:text-4xl">
+                        MELANGKAH LEBIH JAUH
+                      </span>
+                    </h1>
+                  </div>
+                  <div>
+                    <p className="font-jakarta font-medium text-[#3F2900] mt-4 md:mt-24 md:text-xs">Grup restoran yang kasih pengalaman kuliner terbaik untuk kamu yang datang.</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="flex py-20">
-            <div>
+          <div className="flex justify-center py-20">
+            <div className="md:block hidden">
               <img src="/images/map.png" className="w-5/6 h-auto" />
             </div>
             <div>
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6 mx-auto">
                 {/* 2 Tahun */}
                 <div className="bg-white rounded-lg p-6 flex items-start gap-x-6">
                   <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -1169,7 +1171,7 @@ function Home() {
       </div>
 
       <div className="bg-[#F7F7F7] py-20 w-full relative">
-        <div className="absolute right-0 top-0">
+        <div className="absolute right-0 top-0 hidden md:block">
           <svg
             width="205"
             height="298"
@@ -1186,7 +1188,7 @@ function Home() {
           </svg>
         </div>
 
-        <div className="absolute right-1/12 top-1/12">
+        <div className="absolute right-1/12 top-1/12 hidden md:block">
           <svg
             width="51"
             height="51"

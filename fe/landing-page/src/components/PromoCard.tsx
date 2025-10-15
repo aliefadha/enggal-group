@@ -10,7 +10,7 @@ interface PromoCardProps {
 
 const PromoCard: React.FC<PromoCardProps> = ({ title, description, validUntil, image }) => {
   return (
-    <div className="flex flex-col bg-[#F7F7F7] rounded-tl-[6px] rounded-tr-[6px] rounded-b-2xl">
+    <div className="flex flex-col bg-[#F7F7F7] rounded-tl-[6px] rounded-tr-[6px] rounded-b-2xl h-full">
       {/* Expiration date section at the top */}
       <div className="bg-[#FFB835] px-3.5 py-3 flex items-center justify-center rounded-tl-[6px] rounded-tr-[6px] rounded-bl-[16px] rounded-br-[16px]">
         <div className="flex items-center gap-2">
@@ -22,7 +22,7 @@ const PromoCard: React.FC<PromoCardProps> = ({ title, description, validUntil, i
         </div>
       </div>
 
-      <div className="relative my-4 w-[250px] h-[350px] mx-auto rounded-xl">
+      <div className="relative my-4 w-full h-56 md:h-72 lg:h-80 px-4">
         <img
           src={image}
           alt={title}
@@ -35,9 +35,9 @@ const PromoCard: React.FC<PromoCardProps> = ({ title, description, validUntil, i
 
       {/* Text section */}
       <div className="pb-6">
-        <div className="flex flex-col gap-2 font-jakarta w-[250px] mx-auto">
-          <span className="text-xl font-bold">{title}</span>
-          <h3 className="text-[#9B9B9B] text-base/[24px] line-clamp-2">{description}</h3>
+        <div className="flex flex-col gap-2 font-jakarta px-4 w-full">
+          <span className="text-[14px] lg:text-xl font-bold">{title}</span>
+          <h3 className="text-[#9B9B9B] text-[14px] lg:text-base/[24px] line-clamp-2">{description}</h3>
         </div>
       </div>
     </div>

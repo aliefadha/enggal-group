@@ -32,7 +32,7 @@ const TeamCard: React.FC<TeamCardProps> = ({
           <img
             src={image}
             alt={name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center mx-auto"
             onError={(e) => {
               e.currentTarget.src = "https://via.placeholder.com/128x128?text=Profile";
             }}

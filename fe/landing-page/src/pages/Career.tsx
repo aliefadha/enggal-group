@@ -39,37 +39,37 @@ function Career() {
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="relative bg-[#F9F9F9] py-16 md:py-24">
+      <section className="relative bg-[#F9F9F9] py-16 md:py-24 m-2 md:m-0 rounded-md md:rounded-none">
         <div className="absolute inset-0 z-0 pointer-events-none bg-[url('/images/dots.png')] bg-center bg-cover bg-no-repeat opacity-20"></div>
-        <div className="container mx-auto max-w-6xl relative ">
+        <div className="container mx-auto max-w-6xl relative px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div className="space-y-8">
-              <div className="flex gap-4">
-                <div className="bg-white rounded-lg py-2 px-4 shadow-sm flex items-center space-x-3">
+              <div className="flex flex-wrap gap-3 sm:gap-4">
+                <div className="bg-white rounded-lg py-2 px-3 sm:px-4 shadow-sm flex items-center space-x-3">
                   <img src={brandIcon} alt="Brand" className="w-5 h-5" />
-                  <span className="font-semibold text-sm text-[#6E0112] font-jakarta">8 Brand Besar</span>
+                  <span className="font-semibold text-xs sm:text-sm text-[#6E0112] font-jakarta">8 Brand Besar</span>
                 </div>
-                <div className="bg-white rounded-lg py-2 px-4 shadow-sm flex items-center space-x-3">
+                <div className="bg-white rounded-lg py-2 px-3 sm:px-4 shadow-sm flex items-center space-x-3">
                   <img src={outletIcon} alt="Outlet" className="w-5 h-5" />
-                  <span className="font-semibold text-sm text-[#6E0112] font-jakarta">25 Outlet</span>
+                  <span className="font-semibold text-xs sm:text-sm text-[#6E0112] font-jakarta">25 Outlet</span>
                 </div>
-                <div className="bg-white rounded-lg py-2 px-4 shadow-sm flex items-center space-x-3">
+                <div className="bg-white rounded-lg py-2 px-3 sm:px-4 shadow-sm flex items-center space-x-3">
                   <img src={cityIcon} alt="City" className="w-4 h-5" />
-                  <span className="font-semibold text-sm text-[#6E0112] font-jakarta ">12 kota besar Indonesia</span>
+                  <span className="font-semibold text-xs sm:text-sm text-[#6E0112] font-jakarta ">12 kota besar Indonesia</span>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div className="">
-                  <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-5xl  font-runestars text-white whitespace-nowrap">
+                  <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl sm:text-4xl lg:text-5xl font-runestars text-white whitespace-normal md:whitespace-nowrap">
                     Bergabunglah dengan Keluarga
                   </span>
                 </div>
-                <div className="flex gap-x-2">
-                  <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-5xl  font-runestars text-white whitespace-nowrap">
+                <div className="flex flex-wrap gap-x-2 gap-y-1">
+                  <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl sm:text-4xl lg:text-5xl font-runestars text-white whitespace-normal md:whitespace-nowrap">
                     Besar,
                   </span>
-                  <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-bold text-5xl text-[#FFB835] font-runestars whitespace-nowrap">
+                  <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-bold text-3xl sm:text-4xl lg:text-5xl text-[#FFB835] font-runestars whitespace-normal md:whitespace-nowrap">
                     Enggal Group Indonesia
                   </span>
                 </div>
@@ -78,12 +78,12 @@ function Career() {
                 </p>
               </div>
 
-              <button className="bg-black hover:bg-[#333] text-white font-semibold px-8 py-3 rounded-xl transition-colors">
+              <button className="bg-black hover:bg-[#333] text-white font-semibold px-8 py-3 rounded-xl transition-colors w-3/4 sm:w-auto">
                 Lamar Disini!
               </button>
             </div>
 
-            <div className="flex justify-center">
+            <div className="hidden md:flex justify-center mt-8 lg:mt-0">
               <img src={heroIllustration} alt="Career Illustration" className="max-w-full h-auto" />
             </div>
           </div>
@@ -96,13 +96,13 @@ function Career() {
 
       {/* Why Join Us Section */}
       <section className=" py-16">
-        <div className="container mx-auto max-w-6xl flex justify-between items-start">
+        <div className="container mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 items-start px-4">
           <div className="mb-12 max-w-[400px]">
             <div className="flex items-start justify-start mb-4">
               <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
             </div>
             <h2 className="font-runestars mb-6">
-              <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl md:text-4xl text-white whitespace-nowrap">
+              <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-2xl sm:text-3xl md:text-4xl text-white whitespace-normal md:whitespace-nowrap">
                 Mengapa bergabung bersama kami?
               </span>
             </h2>
@@ -141,18 +141,18 @@ function Career() {
       </section>
 
       {/* Application Form Section */}
-      <section className="py-16">
-        <div className="container mx-auto max-w-6xl">
+      <section className="py-8 lg:py-16">
+        <div className="container mx-auto max-w-6xl px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:items-stretch">
             <div className="bg-[#FFB835] rounded-lg p-6 text-white relative overflow-hidden h-full flex flex-col">
               <div className="absolute inset-0 z-0 pointer-events-none bg-[url('/images/dots.png')] bg-center bg-cover bg-no-repeat opacity-20"></div>
-              <div className="relative z-10 space-y-6 max-w-[450px] mx-auto flex-1 flex flex-col justify-between">
-                <div className='bg-white h-[380px] mx-auto rounded-md flex items-center justify-center overflow-hidden'>
+              <div className="relative z-10 space-y-6 max-w-[450px] w-full mx-auto flex-1 flex flex-col justify-between">
+                <div className='bg-white h-48 sm:h-64 md:h-80 lg:h-[380px] mx-auto rounded-md flex items-center justify-center overflow-hidden w-full'>
                   <img src={careerGroup} alt="Career Group" className="w-full h-auto object-cover" />
                 </div>
                 <div className="space-y-2">
                   <h3 className="font-runestars">
-                    <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-4xl text-white whitespace-nowrap">
+                    <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-2xl sm:text-3xl md:text-4xl text-white whitespace-normal md:whitespace-nowrap">
                       Yuk, Daftar Sekarang!
                     </span>
                   </h3>
@@ -161,7 +161,7 @@ function Career() {
                   </p>
                 </div>
                 <div className="bg-[#9C0000] rounded-lg p-4 w-full">
-                  <h4 className="text-3xl text-[#FFB835] font-runestars mb-2">Visi</h4>
+                  <h4 className="text-2xl md:text-3xl text-[#FFB835] font-runestars mb-2">Visi</h4>
                   <p className="font-jakarta text-white font-semibold font-normal/relaxed">
                     Menjadi F&B group terkemuka di Indonesia yang nyaman untuk semua kalangan.
                   </p>

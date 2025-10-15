@@ -3,15 +3,15 @@ import PromoCard from "../components/PromoCard";
 function PromoDetail() {
   return (
     <div>
-      <div className="flex h-2 w-full mb-10">
+      <div className="lg:flex h-2 w-full mb-6 md:mb-10 hidden">
         <div className="h-full w-1/3 bg-[#9C0000]" />
         <div className="h-full w-1/3 bg-[#FFB835]" />
         <div className="h-full w-1/3 bg-[#6E0112]" />
       </div>
 
-      <div className="w-full container px-24 mx-auto flex flex-col gap-y-10">
-        <div className="flex justify-start items-center gap-10">
-          <a href="/" className="font-jakarta text-[#727272]">
+      <div className="w-full max-w-5xl mx-auto px-4 md:px-8 flex flex-col gap-y-6 md:gap-y-10 py-10">
+        <div className="flex flex-wrap items-center gap-2 md:gap-4 lg:gap-10">
+          <a href="/" className="font-jakarta text-[#727272] text-sm md:text-base">
             Home
           </a>
           <span className="text-[#727272]">
@@ -28,7 +28,7 @@ function PromoDetail() {
               />
             </svg>
           </span>
-          <a href="/promo" className="font-jakarta text-[#727272]">
+          <a href="/promo" className="font-jakarta text-[#727272] text-sm md:text-base">
             Promo
           </a>
           <span className="text-[#727272]">
@@ -45,20 +45,20 @@ function PromoDetail() {
               />
             </svg>
           </span>
-          <p className="font-jakarta text-white font-medium bg-[#9C0000] p-2 rounded-sm">
+          <p className="font-jakarta text-white font-medium bg-[#9C0000] p-2 rounded-sm text-sm md:text-base">
             Detail Promo
           </p>
         </div>
-        <div className="flex gap-10">
-          <div className="flex flex-col gap-y-6">
-            <div className="bg-[#F7F7F7] px-4 py-6 rounded-lg">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
+          <div className="flex w-full lg:w-auto flex-col gap-y-4 md:gap-y-6">
+            <div className="bg-[#F7F7F7] px-4 py-4 md:py-6 rounded-lg w-full lg:max-w-sm">
               <img
                 src="/images/promo.png"
                 alt="promo"
-                className="w-[350px] h-auto rounded-xl"
+                className="w-full h-auto rounded-xl"
               />
             </div>
-            <div className="bg-[#FFB835] w-full flex p-6 gap-6 rounded-md">
+            <div className="bg-[#FFB835] w-full flex items-center p-4 md:p-6 gap-4 md:gap-6 rounded-md">
               <svg
                 width="24"
                 height="24"
@@ -71,27 +71,27 @@ function PromoDetail() {
                   fill="#9C0000"
                 />
               </svg>
-              <p className="font-jakarta text-[#9C0000] font-medium">
+              <p className="font-jakarta text-[#9C0000] font-medium text-sm md:text-base">
                 Berlaku Hingga 1 Oktober 2026
               </p>
             </div>
           </div>
-          <div className="flex flex-col gap-2.5 w-2/3">
+          <div className="flex flex-col gap-2.5 w-full lg:w-2/3">
             <h2 className="font-runestars">
-              <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl md:text-4xl text-white whitespace-nowrap">
+              <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl md:text-4xl text-white">
                 Promo
               </span>
             </h2>
-            <h1 className="font-jakarta font-bold text-[40px] w-[500px]">
+            <h1 className="font-jakarta font-bold text-2xl md:text-4xl leading-snug max-w-2xl">
               Re Opening Bakso Malang
             </h1>
-            <p className="text-[#9B9B9B] font-jakarta">
+            <p className="text-[#9B9B9B] font-jakarta text-sm md:text-base">
               Dapatkan Bakso Gratis untuk 50 customer pertama
             </p>
-            <div className="font-jakarta mt-10 flex flex-col gap-y-10">
+            <div className="font-jakarta mt-6 md:mt-10 flex flex-col gap-y-6 md:gap-y-10">
               <div>
                 <p className="font-bold mb-2 ">Deskripsi Promo</p>
-                <p className="text-[#1E1E1E] font-meidum text-justify tracking-wide leading-[32px]">
+                <p className="text-[#1E1E1E] font-meidum text-justify tracking-wide leading-[28px] md:leading-[32px] text-sm md:text-base">
                   Dalam rangka re-opening, Bakso Malang Enggal menghadirkan
                   promo spesial untuk pelanggan setia. Setiap pengunjung
                   berkesempatan menikmati semangkuk bakso gratis untuk 100 orang
@@ -103,7 +103,7 @@ function PromoDetail() {
               </div>
               <div>
                 <p className="font-bold mb-2 ">Syarat & Ketentuan</p>
-                <p className="text-[#1E1E1E] font-meidum text-justify tracking-wide leading-[32px]">
+                <p className="text-[#1E1E1E] font-meidum text-justify tracking-wide leading-[28px] md:leading-[32px] text-sm md:text-base">
                   Promo ini berlaku hanya pada outlet dan tanggal yang telah
                   ditentukan. Setiap pengunjung berhak mendapatkan promo
                   maksimal satu kali per transaksi atau per orang, baik untuk
@@ -121,7 +121,7 @@ function PromoDetail() {
           </div>
         </div>
         <div>
-          <div className="relative my-10">
+          <div className="relative my-8 md:my-10">
             <div className="mb-2">
               <svg
                 width="67"
@@ -139,10 +139,10 @@ function PromoDetail() {
               </svg>
             </div>
             <h2 className="font-runestars mb-6 relative">
-              <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl md:text-4xl text-white whitespace-nowrap">
+              <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl md:text-4xl text-white">
                 Rekomendasi Promo lainnya!
               </span>
-              <div className="absolute -top-4 left-1/3 w-[39.95px] h-[39.95px] rotate-[30deg]">
+              <div className="absolute -top-4 left-1/3 w-[39.95px] h-[39.95px] rotate-[30deg] hidden lg:block">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -157,12 +157,12 @@ function PromoDetail() {
                 </svg>
               </div>
             </h2>
-            <p className="font-jakarta text-[#585858]">
+            <p className="font-jakarta text-[#585858] text-sm md:text-base">
               Jangan lewatkan pilihan promo menarik yang sudah kami siapkan.
             </p>
           </div>
-          <div className="flex flex-col gap-y-16 my-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-20 gap-y-16 relative z-10">
+          <div className="flex flex-col gap-y-10 md:gap-y-16 my-10 md:my-16">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 lg:gap-x-20 gap-y-8 md:gap-y-16 relative z-10">
               <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
                 <PromoCard
                   id="promo1"
@@ -225,7 +225,7 @@ function PromoDetail() {
             </div>
             <div className="mx-auto">
               <a
-                className="bg-[#1E1E1E] rounded-xl py-4 px-6 font-jakarta text-white font-medium"
+                className="bg-[#1E1E1E] rounded-xl py-3 md:py-4 px-5 md:px-6 font-jakarta text-white font-medium text-sm md:text-base"
                 href="/promo"
               >
                 Lihat Promo Lebih Lengkap

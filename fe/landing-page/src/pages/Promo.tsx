@@ -1,9 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PromoCard from "../components/PromoCard";
 
 function Promo() {
   const [selectedBrand, setSelectedBrand] = useState<string>("all");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [currentSlide, setCurrentSlide] = useState<number>(0);
+
+  const banners = [
+    "/images/banner-1.png",
+    "/images/banner-1.png",
+    "/images/banner-1.png",
+  ];
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCurrentSlide((s) => (s + 1) % banners.length);
+    }, 4000);
+    return () => clearInterval(id);
+  }, [banners.length]);
 
   // Sample brand data - replace with actual data from API or props
   const brands = [
@@ -64,20 +78,64 @@ function Promo() {
   return (
     <div className="h-full relative">
       <div className="w-full">
-        <img
-          src="/images/banner-1.png"
-          className="w-full h-full object-cover"
-          alt="Promo"
-        />
+        {/* Banner Carousel */}
+        <div className="relative w-full overflow-hidden">
+          <div
+            className="flex transition-transform duration-700 ease-out"
+            style={{
+              width: `${banners.length * 100}%`,
+              transform: `translateX(-${(currentSlide * 100) / banners.length}%)`,
+            }}
+          >
+            {banners.map((src, idx) => (
+              <div
+                key={idx}
+                className="shrink-0"
+                style={{ width: `${100 / banners.length}%` }}
+              >
+                <img src={src} alt={`Banner ${idx + 1}`} className="block w-full h-auto" />
+              </div>
+            ))}
+          </div>
+
+          {/* Controls */}
+          <button
+            aria-label="Previous slide"
+            className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-9 h-9 flex items-center justify-center"
+            onClick={() => setCurrentSlide((s) => (s - 1 + banners.length) % banners.length)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+          <button
+            aria-label="Next slide"
+            className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-9 h-9 flex items-center justify-center"
+            onClick={() => setCurrentSlide((s) => (s + 1) % banners.length)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+
+          {/* Dots moved below bars */}
+        </div>
         <div className="flex h-2 w-full">
           <div className="w-1/3 bg-[#9C0000]"></div>
           <div className="w-1/3 bg-[#FFB835]"></div>
           <div className="w-1/3 bg-[#6E0112]"></div>
         </div>
+        {/* Dots under the colored bars */}
+        <div className="w-full flex items-center justify-center gap-2 mt-3">
+          {banners.map((_, idx) => (
+            <button
+              key={idx}
+              aria-label={`Go to slide ${idx + 1}`}
+              className={`w-2.5 h-2.5 rounded-full transition-all ${currentSlide === idx ? "bg-[#6E0112]" : "bg-[#6E0112]/40 hover:bg-[#6E0112]/60"}`}
+              onClick={() => setCurrentSlide(idx)}
+            />
+          ))}
+        </div>
       </div>
-      <div className=" py-12 relative">
-        <div className="absolute w-[350px] h-[350px] rounded-full bg-[url('/images/dots_spaced.png')] bg-center bg-cover bg-no-repeat z-0 pointer-events-none left-0 -translate-x-1/4"></div>
-        <div className="absolute z-0 pointer-events-none right-0 top-0">
+      <div className=" py-12 relative px-4">
+        <div className="hidden md:block absolute w-[350px] h-[350px] rounded-full bg-[url('/images/dots_spaced.png')] bg-center bg-cover bg-no-repeat z-0 pointer-events-none left-0 -translate-x-1/4"></div>
+        <div className="hidden md:block absolute z-0 pointer-events-none right-0 top-0">
           <svg
             width="207"
             height="250"
@@ -113,10 +171,10 @@ function Promo() {
             </div>
             <div className="relative max-w-[450px]">
               <h2 className="font-runestars mb-6 relative">
-                <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl md:text-4xl text-white whitespace-nowrap">
+                <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl md:text-4xl text-white ">
                   Promo Eksklusif dari Setiap Brand
                 </span>
-                <div className="absolute -top-4 -right-4 w-[39.95px] h-[39.95px] rotate-[30deg]">
+                <div className="hidden md:block absolute -top-4 -right-4 w-[39.95px] h-[39.95px] rotate-[30deg]">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -132,15 +190,15 @@ function Promo() {
                 </div>
               </h2>
             </div>
-            <div className="flex justify-between items-center w-full">
-              <p className="font-jakarta text-base/[24px] font-medium max-w-[450px]">
+            <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center w-full gap-6 md:gap-10">
+              <p className="font-jakarta text-base/[24px] font-medium md:max-w-[450px]">
                 Temukan penawaran spesial yang bisa kamu pilih sesuai dengan
                 brand favoritmu.
               </p>
               {/* Brand Filter Dropdown */}
-              <div className="relative">
+              <div className="relative w-full md:w-auto">
                 <div
-                  className="inline-flex items-center bg-white border border-gray-300 rounded-md px-4 py-2 gap-2 cursor-pointer hover:bg-gray-50 z-50"
+                  className="inline-flex w-full md:w-auto items-center justify-between bg-white border border-gray-300 rounded-md px-4 py-2 gap-2 cursor-pointer hover:bg-gray-50 z-50"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
                   <svg
@@ -155,7 +213,7 @@ function Promo() {
                       fill="#9C0000"
                     />
                   </svg>
-                  <span className="text-sm font-jakarta">
+                  <span className="flex-1 text-left truncate text-sm font-jakarta">
                     {brands.find((brand) => brand.id === selectedBrand)?.name ||
                       "Pilih Brand"}
                   </span>
@@ -165,7 +223,7 @@ function Promo() {
                     viewBox="0 0 16 16"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className={`ml-2 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
+                    className={`ml-2 shrink-0 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
                   >
                     <path
                       d="M4 6L8 10L12 6"
@@ -179,15 +237,14 @@ function Promo() {
 
                 {/* Dropdown Menu */}
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 py-1 border border-gray-200">
+                  <div className="absolute right-0 mt-2 w-full md:w-56 bg-white rounded-md shadow-lg z-50 py-1 border border-gray-200 max-h-72 overflow-auto">
                     {brands.map((brand) => (
                       <div
                         key={brand.id}
-                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 ${
-                          selectedBrand === brand.id
-                            ? "bg-gray-50 font-medium text-[#9C0000]"
-                            : ""
-                        }`}
+                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 ${selectedBrand === brand.id
+                          ? "bg-gray-50 font-medium text-[#9C0000]"
+                          : ""
+                          }`}
                         onClick={() => handleBrandSelect(brand.id)}
                       >
                         {brand.name}
@@ -199,7 +256,7 @@ function Promo() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-20 gap-y-16 relative z-10">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-x-20 lg:gap-y-16 relative">
             {filteredPromos.length > 0 ? (
               filteredPromos.map((promo) => (
                 <div
@@ -217,7 +274,7 @@ function Promo() {
                 </div>
               ))
             ) : (
-              <div className="col-span-3 py-10 text-center">
+              <div className="col-span-1 md:col-span-2 lg:col-span-3 py-10 text-center">
                 <p className="text-gray-500 font-medium">
                   Tidak ada promo tersedia untuk brand ini saat ini.
                 </p>
@@ -225,7 +282,7 @@ function Promo() {
             )}
           </div>
         </div>
-        <div className="absolute z-0 pointer-events-none left-0 bottom-0 ">
+        <div className="absolute -z-10 pointer-events-none left-0 bottom-0 hidden lg:block ">
           <svg
             width="237"
             height="200"

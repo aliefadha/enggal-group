@@ -93,8 +93,7 @@ const Navbar: React.FC = () => {
             className={({ isActive }) =>
               [
                 "rounded-xl px-4 py-2 uppercase font-runestars text-sm text-[#6E0112] transition hover:underline",
-                "bg-[#FFB835]",
-                isActive ? "underline" : "",
+                isActive ? "underline bg-[#6E0112] text-[#FFB835]" : "bg-[#FFB835]",
               ].join(" ")
             }
             onClick={closeMobileMenu}
