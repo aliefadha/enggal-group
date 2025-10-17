@@ -26,6 +26,12 @@ export class PrismaService
   }
 
   async cleanDatabase() {
-    await this.$transaction([this.user.deleteMany()]);
+    await this.$transaction([
+      this.user.deleteMany(),
+      this.userCareer.deleteMany(),
+      this.promo.deleteMany(),
+      this.berita.deleteMany(),
+      this.brand.deleteMany(),
+    ]);
   }
 }

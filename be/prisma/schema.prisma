@@ -28,3 +28,58 @@ model UserCareer {
   email   String
   cv_link String
 }
+
+model Promo {
+  id               String   @id @default(uuid())
+  title            String
+  subtitle         String
+  description      String
+  syaratKetentuan  String
+  berlakuHingga    DateTime
+  brandId          String
+  brand            Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  image            String
+}
+
+model Brand {
+  id          String @id @default(uuid())
+  nama        String
+  logo        String
+  description String
+  promos      Promo[]
+  outlets     Outlet[]
+}
+
+model Berita {
+  id          String   @id @default(uuid())
+  judul       String
+  image       String
+  createdDate DateTime
+  penulis     String
+  content     String
+}
+
+model Outlet {
+  id             String   @id @default(uuid())
+  brandId        String
+  brand          Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  kota           String
+  jamOperasional String
+  lokasi         String
+  image          String
+  googleMapsLink String
+  whatsappUrl    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Team {
+  id            String   @id @default(uuid())
+  nama          String
+  title         String
+  image         String
+  linkedinUrl   String
+  instagramUrl  String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
