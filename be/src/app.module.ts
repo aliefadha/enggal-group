@@ -7,6 +7,12 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './api/user/user.module';
 import { UserCareerModule } from './api/user-career/user-career.module';
+import { PromoModule } from './api/promo/promo.module';
+import { BrandModule } from './api/brand/brand.module';
+import { OutletModule } from './api/outlet/outlet.module';
+import { TeamModule } from './api/team/team.module';
+import { UploadModule } from './api/upload/upload.module';
+import { BeritaModule } from './api/berita/berita.module';
 
 @Module({
   imports: [
@@ -15,7 +21,13 @@ import { UserCareerModule } from './api/user-career/user-career.module';
     }),
     PrismaModule,
     UserModule,
-    UserCareerModule
+    UserCareerModule,
+    PromoModule,
+    BrandModule,
+    OutletModule,
+    TeamModule,
+    UploadModule,
+    BeritaModule
   ],
   controllers: [AppController],
   providers: [AppService, {

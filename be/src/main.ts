@@ -7,9 +7,11 @@ import { ValidationPipe } from '@nestjs/common'
 import { LoggingInterceptor } from '@/logging/logging.interceptor'
 import { TransformInterceptor } from '@/interceptors/transform.interceptor';
 import { HttpExceptionFilter } from '@/filters/http-exception.filter';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'node:path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
@@ -27,6 +29,9 @@ async function bootstrap() {
   })
   app.useGlobalPipes(new ValidationPipe())
   app.useGlobalInterceptors(new LoggingInterceptor())
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/uploads/',
+  });
 
   const config = new DocumentBuilder()
     .setTitle('EnggalGroup API')
