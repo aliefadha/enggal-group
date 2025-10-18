@@ -1,73 +1,50 @@
-# React + TypeScript + Vite
+# Enggal Group Landing Page (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based public site for showcasing Enggal Group content (brands, promos, outlets, team, and latest news).
 
-Currently, two official plugins are available:
+## Features (Planned/Typical)
+- Display brands and their promos
+- List outlets with location info and maps links
+- Present team members
+- Show latest berita (news) with images
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Getting Started
+```bash
+cd fe/landing-page
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Integration with Backend (Suggested)
+Point the landing page to the same backend used by the admin dashboard and consume read-only endpoints:
+- Brands: `GET /brand?page&limit`
+- Promos: `GET /promo?page&limit&brandId?`
+- Outlets: `GET /outlet?page&limit&brandId?`
+- Team: `GET /team?page&limit`
+- Berita: `GET /berita?page&limit`
+- Static assets: `GET /uploads/:filename`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Example fetch using native `fetch`:
+```ts
+async function getBrands(page = 1, limit = 10) {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/brand?page=${page}&limit=${limit}`)
+  const envelope = await res.json() // { statusCode, message, data }
+  return envelope.data
+}
 ```
+
+## Environment
+- Reuse `VITE_API_URL` if needed (create `.env.local`):
+```bash
+VITE_API_URL="http://localhost:3003"
+```
+
+## Notes
+- The landing page focuses on read-only views; mutations happen in the admin dashboard.
+- Images in records reference `/uploads/<filename>` served by the backend.
+
+## Deployment
+- Standard Vite build: `npm run build` → deploy `dist/` to static hosting.
+
+## License
+Internal project. Copyright © Enggal Group.

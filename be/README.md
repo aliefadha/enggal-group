@@ -1,98 +1,157 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Enggal Group API (NestJS)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A RESTful API for managing Enggal Group data: Brands, Promos, Outlets, Team Members, News (Berita), Users, and Careers. Built with NestJS 11, Prisma, and PostgreSQL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
+- CRUD for core resources: `brand`, `promo`, `outlet`, `team`, `berita`, `user`, `user-career`
+- File uploads with static serving via `/uploads`
+- Global response normalization (success envelope)
+- Centralized error handling (validation-aware error envelope)
+- API documentation via Swagger and Scalar
 
-## Description
+## Tech Stack
+- NestJS 11, Express
+- Prisma ORM
+- PostgreSQL (via Docker in local dev)
+- Swagger (`/api`) and Scalar API Reference (`/swagger`)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Getting Started
 
-## Project setup
+### Prerequisites
+- Node.js >= 20, npm >= 10
+- Docker (for local PostgreSQL)
 
+### Setup & Run
 ```bash
-$ npm install
+cd be
+npm install
+
+# Configure database connection
+cat > .env << 'EOF'
+DATABASE_URL="postgresql://postgres:password@localhost:5435/enggal_group"
+EOF
+
+# Start local database (from repo root)
+docker compose up -d
+
+# Apply migrations and generate Prisma client
+npx prisma migrate dev
+npx prisma generate
+
+# Start the API (port 3003)
+npm run start:dev
 ```
 
-## Compile and run the project
+### API Docs
+- Swagger UI: http://localhost:3003/api
+- Scalar Reference: http://localhost:3003/swagger
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+## Response Envelope
+Successful responses are wrapped by `TransformInterceptor`:
+```json
+{
+  "statusCode": 200,
+  "message": "Success",
+  "data": { /* resource payload */ }
+}
+```
+Errors are handled by `HttpExceptionFilter`:
+```json
+{
+  "statusCode": 400,
+  "message": "Validation failed",
+  "data": { /* validationErrors when applicable */ }
+}
 ```
 
-## Run tests
+## Endpoints Summary
+- `POST /upload` (multipart: `file`) → returns file URL under `/uploads/<filename>`
+- `GET /uploads/:filename` → serves uploaded assets
 
+- `POST /brand` (multipart: `logo`, body: `nama`, `description`) → create brand
+- `GET /brand?page&limit` → list brands (paginated)
+- `GET /brand/:id` → brand details
+- `PUT /brand/:id` (multipart: `logo` optional) → update brand
+- `DELETE /brand/:id` → delete brand
+
+- `POST /promo` (multipart: `image`, body: `title`, `subtitle`, `description`, `syaratKetentuan`, `berlakuHingga`, `brandId`) → create promo
+- `GET /promo?page&limit&brandId?` → list promos (paginated, filter by brand)
+- `GET /promo/:id` → promo details
+- `PUT /promo/:id` (multipart: `image` optional) → update promo
+- `DELETE /promo/:id` → delete promo
+
+- `POST /outlet` (JSON) → create outlet
+- `GET /outlet?page&limit&brandId?` → list outlets (paginated, filter by brand)
+- `GET /outlet/:id` → outlet details
+- `PUT /outlet/:id` → update outlet
+- `DELETE /outlet/:id` → delete outlet
+
+- `POST /team` (JSON) → create team member
+- `GET /team?page&limit` → list team (paginated)
+- `GET /team/:id` → team details
+- `PUT /team/:id` → update team member
+- `DELETE /team/:id` → delete team member
+
+- `POST /berita` (multipart: `image` optional, body: `judul`, `createdDate`, `penulis`, `content`) → create news
+- `GET /berita?page&limit` → list news (paginated)
+- `GET /berita/:id` → news details
+- `PUT /berita/:id` (multipart: `image` optional) → update news
+- `DELETE /berita/:id` → delete news
+
+- `POST /user` (JSON) → create user
+- `GET /user` → list all users
+- `GET /user/:id` → user details
+- `PUT /user/:id` → update user
+- `DELETE /user/:id` → delete user
+
+- `POST /user-career` (JSON) → create career entry
+- `GET /user-career?page&limit` → list careers (paginated)
+- `GET /user-career/:id` → career details
+- `PUT /user-career/:id` → update career entry
+- `DELETE /user-career/:id` → delete career entry
+
+## File Upload Examples
+Create Brand:
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+curl -X POST "http://localhost:3003/brand" \
+  -H "Content-Type: multipart/form-data" \
+  -F "nama=Bakso Enggal" \
+  -F "description=Restoran bakso prasmanan pertama di Indonesia" \
+  -F "logo=@./logo.png"
+```
+Create Promo:
+```bash
+curl -X POST "http://localhost:3003/promo" \
+  -H "Content-Type: multipart/form-data" \
+  -F "title=Promo Spesial Akhir Tahun" \
+  -F "subtitle=Diskon hingga 50%" \
+  -F "description=Nikmati potongan harga besar" \
+  -F "syaratKetentuan=Berlaku minimal Rp500.000" \
+  -F "berlakuHingga=2024-12-31" \
+  -F "brandId=<brand-uuid>" \
+  -F "image=@./promo.jpg"
 ```
 
-## Deployment
+## Integration Notes
+- CORS is enabled for common methods and headers
+- Static files are served from `/uploads/`
+- Swagger spec is written to `be/swagger-spec.json` on server start
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### Generate Types for Frontend (Optional)
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# from fe/dashboard
+npx openapi-typescript ../../be/swagger-spec.json -o src/api/types.ts
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Authentication
+Swagger is configured with Bearer auth, but guards are not yet enforced on controllers. Planned addition: JWT-based auth module.
 
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Testing
+```bash
+npm run test         # unit
+npm run test:e2e     # e2e
+npm run test:cov     # coverage
+```
 
 ## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Internal project. Copyright © Enggal Group.
