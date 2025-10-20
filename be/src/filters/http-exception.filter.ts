@@ -5,7 +5,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -16,7 +16,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const exceptionResponse = exception.getResponse();
 
     let message: string;
-    let data: any = null; // Default data is null
+    let data: any = null;
 
     // This is the new, smarter logic
     if (
@@ -33,7 +33,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         typeof exceptionResponse === 'string'
           ? exceptionResponse
           : (exceptionResponse as any).message ||
-          'An unexpected error occurred';
+            'An unexpected error occurred';
     }
 
     response.status(status).json({

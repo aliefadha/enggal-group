@@ -2,6 +2,10 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsUUID, IsUrl } from 'class-validator';
 
 export class RequestOutletUpdateDto {
+  @ApiPropertyOptional({ example: 'Bakso Enggal Jakarta' })
+  @IsNotEmpty()
+  nama?: string;
+
   @ApiPropertyOptional({ example: 'Jakarta' })
   @IsOptional()
   @IsNotEmpty()

@@ -61,6 +61,7 @@ model Berita {
 
 model Outlet {
   id             String   @id @default(uuid())
+  nama           String
   brandId        String
   brand          Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
   kota           String

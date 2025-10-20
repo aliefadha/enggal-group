@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsOptional, IsString } from 'class-validator';
 
 export class BeritaListQueryDto {
   @ApiPropertyOptional({ description: 'Page number (1-based)' })
@@ -11,6 +11,22 @@ export class BeritaListQueryDto {
   @IsOptional()
   @IsString()
   limit?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter by createdDate greater than or equal to this ISO date',
+    example: '2024-01-01',
+  })
+  @IsOptional()
+  @IsDateString()
+  startDate?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter by createdDate less than or equal to this ISO date',
+    example: '2024-12-31',
+  })
+  @IsOptional()
+  @IsDateString()
+  endDate?: string;
 
   constructor(dto: BeritaListQueryDto) {
     Object.assign(this, dto);

@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import type { Prisma } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { RequestBeritaCreateDto } from '@/api/berita/dto/requests/create.dto';
 import { RequestBeritaUpdateDto } from '@/api/berita/dto/requests/update.dto';
@@ -19,14 +20,37 @@ export class BeritaService {
     });
   }
 
-  async findAll({ page = 1, limit = 10 }: { page?: number; limit?: number }) {
+  async findAll({
+    page = 1,
+    limit = 10,
+    startDate,
+    endDate,
+  }: {
+    page?: number;
+    limit?: number;
+    startDate?: Date;
+    endDate?: Date;
+  }) {
     const skip = (page - 1) * limit;
+    const where: Prisma.BeritaWhereInput = {};
+
+    if (startDate || endDate) {
+      where.createdDate = {};
+      if (startDate) {
+        where.createdDate.gte = startDate;
+      }
+      if (endDate) {
+        where.createdDate.lte = endDate;
+      }
+    }
+
     const [total, data] = await this.prisma.$transaction([
-      this.prisma.berita.count(),
+      this.prisma.berita.count({ where }),
       this.prisma.berita.findMany({
         skip,
         take: limit,
         orderBy: { createdDate: 'desc' },
+        where,
       }),
     ]);
 

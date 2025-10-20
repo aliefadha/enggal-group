@@ -13,6 +13,7 @@ import { OutletModule } from './api/outlet/outlet.module';
 import { TeamModule } from './api/team/team.module';
 import { UploadModule } from './api/upload/upload.module';
 import { BeritaModule } from './api/berita/berita.module';
+import { DashboardModule } from './api/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { BeritaModule } from './api/berita/berita.module';
     OutletModule,
     TeamModule,
     UploadModule,
-    BeritaModule
+    BeritaModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService, {

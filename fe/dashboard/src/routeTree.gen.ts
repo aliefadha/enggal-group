@@ -13,13 +13,17 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UserCareerRouteImport } from './routes/user-career'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as OutletRouteImport } from './routes/outlet'
 import { Route as BrandRouteImport } from './routes/brand'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PromoIndexRouteImport } from './routes/promo/index'
+import { Route as OutletIndexRouteImport } from './routes/outlet/index'
 import { Route as BeritaIndexRouteImport } from './routes/berita/index'
 import { Route as PromoCreateRouteImport } from './routes/promo/create'
+import { Route as OutletCreateRouteImport } from './routes/outlet/create'
 import { Route as BeritaCreateRouteImport } from './routes/berita/create'
+import { Route as PromoPromoIdEditRouteImport } from './routes/promo/$promoId/edit'
+import { Route as OutletOutletIdEditRouteImport } from './routes/outlet/$outletId/edit'
+import { Route as BeritaBeritaIdEditRouteImport } from './routes/berita/$beritaId/edit'
 
 const AboutLazyRouteImport = createFileRoute('/about')()
 
@@ -38,11 +42,6 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OutletRoute = OutletRouteImport.update({
-  id: '/outlet',
-  path: '/outlet',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const BrandRoute = BrandRouteImport.update({
   id: '/brand',
   path: '/brand',
@@ -58,6 +57,11 @@ const PromoIndexRoute = PromoIndexRouteImport.update({
   path: '/promo/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OutletIndexRoute = OutletIndexRouteImport.update({
+  id: '/outlet/',
+  path: '/outlet/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BeritaIndexRoute = BeritaIndexRouteImport.update({
   id: '/berita/',
   path: '/berita/',
@@ -68,99 +72,147 @@ const PromoCreateRoute = PromoCreateRouteImport.update({
   path: '/promo/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OutletCreateRoute = OutletCreateRouteImport.update({
+  id: '/outlet/create',
+  path: '/outlet/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BeritaCreateRoute = BeritaCreateRouteImport.update({
   id: '/berita/create',
   path: '/berita/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromoPromoIdEditRoute = PromoPromoIdEditRouteImport.update({
+  id: '/promo/$promoId/edit',
+  path: '/promo/$promoId/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OutletOutletIdEditRoute = OutletOutletIdEditRouteImport.update({
+  id: '/outlet/$outletId/edit',
+  path: '/outlet/$outletId/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BeritaBeritaIdEditRoute = BeritaBeritaIdEditRouteImport.update({
+  id: '/berita/$beritaId/edit',
+  path: '/berita/$beritaId/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/brand': typeof BrandRoute
-  '/outlet': typeof OutletRoute
   '/settings': typeof SettingsRoute
   '/user-career': typeof UserCareerRoute
   '/about': typeof AboutLazyRoute
   '/berita/create': typeof BeritaCreateRoute
+  '/outlet/create': typeof OutletCreateRoute
   '/promo/create': typeof PromoCreateRoute
   '/berita': typeof BeritaIndexRoute
+  '/outlet': typeof OutletIndexRoute
   '/promo': typeof PromoIndexRoute
+  '/berita/$beritaId/edit': typeof BeritaBeritaIdEditRoute
+  '/outlet/$outletId/edit': typeof OutletOutletIdEditRoute
+  '/promo/$promoId/edit': typeof PromoPromoIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/brand': typeof BrandRoute
-  '/outlet': typeof OutletRoute
   '/settings': typeof SettingsRoute
   '/user-career': typeof UserCareerRoute
   '/about': typeof AboutLazyRoute
   '/berita/create': typeof BeritaCreateRoute
+  '/outlet/create': typeof OutletCreateRoute
   '/promo/create': typeof PromoCreateRoute
   '/berita': typeof BeritaIndexRoute
+  '/outlet': typeof OutletIndexRoute
   '/promo': typeof PromoIndexRoute
+  '/berita/$beritaId/edit': typeof BeritaBeritaIdEditRoute
+  '/outlet/$outletId/edit': typeof OutletOutletIdEditRoute
+  '/promo/$promoId/edit': typeof PromoPromoIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/brand': typeof BrandRoute
-  '/outlet': typeof OutletRoute
   '/settings': typeof SettingsRoute
   '/user-career': typeof UserCareerRoute
   '/about': typeof AboutLazyRoute
   '/berita/create': typeof BeritaCreateRoute
+  '/outlet/create': typeof OutletCreateRoute
   '/promo/create': typeof PromoCreateRoute
   '/berita/': typeof BeritaIndexRoute
+  '/outlet/': typeof OutletIndexRoute
   '/promo/': typeof PromoIndexRoute
+  '/berita/$beritaId/edit': typeof BeritaBeritaIdEditRoute
+  '/outlet/$outletId/edit': typeof OutletOutletIdEditRoute
+  '/promo/$promoId/edit': typeof PromoPromoIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/brand'
-    | '/outlet'
     | '/settings'
     | '/user-career'
     | '/about'
     | '/berita/create'
+    | '/outlet/create'
     | '/promo/create'
     | '/berita'
+    | '/outlet'
     | '/promo'
+    | '/berita/$beritaId/edit'
+    | '/outlet/$outletId/edit'
+    | '/promo/$promoId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/brand'
-    | '/outlet'
     | '/settings'
     | '/user-career'
     | '/about'
     | '/berita/create'
+    | '/outlet/create'
     | '/promo/create'
     | '/berita'
+    | '/outlet'
     | '/promo'
+    | '/berita/$beritaId/edit'
+    | '/outlet/$outletId/edit'
+    | '/promo/$promoId/edit'
   id:
     | '__root__'
     | '/'
     | '/brand'
-    | '/outlet'
     | '/settings'
     | '/user-career'
     | '/about'
     | '/berita/create'
+    | '/outlet/create'
     | '/promo/create'
     | '/berita/'
+    | '/outlet/'
     | '/promo/'
+    | '/berita/$beritaId/edit'
+    | '/outlet/$outletId/edit'
+    | '/promo/$promoId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BrandRoute: typeof BrandRoute
-  OutletRoute: typeof OutletRoute
   SettingsRoute: typeof SettingsRoute
   UserCareerRoute: typeof UserCareerRoute
   AboutLazyRoute: typeof AboutLazyRoute
   BeritaCreateRoute: typeof BeritaCreateRoute
+  OutletCreateRoute: typeof OutletCreateRoute
   PromoCreateRoute: typeof PromoCreateRoute
   BeritaIndexRoute: typeof BeritaIndexRoute
+  OutletIndexRoute: typeof OutletIndexRoute
   PromoIndexRoute: typeof PromoIndexRoute
+  BeritaBeritaIdEditRoute: typeof BeritaBeritaIdEditRoute
+  OutletOutletIdEditRoute: typeof OutletOutletIdEditRoute
+  PromoPromoIdEditRoute: typeof PromoPromoIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -186,13 +238,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/outlet': {
-      id: '/outlet'
-      path: '/outlet'
-      fullPath: '/outlet'
-      preLoaderRoute: typeof OutletRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/brand': {
       id: '/brand'
       path: '/brand'
@@ -214,6 +259,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromoIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/outlet/': {
+      id: '/outlet/'
+      path: '/outlet'
+      fullPath: '/outlet'
+      preLoaderRoute: typeof OutletIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/berita/': {
       id: '/berita/'
       path: '/berita'
@@ -228,11 +280,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromoCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/outlet/create': {
+      id: '/outlet/create'
+      path: '/outlet/create'
+      fullPath: '/outlet/create'
+      preLoaderRoute: typeof OutletCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/berita/create': {
       id: '/berita/create'
       path: '/berita/create'
       fullPath: '/berita/create'
       preLoaderRoute: typeof BeritaCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promo/$promoId/edit': {
+      id: '/promo/$promoId/edit'
+      path: '/promo/$promoId/edit'
+      fullPath: '/promo/$promoId/edit'
+      preLoaderRoute: typeof PromoPromoIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/outlet/$outletId/edit': {
+      id: '/outlet/$outletId/edit'
+      path: '/outlet/$outletId/edit'
+      fullPath: '/outlet/$outletId/edit'
+      preLoaderRoute: typeof OutletOutletIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/berita/$beritaId/edit': {
+      id: '/berita/$beritaId/edit'
+      path: '/berita/$beritaId/edit'
+      fullPath: '/berita/$beritaId/edit'
+      preLoaderRoute: typeof BeritaBeritaIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -241,14 +321,18 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BrandRoute: BrandRoute,
-  OutletRoute: OutletRoute,
   SettingsRoute: SettingsRoute,
   UserCareerRoute: UserCareerRoute,
   AboutLazyRoute: AboutLazyRoute,
   BeritaCreateRoute: BeritaCreateRoute,
+  OutletCreateRoute: OutletCreateRoute,
   PromoCreateRoute: PromoCreateRoute,
   BeritaIndexRoute: BeritaIndexRoute,
+  OutletIndexRoute: OutletIndexRoute,
   PromoIndexRoute: PromoIndexRoute,
+  BeritaBeritaIdEditRoute: BeritaBeritaIdEditRoute,
+  OutletOutletIdEditRoute: OutletOutletIdEditRoute,
+  PromoPromoIdEditRoute: PromoPromoIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

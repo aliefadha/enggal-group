@@ -33,23 +33,39 @@ export class PromoController {
       type: 'object',
       properties: {
         title: { type: 'string', example: 'Promo Spesial Akhir Tahun' },
-        subtitle: { type: 'string', example: 'Diskon hingga 50% untuk semua produk' },
+        subtitle: {
+          type: 'string',
+          example: 'Diskon hingga 50% untuk semua produk',
+        },
         description: {
           type: 'string',
-          example: 'Nikmati potongan harga besar untuk berbagai produk pilihan selama periode promo.',
+          example:
+            'Nikmati potongan harga besar untuk berbagai produk pilihan selama periode promo.',
         },
         syaratKetentuan: {
           type: 'string',
-          example: 'Berlaku untuk pembelian minimal Rp500.000 dan tidak dapat digabung dengan promo lain.',
+          example:
+            'Berlaku untuk pembelian minimal Rp500.000 dan tidak dapat digabung dengan promo lain.',
         },
         berlakuHingga: { type: 'string', example: '2024-12-31' },
         brandId: { type: 'string', format: 'uuid' },
         image: { type: 'string', format: 'binary' },
       },
-      required: ['title', 'subtitle', 'description', 'syaratKetentuan', 'berlakuHingga', 'brandId', 'image'],
+      required: [
+        'title',
+        'subtitle',
+        'description',
+        'syaratKetentuan',
+        'berlakuHingga',
+        'brandId',
+        'image',
+      ],
     },
   })
-  create(@Body() dto: RequestPromoCreateDto, @UploadedFile() image?: StoredFile) {
+  create(
+    @Body() dto: RequestPromoCreateDto,
+    @UploadedFile() image?: StoredFile,
+  ) {
     if (!image) {
       throw new BadRequestException('Image file is required');
     }
@@ -67,7 +83,15 @@ export class PromoController {
     const page = Math.max(1, parseInt(query.page ?? '1', 10) || 1);
     const limitRaw = parseInt(query.limit ?? '10', 10) || 10;
     const limit = Math.min(Math.max(1, limitRaw), 100);
-    return this.promoService.findAll({ page, limit, brandId: query.brandId });
+    const startDate = query.startDate ? new Date(query.startDate) : undefined;
+    const endDate = query.endDate ? new Date(query.endDate) : undefined;
+    return this.promoService.findAll({
+      page,
+      limit,
+      brandId: query.brandId,
+      startDate,
+      endDate,
+    });
   }
 
   @Get(':id')
@@ -83,14 +107,19 @@ export class PromoController {
       type: 'object',
       properties: {
         title: { type: 'string', example: 'Promo Spesial Akhir Tahun' },
-        subtitle: { type: 'string', example: 'Diskon hingga 50% untuk semua produk' },
+        subtitle: {
+          type: 'string',
+          example: 'Diskon hingga 50% untuk semua produk',
+        },
         description: {
           type: 'string',
-          example: 'Nikmati potongan harga besar untuk berbagai produk pilihan selama periode promo.',
+          example:
+            'Nikmati potongan harga besar untuk berbagai produk pilihan selama periode promo.',
         },
         syaratKetentuan: {
           type: 'string',
-          example: 'Berlaku untuk pembelian minimal Rp500.000 dan tidak dapat digabung dengan promo lain.',
+          example:
+            'Berlaku untuk pembelian minimal Rp500.000 dan tidak dapat digabung dengan promo lain.',
         },
         berlakuHingga: { type: 'string', example: '2024-12-31' },
         brandId: { type: 'string', format: 'uuid' },
@@ -98,7 +127,11 @@ export class PromoController {
       },
     },
   })
-  update(@Param('id') id: string, @Body() dto: RequestPromoUpdateDto, @UploadedFile() image?: StoredFile) {
+  update(
+    @Param('id') id: string,
+    @Body() dto: RequestPromoUpdateDto,
+    @UploadedFile() image?: StoredFile,
+  ) {
     const payload: RequestPromoUpdateDto = {
       ...dto,
       ...(image ? { image: `/uploads/${image.filename}` } : {}),

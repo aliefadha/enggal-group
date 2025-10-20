@@ -2,6 +2,15 @@ import * as React from "react";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
+import { UserRound } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import {
   Sidebar,
@@ -157,9 +166,32 @@ export function DashboardLayout() {
           <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mx-2 h-6" />
+            <div className="ml-auto flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="h-11 w-11 rounded-full border border-white/20 bg-white/10 p-0 transition hover:bg-white/20"
+                  >
+                    <span className="sr-only">Open profile menu</span>
+                    <div className="flex h-full w-full items-center justify-center rounded-full bg-white">
+                      <UserRound className="size-5 text-[#6E0112]" />
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-40 rounded-2xl border border-[#F0F1F3]"
+                >
+                  <DropdownMenuItem className="text-[#C1272D]">
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </header>
           <div className="flex flex-1 flex-col overflow-auto">
-            <div className="grow p-4">
+            <div className="grow p-10 bg-[#F9F9F9]">
               <Outlet />
             </div>
           </div>

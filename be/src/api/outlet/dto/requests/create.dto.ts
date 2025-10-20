@@ -2,6 +2,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsUUID, IsUrl } from 'class-validator';
 
 export class RequestOutletCreateDto {
+  @ApiProperty({ example: 'Bakso Enggal Jakarta' })
+  @IsNotEmpty()
+  nama!: string;
+
   @ApiProperty({ example: 'Jakarta' })
   @IsNotEmpty()
   kota!: string;
@@ -14,9 +18,9 @@ export class RequestOutletCreateDto {
   @IsNotEmpty()
   lokasi!: string;
 
-  @ApiProperty({ example: '/uploads/outlet-jakarta.png' })
-  @IsNotEmpty()
-  image!: string;
+  @ApiPropertyOptional({ example: '/uploads/outlet-jakarta.png' })
+  @IsOptional()
+  image?: string;
 
   @ApiProperty({ example: 'https://maps.app.goo.gl/abcdefghijk' })
   @IsNotEmpty()

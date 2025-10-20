@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import type { Prisma } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { RequestUserCareerCreateDto } from '@/api/user-career/dto/requests/create.dto';
 import { RequestUserCareerUpdateDto } from '@/api/user-career/dto/requests/update.dto';
@@ -19,14 +20,37 @@ export class UserCareerService {
     });
   }
 
-  async findAll({ page = 1, limit = 10 }: { page?: number; limit?: number }) {
+  async findAll({
+    page = 1,
+    limit = 10,
+    startDate,
+    endDate,
+  }: {
+    page?: number;
+    limit?: number;
+    startDate?: Date;
+    endDate?: Date;
+  }) {
     const skip = (page - 1) * limit;
+    const where: Prisma.UserCareerWhereInput = {};
+
+    if (startDate || endDate) {
+      where.tanggal = {};
+      if (startDate) {
+        where.tanggal.gte = startDate;
+      }
+      if (endDate) {
+        where.tanggal.lte = endDate;
+      }
+    }
+
     const [total, data] = await this.prisma.$transaction([
-      this.prisma.userCareer.count(),
+      this.prisma.userCareer.count({ where }),
       this.prisma.userCareer.findMany({
         skip,
         take: limit,
         orderBy: { tanggal: 'desc' },
+        where,
       }),
     ]);
 

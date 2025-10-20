@@ -33,13 +33,19 @@ export class BrandController {
       type: 'object',
       properties: {
         nama: { type: 'string', example: 'Bakso Enggal' },
-        description: { type: 'string', example: 'Restoran bakso prasmanan pertama di Indonesia.' },
+        description: {
+          type: 'string',
+          example: 'Restoran bakso prasmanan pertama di Indonesia.',
+        },
         logo: { type: 'string', format: 'binary' },
       },
       required: ['nama', 'description', 'logo'],
     },
   })
-  create(@Body() dto: RequestBrandCreateDto, @UploadedFile() logo?: StoredFile) {
+  create(
+    @Body() dto: RequestBrandCreateDto,
+    @UploadedFile() logo?: StoredFile,
+  ) {
     if (!logo) {
       throw new BadRequestException('Logo file is required');
     }
@@ -73,12 +79,19 @@ export class BrandController {
       type: 'object',
       properties: {
         nama: { type: 'string', example: 'Bakso Enggal' },
-        description: { type: 'string', example: 'Restoran bakso prasmanan pertama di Indonesia.' },
+        description: {
+          type: 'string',
+          example: 'Restoran bakso prasmanan pertama di Indonesia.',
+        },
         logo: { type: 'string', format: 'binary' },
       },
     },
   })
-  update(@Param('id') id: string, @Body() dto: RequestBrandUpdateDto, @UploadedFile() logo?: StoredFile) {
+  update(
+    @Param('id') id: string,
+    @Body() dto: RequestBrandUpdateDto,
+    @UploadedFile() logo?: StoredFile,
+  ) {
     const payload: RequestBrandUpdateDto = {
       ...dto,
       ...(logo ? { logo: `/uploads/${logo.filename}` } : {}),
