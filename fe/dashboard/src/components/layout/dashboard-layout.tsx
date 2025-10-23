@@ -1,5 +1,10 @@
 import * as React from "react";
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import {
+  Link,
+  Outlet,
+  useNavigate,
+  useRouterState,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
 import { UserRound } from "lucide-react";
@@ -34,6 +39,7 @@ import dashboardIcon from "@/assets/icons/dashboard.svg";
 import outletIcon from "@/assets/icons/outlet.svg";
 import promoIcon from "@/assets/icons/promo.svg";
 import userCareerIcon from "@/assets/icons/usercareer.svg";
+import { useAuth } from "@/auth";
 
 type NavItem = {
   title: string;
@@ -45,7 +51,7 @@ type NavItem = {
 const primaryNav: NavItem[] = [
   {
     title: "Dashboard",
-    href: "/",
+    href: "/dashboard",
     icon: dashboardIcon,
     exact: true,
   },
@@ -158,6 +164,13 @@ function AppSidebar() {
 }
 
 export function DashboardLayout() {
+  const auth = useAuth();
+  const navigate = useNavigate({ from: "/dashboard" });
+
+  const handleLogout = () => {
+    auth.logout();
+    navigate({ to: "/login" });
+  };
   return (
     <SidebarProvider style={sidebarTheme}>
       <div className="bg-background flex min-h-svh w-full">
@@ -183,7 +196,10 @@ export function DashboardLayout() {
                   align="end"
                   className="w-40 rounded-2xl border border-[#F0F1F3]"
                 >
-                  <DropdownMenuItem className="text-[#C1272D]">
+                  <DropdownMenuItem
+                    className="text-[#C1272D]"
+                    onClick={handleLogout}
+                  >
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -195,9 +211,6 @@ export function DashboardLayout() {
               <Outlet />
             </div>
           </div>
-          {import.meta.env.DEV ? (
-            <TanStackRouterDevtools position="bottom-right" />
-          ) : null}
         </SidebarInset>
       </div>
     </SidebarProvider>

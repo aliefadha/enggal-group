@@ -9,6 +9,7 @@ import {
   Put,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -19,13 +20,15 @@ import { OutletListQueryDto } from '@/api/outlet/dto/requests/list.query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadDiskStorage } from '../upload/upload.storage';
 import { StoredFile } from '../upload/upload.types';
+import { JwtAuthGuard } from '../auth/guard/jwt-guard.auth';
 
 @ApiTags('outlet')
 @Controller('outlet')
 export class OutletController {
-  constructor(private readonly outletService: OutletService) { }
+  constructor(private readonly outletService: OutletService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image', { storage: uploadDiskStorage }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -97,6 +100,7 @@ export class OutletController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image', { storage: uploadDiskStorage }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -137,6 +141,7 @@ export class OutletController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string) {
     return this.outletService.remove(id);
   }

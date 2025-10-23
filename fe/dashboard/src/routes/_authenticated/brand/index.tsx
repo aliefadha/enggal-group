@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { createFileRoute } from "@tanstack/react-router";
-import { Search, Pencil, Trash2, Upload, Plus, Loader2 } from "lucide-react";
+import { Search, Trash2, Upload, Plus, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -98,7 +98,7 @@ const updateBrand = async ({ id, formData }: UpdateBrandPayload) => {
   return response.data;
 };
 
-export const Route = createFileRoute("/brand")({
+export const Route = createFileRoute("/_authenticated/brand/")({
   component: RouteComponent,
 });
 

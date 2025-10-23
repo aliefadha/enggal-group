@@ -34,6 +34,13 @@ export async function apiFetch<TData, TMeta = unknown>(
   const url = input.startsWith("http") ? input : `${baseUrl}${input}`;
   const mergedHeaders = new Headers(headers);
 
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("auth-token");
+    if (token && !mergedHeaders.has("Authorization")) {
+      mergedHeaders.set("Authorization", `Bearer ${token}`);
+    }
+  }
+
   const isFormData = options.body instanceof FormData;
   if (!isFormData && options.body && !mergedHeaders.has("Content-Type")) {
     mergedHeaders.set("Content-Type", "application/json");

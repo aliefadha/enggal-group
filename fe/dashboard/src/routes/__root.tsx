@@ -1,6 +1,22 @@
-import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { createRootRoute } from "@tanstack/react-router";
+import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
-export const Route = createRootRoute({
-  component: DashboardLayout,
+interface AuthState {
+  isAuthenticated: boolean;
+  user: { id: string; name: string; email: string } | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+}
+
+interface MyRouterContext {
+  auth: AuthState;
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
+  component: () => (
+    <div>
+      <Outlet />
+      <TanStackRouterDevtools />
+    </div>
+  ),
 });

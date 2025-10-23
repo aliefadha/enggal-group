@@ -9,6 +9,7 @@ import {
   Put,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -19,6 +20,7 @@ import { RequestPromoUpdateDto } from '@/api/promo/dto/requests/update.dto';
 import { PromoListQueryDto } from '@/api/promo/dto/requests/list.query.dto';
 import { uploadDiskStorage } from '@/api/upload/upload.storage';
 import type { StoredFile } from '@/api/upload/upload.types';
+import { JwtAuthGuard } from '../auth/guard/jwt-guard.auth';
 
 @ApiTags('promo')
 @Controller('promo')
@@ -26,6 +28,7 @@ export class PromoController {
   constructor(private readonly promoService: PromoService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image', { storage: uploadDiskStorage }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -100,6 +103,7 @@ export class PromoController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image', { storage: uploadDiskStorage }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -140,6 +144,7 @@ export class PromoController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string) {
     return this.promoService.remove(id);
   }

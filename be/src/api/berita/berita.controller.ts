@@ -9,6 +9,7 @@ import {
   Put,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -19,6 +20,7 @@ import { RequestBeritaUpdateDto } from '@/api/berita/dto/requests/update.dto';
 import { BeritaListQueryDto } from '@/api/berita/dto/requests/list.query.dto';
 import { uploadDiskStorage } from '@/api/upload/upload.storage';
 import type { StoredFile } from '@/api/upload/upload.types';
+import { JwtAuthGuard } from '../auth/guard/jwt-guard.auth';
 
 @ApiTags('berita')
 @Controller('berita')
@@ -26,6 +28,7 @@ export class BeritaController {
   constructor(private readonly beritaService: BeritaService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image', { storage: uploadDiskStorage }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -96,6 +99,7 @@ export class BeritaController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image', { storage: uploadDiskStorage }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -128,6 +132,7 @@ export class BeritaController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string) {
     return this.beritaService.remove(id);
   }

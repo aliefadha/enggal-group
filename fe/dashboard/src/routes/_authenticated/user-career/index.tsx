@@ -32,7 +32,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { apiClient } from "@/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 
-export const Route = createFileRoute("/user-career")({
+export const Route = createFileRoute("/_authenticated/user-career/")({
   component: RouteComponent,
 });
 

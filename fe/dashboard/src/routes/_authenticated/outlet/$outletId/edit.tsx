@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { ApiError, apiClient } from "@/lib/api-client";
 
-export const Route = createFileRoute("/outlet/$outletId/edit")({
+export const Route = createFileRoute("/_authenticated/outlet/$outletId/edit")({
   component: RouteComponent,
 });
 

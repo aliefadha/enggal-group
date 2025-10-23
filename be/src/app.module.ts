@@ -14,6 +14,7 @@ import { TeamModule } from './api/team/team.module';
 import { UploadModule } from './api/upload/upload.module';
 import { BeritaModule } from './api/berita/berita.module';
 import { DashboardModule } from './api/dashboard/dashboard.module';
+import { AuthModule } from './api/auth/auth.module';
 
 @Module({
   imports: [
@@ -30,11 +31,15 @@ import { DashboardModule } from './api/dashboard/dashboard.module';
     UploadModule,
     BeritaModule,
     DashboardModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, {
-    provide: APP_INTERCEPTOR,
-    useClass: LoggingInterceptor
-  }],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+  ],
 })
 export class AppModule {}

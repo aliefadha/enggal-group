@@ -1,11 +1,38 @@
 import * as React from "react";
 
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Filter, Loader2, Plus, Search, Trash2 } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Calendar as CalendarIcon,
+  Loader2,
+  Plus,
+  Search,
+  Trash2,
+} from "lucide-react";
+import { format } from "date-fns";
+import type { DateRange } from "react-day-picker";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
+import { ApiError, apiClient } from "@/lib/api-client";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -21,77 +48,55 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { ApiError, apiClient } from "@/lib/api-client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Edit from "@/assets/icons/edit.svg";
 import { toast } from "sonner";
+import Edit from "@/assets/icons/edit.svg";
 
-export const Route = createFileRoute("/outlet/")({
+export const Route = createFileRoute("/_authenticated/berita/")({
   component: RouteComponent,
 });
 
-type OutletItem = {
+type BeritaItem = {
   id: string;
-  nama: string;
-  kota: string;
-  namaBrand: string;
-  jamOperasional: string;
-  whatsappUrl: string;
-  googleMapsLink: string;
-  lokasi: string;
-  image: string;
+  judul: string;
+  image?: string;
+  createdDate?: string;
+  penulis: string;
+  content: string;
 };
 
-type OutletListMeta = {
+type BeritaListMeta = {
   page?: number;
   limit?: number;
   total?: number;
   totalPages?: number;
 };
 
-type BrandOption = {
-  id: string;
-  nama: string;
-};
-
-type BrandListMeta = {
-  page?: number;
-  limit?: number;
-  total?: number;
-  totalPages?: number;
-};
-
-async function fetchOutlet({
+async function fetchNews({
   page,
   limit,
-  brandId,
+  startDate,
+  endDate,
 }: {
   page: number;
   limit: number;
-  brandId?: string;
+  startDate?: string;
+  endDate?: string;
 }) {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
   });
 
-  if (brandId) {
-    params.set("brandId", brandId);
+  if (startDate) {
+    params.set("startDate", startDate);
   }
 
-  const response = await apiClient.get<OutletItem[], OutletListMeta>(
-    `/outlet?${params}`,
+  if (endDate) {
+    params.set("endDate", endDate);
+  }
+
+  const response = await apiClient.get<BeritaItem[], BeritaListMeta>(
+    `/berita?${params}`,
   );
 
   const items = response.data ?? [];
@@ -107,66 +112,60 @@ async function fetchOutlet({
   };
 }
 
-const fetchBrandOptions = async () => {
-  const params = new URLSearchParams({
-    page: "1",
-    limit: "100",
-  });
+function formatDisplayDate(date?: string) {
+  if (!date) {
+    return "-";
+  }
 
-  const response = await apiClient.get<BrandOption[], BrandListMeta>(
-    `/brand?${params}`,
-  );
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) {
+    return date;
+  }
 
-  return response.data ?? [];
-};
+  return format(parsed, "dd-MM-yyyy");
+}
 
 function RouteComponent() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [pagination, setPagination] = React.useState({ page: 1, limit: 15 });
-  const [selectedBrandId, setSelectedBrandId] = React.useState<
-    string | undefined
-  >(undefined);
+
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>();
+
+  const queryClient = useQueryClient();
   const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(
     null,
   );
-  const queryClient = useQueryClient();
-  const { data: brandOptions = [], isLoading: isBrandLoading } = useQuery({
-    queryKey: ["brands", "options"],
-    queryFn: fetchBrandOptions,
-  });
+
+  const startDateParam = dateRange?.from
+    ? format(dateRange.from, "yyyy-MM-dd")
+    : undefined;
+  const endDateParam = dateRange?.to
+    ? format(dateRange.to, "yyyy-MM-dd")
+    : undefined;
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: [
-      "outlets",
+      "berita",
       pagination.page,
       pagination.limit,
-      selectedBrandId ?? null,
+      startDateParam ?? null,
+      endDateParam ?? null,
     ],
     queryFn: () =>
-      fetchOutlet({
+      fetchNews({
         ...pagination,
-        brandId: selectedBrandId,
+        startDate: startDateParam,
+        endDate: endDateParam,
       }),
   });
 
-  const outlets = React.useMemo(() => {
+  const news = React.useMemo(() => {
     const items = data?.data ?? [];
-    return items.filter((item) =>
-      (item.nama ?? "").toLowerCase().includes(searchTerm.toLowerCase()),
+    const filtered = items.filter((item: BeritaItem) =>
+      (item.judul ?? "").toLowerCase().includes(searchTerm.toLowerCase()),
     );
+    return filtered;
   }, [data?.data, searchTerm]);
-
-  const totalItems = data?.meta.total ?? 0;
-  const totalPages =
-    totalItems > 0 ? Math.ceil(totalItems / pagination.limit) : 1;
-  const startItemIndex =
-    totalItems === 0 ? 0 : (pagination.page - 1) * pagination.limit + 1;
-  const endItemIndex =
-    totalItems === 0
-      ? 0
-      : Math.min(pagination.page * pagination.limit, totalItems);
-  const isPrevDisabled = pagination.page <= 1 || isLoading;
-  const isNextDisabled = pagination.page >= totalPages || isLoading;
-  const shouldShowPagination = totalPages > 1 && !isError;
 
   const handleLimitChange = (value: string) => {
     const newLimit = Number(value);
@@ -176,38 +175,27 @@ function RouteComponent() {
     }));
   };
 
-  const handleBrandChange = (value: string) => {
-    setSelectedBrandId(value === "all" ? undefined : value);
+  const handleDateRangeChange = (value: DateRange | undefined) => {
+    setDateRange(value);
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
-  const handlePageChange = (direction: "prev" | "next") => {
-    setPagination((prev) => {
-      if (direction === "prev") {
-        const nextPage = Math.max(prev.page - 1, 1);
-        return { ...prev, page: nextPage };
-      }
-
-      const nextPage = Math.min(prev.page + 1, totalPages);
-      return { ...prev, page: nextPage };
-    });
-  };
-
-  const deleteOutletMutation = useMutation({
+  const deleteNewsMutation = useMutation({
     mutationFn: async (id: string) => {
-      await apiClient.delete(`/outlet/${id}`);
+      await apiClient.delete(`/berita/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["outlets"] });
-      toast.success("Outlet berhasil dihapus.");
+      queryClient.invalidateQueries({ queryKey: ["berita"] });
+      toast.success("Berita berhasil dihapus.");
     },
     onError: (mutationError: unknown) => {
       const message =
         mutationError instanceof ApiError
-          ? mutationError.message || "Gagal menghapus outlet."
+          ? mutationError.message || "Gagal menghapus berita."
           : mutationError instanceof Error
             ? mutationError.message
-            : "Gagal menghapus outlet. Silakan coba lagi.";
+            : "Gagal menghapus berita. Silakan coba lagi.";
+
       toast.error(message);
     },
     onSettled: () => {
@@ -215,17 +203,62 @@ function RouteComponent() {
     },
   });
 
-  const { mutate: deleteOutlet, isPending: isDeletePending } =
-    deleteOutletMutation;
+  const { mutate: deleteNews, isPending: isDeletePending } = deleteNewsMutation;
 
   const handleDelete = (id: string) => {
     setDeleteTargetId(id);
-    deleteOutlet(id);
+    deleteNews(id);
   };
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-[#9C1A1C]">Daftar Outlet</h1>
+      <div className="flex justify-between">
+        <h1 className="text-2xl font-semibold text-[#9C1A1C]">Daftar Berita</h1>
+        <div className="flex justify-between space-x-6">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-12 rounded-2xl border border-[#F0F1F3] bg-[#F9FBFD] px-4 text-sm font-medium text-[#4F4F4F] hover:bg-[#f1f3f7]"
+              >
+                <CalendarIcon className="mr-2 size-4 text-[#A25C67]" />
+                {dateRange?.from && dateRange?.to
+                  ? `${format(dateRange.from, "MMM dd yyyy")} - ${format(
+                      dateRange.to,
+                      "MMM dd yyyy",
+                    )}`
+                  : dateRange?.from
+                    ? `${format(dateRange.from, "MMM dd yyyy")} - …`
+                    : "Pilih Rentang Tanggal"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto rounded-2xl border border-[#F0F1F3] bg-white p-4"
+              align="end"
+            >
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={dateRange?.from ?? dateRange?.to ?? new Date()}
+                selected={dateRange}
+                onSelect={handleDateRangeChange}
+                numberOfMonths={2}
+              />
+            </PopoverContent>
+          </Popover>
+          <Button
+            type="button"
+            asChild
+            className="h-12 rounded-2xl bg-[#6E0112] px-6 text-sm font-semibold text-white hover:bg-[#5a010e]"
+          >
+            <Link to="/berita/create">
+              <Plus className="mr-2 size-4" />
+              Tambah Berita
+            </Link>
+          </Button>
+        </div>
+      </div>
       <Card className="border-none shadow-sm">
         <CardContent className="space-y-6 p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -233,30 +266,13 @@ function RouteComponent() {
               <div className="relative w-full max-w-sm">
                 <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#A25C67]" />
                 <Input
-                  placeholder="Cari Outlet"
+                  placeholder="Cari Berita"
                   className="h-12 rounded-2xl border border-[#F0F1F3] bg-[#F9FBFD] pl-11 text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
                 />
               </div>
-              <Select
-                value={selectedBrandId ?? "all"}
-                onValueChange={handleBrandChange}
-                disabled={isBrandLoading}
-              >
-                <SelectTrigger className="relative h-12 w-full min-w-[12rem] rounded-2xl border border-[#F0F1F3] bg-[#F9FBFD] pl-11 pr-4 text-left text-sm font-medium text-[#4F4F4F] focus:ring-0 focus:ring-offset-0 md:w-60">
-                  <Filter className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#A25C67]" />
-                  <SelectValue placeholder="Semua brand" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua brand</SelectItem>
-                  {brandOptions.map((brand) => (
-                    <SelectItem key={brand.id} value={brand.id}>
-                      {brand.nama}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+
               <div className="flex items-center gap-3 text-sm text-[#A25C67]">
                 <span>Page</span>
                 <Select
@@ -274,16 +290,6 @@ function RouteComponent() {
                 </Select>
               </div>
             </div>
-            <Button
-              type="button"
-              asChild
-              className="h-12 rounded-2xl bg-[#6E0112] px-6 text-sm font-semibold text-white hover:bg-[#5a010e]"
-            >
-              <Link to="/outlet/create">
-                <Plus className="mr-2 size-4" />
-                Tambah Outlet
-              </Link>
-            </Button>
           </div>
 
           <div className="overflow-hidden rounded-3xl border border-[#F0F1F3] bg-white">
@@ -293,11 +299,11 @@ function RouteComponent() {
                   <TableHead className="w-16 text-center text-[#9C1A1C]">
                     No
                   </TableHead>
-                  <TableHead className="text-[#9C1A1C]">Nama Outlet</TableHead>
-                  <TableHead className="w-48 text-[#9C1A1C]">Brand</TableHead>
                   <TableHead className="w-40 text-[#9C1A1C]">
-                    Jam Operasional
+                    Tanggal Publish
                   </TableHead>
+                  <TableHead className="text-[#9C1A1C]">Judul Berita</TableHead>
+                  <TableHead className="w-40 text-[#9C1A1C]">Penulis</TableHead>
                   <TableHead className="w-32 text-center text-[#9C1A1C]">
                     Aksi
                   </TableHead>
@@ -312,7 +318,7 @@ function RouteComponent() {
                     >
                       <div className="flex items-center justify-center gap-2">
                         <Loader2 className="size-4 animate-spin" />
-                        Memuat data outlet...
+                        Memuat data berita...
                       </div>
                     </TableCell>
                   </TableRow>
@@ -322,55 +328,55 @@ function RouteComponent() {
                       colSpan={5}
                       className="py-12 text-center text-sm text-[#C1272D]"
                     >
-                      Terjadi kesalahan saat memuat data outlet.
+                      Terjadi kesalahan saat memuat data berita.
                       <br />
                       <span className="text-xs text-[#9C1A1C]/70">
                         {(error as Error)?.message ?? "Silakan coba lagi."}
                       </span>
                     </TableCell>
                   </TableRow>
-                ) : outlets.length === 0 ? (
+                ) : news.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={5}
                       className="py-12 text-center text-sm text-[#6B7280]"
                     >
-                      Tidak ada outlet yang tersedia.
+                      Tidak ada data berita yang tersedia.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  outlets.map((outlet, index) => (
+                  news.map((item: BeritaItem, index: number) => (
                     <TableRow
-                      key={outlet.id}
+                      key={item.id}
                       className="border-b border-[#F0F1F3]"
                     >
                       <TableCell className="text-center text-sm text-[#4F4F4F]">
                         {(pagination.page - 1) * pagination.limit + index + 1}
                       </TableCell>
+                      <TableCell className="text-sm text-[#4F4F4F]">
+                        {formatDisplayDate(item.createdDate)}
+                      </TableCell>
                       <TableCell className="text-sm font-medium text-[#4F4F4F]">
-                        {outlet.nama}
+                        {item.judul}
                       </TableCell>
                       <TableCell className="text-sm text-[#6B7280]">
-                        {outlet.namaBrand}
-                      </TableCell>
-                      <TableCell className="text-sm text-[#6B7280]">
-                        {outlet.jamOperasional}
+                        {item.penulis}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center justify-center gap-3">
                           <Button
                             size="icon"
+                            className="h-10 w-10 rounded-xl bg-[#FFECC9] hover:bg-[#FFD700]"
                             type="button"
                             asChild
-                            className="h-10 w-10 rounded-xl bg-[#FFECC9] hover:bg-[#FFD700]"
                           >
                             <Link
-                              to="/outlet/$outletId/edit"
-                              params={{ outletId: outlet.id }}
+                              to="/berita/$beritaId/edit"
+                              params={{ beritaId: item.id }}
                             >
                               <img
                                 src={Edit}
-                                alt="Edit outlet"
+                                alt="Edit promo"
                                 className="size-4"
                               />
                             </Link>
@@ -382,12 +388,11 @@ function RouteComponent() {
                                 type="button"
                                 className="h-10 w-10 rounded-xl bg-[#C1272D] hover:bg-[#a01f24]"
                                 disabled={
-                                  isDeletePending &&
-                                  deleteTargetId === outlet.id
+                                  isDeletePending && deleteTargetId === item.id
                                 }
                               >
                                 {isDeletePending &&
-                                deleteTargetId === outlet.id ? (
+                                deleteTargetId === item.id ? (
                                   <Loader2 className="size-4 animate-spin text-white" />
                                 ) : (
                                   <Trash2 className="size-4 text-white" />
@@ -397,10 +402,10 @@ function RouteComponent() {
                             <AlertDialogContent className="rounded-2xl">
                               <AlertDialogHeader>
                                 <AlertDialogTitle>
-                                  Hapus outlet ini?
+                                  Hapus berita ini?
                                 </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Tindakan ini tidak dapat dibatalkan. Outlet
+                                  Tindakan ini tidak dapat dibatalkan. Berita
                                   yang dihapus akan hilang secara permanen.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
@@ -412,12 +417,12 @@ function RouteComponent() {
                                   className="rounded-2xl bg-[#C1272D] hover:bg-[#a01f24]"
                                   disabled={
                                     isDeletePending &&
-                                    deleteTargetId === outlet.id
+                                    deleteTargetId === item.id
                                   }
-                                  onClick={() => handleDelete(outlet.id)}
+                                  onClick={() => handleDelete(item.id)}
                                 >
                                   {isDeletePending &&
-                                  deleteTargetId === outlet.id ? (
+                                  deleteTargetId === item.id ? (
                                     <Loader2 className="mr-2 size-4 animate-spin" />
                                   ) : null}
                                   Hapus
@@ -433,37 +438,6 @@ function RouteComponent() {
               </TableBody>
             </Table>
           </div>
-          {shouldShowPagination ? (
-            <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-[#6B7280]">
-                Menampilkan {startItemIndex}-{endItemIndex} dari {totalItems}{" "}
-                outlet
-              </p>
-              <div className="flex items-center gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-10 rounded-2xl border border-[#D6DAE1] bg-white px-4 text-sm font-medium text-[#4F4F4F]"
-                  onClick={() => handlePageChange("prev")}
-                  disabled={isPrevDisabled}
-                >
-                  Sebelumnya
-                </Button>
-                <span className="text-sm font-medium text-[#4F4F4F]">
-                  Halaman {pagination.page} dari {totalPages}
-                </span>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-10 rounded-2xl border border-[#D6DAE1] bg-white px-4 text-sm font-medium text-[#4F4F4F]"
-                  onClick={() => handlePageChange("next")}
-                  disabled={isNextDisabled}
-                >
-                  Selanjutnya
-                </Button>
-              </div>
-            </div>
-          ) : null}
         </CardContent>
       </Card>
     </div>

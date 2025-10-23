@@ -9,6 +9,7 @@ import {
   Put,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -19,6 +20,7 @@ import { RequestBrandUpdateDto } from '@/api/brand/dto/requests/update.dto';
 import { BrandListQueryDto } from '@/api/brand/dto/requests/list.query.dto';
 import { uploadDiskStorage } from '@/api/upload/upload.storage';
 import type { StoredFile } from '@/api/upload/upload.types';
+import { JwtAuthGuard } from '../auth/guard/jwt-guard.auth';
 
 @ApiTags('brand')
 @Controller('brand')
@@ -26,6 +28,7 @@ export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('logo', { storage: uploadDiskStorage }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -72,6 +75,7 @@ export class BrandController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('logo', { storage: uploadDiskStorage }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -101,6 +105,7 @@ export class BrandController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string) {
     return this.brandService.remove(id);
   }

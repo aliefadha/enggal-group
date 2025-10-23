@@ -8,43 +8,36 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UserCareerRouteImport } from './routes/user-career'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as BrandRouteImport } from './routes/brand'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PromoIndexRouteImport } from './routes/promo/index'
-import { Route as OutletIndexRouteImport } from './routes/outlet/index'
-import { Route as BeritaIndexRouteImport } from './routes/berita/index'
-import { Route as PromoCreateRouteImport } from './routes/promo/create'
-import { Route as OutletCreateRouteImport } from './routes/outlet/create'
-import { Route as BeritaCreateRouteImport } from './routes/berita/create'
-import { Route as PromoPromoIdEditRouteImport } from './routes/promo/$promoId/edit'
-import { Route as OutletOutletIdEditRouteImport } from './routes/outlet/$outletId/edit'
-import { Route as BeritaBeritaIdEditRouteImport } from './routes/berita/$beritaId/edit'
+import { Route as AuthenticatedUserCareerIndexRouteImport } from './routes/_authenticated/user-career/index'
+import { Route as AuthenticatedPromoIndexRouteImport } from './routes/_authenticated/promo/index'
+import { Route as AuthenticatedOutletIndexRouteImport } from './routes/_authenticated/outlet/index'
+import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
+import { Route as AuthenticatedBrandIndexRouteImport } from './routes/_authenticated/brand/index'
+import { Route as AuthenticatedBeritaIndexRouteImport } from './routes/_authenticated/berita/index'
+import { Route as AuthenticatedPromoCreateRouteImport } from './routes/_authenticated/promo/create'
+import { Route as AuthenticatedOutletCreateRouteImport } from './routes/_authenticated/outlet/create'
+import { Route as AuthenticatedBeritaCreateRouteImport } from './routes/_authenticated/berita/create'
+import { Route as AuthenticatedPromoPromoIdEditRouteImport } from './routes/_authenticated/promo/$promoId/edit'
+import { Route as AuthenticatedOutletOutletIdEditRouteImport } from './routes/_authenticated/outlet/$outletId/edit'
+import { Route as AuthenticatedBeritaBeritaIdEditRouteImport } from './routes/_authenticated/berita/$beritaId/edit'
 
-const AboutLazyRouteImport = createFileRoute('/about')()
-
-const AboutLazyRoute = AboutLazyRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
-const UserCareerRoute = UserCareerRouteImport.update({
-  id: '/user-career',
-  path: '/user-career',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BrandRoute = BrandRouteImport.update({
-  id: '/brand',
-  path: '/brand',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -52,185 +45,194 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PromoIndexRoute = PromoIndexRouteImport.update({
+const AuthenticatedUserCareerIndexRoute =
+  AuthenticatedUserCareerIndexRouteImport.update({
+    id: '/user-career/',
+    path: '/user-career/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPromoIndexRoute = AuthenticatedPromoIndexRouteImport.update({
   id: '/promo/',
   path: '/promo/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const OutletIndexRoute = OutletIndexRouteImport.update({
-  id: '/outlet/',
-  path: '/outlet/',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedOutletIndexRoute =
+  AuthenticatedOutletIndexRouteImport.update({
+    id: '/outlet/',
+    path: '/outlet/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardIndexRoute =
+  AuthenticatedDashboardIndexRouteImport.update({
+    id: '/dashboard/',
+    path: '/dashboard/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedBrandIndexRoute = AuthenticatedBrandIndexRouteImport.update({
+  id: '/brand/',
+  path: '/brand/',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const BeritaIndexRoute = BeritaIndexRouteImport.update({
-  id: '/berita/',
-  path: '/berita/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PromoCreateRoute = PromoCreateRouteImport.update({
-  id: '/promo/create',
-  path: '/promo/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OutletCreateRoute = OutletCreateRouteImport.update({
-  id: '/outlet/create',
-  path: '/outlet/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BeritaCreateRoute = BeritaCreateRouteImport.update({
-  id: '/berita/create',
-  path: '/berita/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PromoPromoIdEditRoute = PromoPromoIdEditRouteImport.update({
-  id: '/promo/$promoId/edit',
-  path: '/promo/$promoId/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OutletOutletIdEditRoute = OutletOutletIdEditRouteImport.update({
-  id: '/outlet/$outletId/edit',
-  path: '/outlet/$outletId/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BeritaBeritaIdEditRoute = BeritaBeritaIdEditRouteImport.update({
-  id: '/berita/$beritaId/edit',
-  path: '/berita/$beritaId/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticatedBeritaIndexRoute =
+  AuthenticatedBeritaIndexRouteImport.update({
+    id: '/berita/',
+    path: '/berita/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPromoCreateRoute =
+  AuthenticatedPromoCreateRouteImport.update({
+    id: '/promo/create',
+    path: '/promo/create',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedOutletCreateRoute =
+  AuthenticatedOutletCreateRouteImport.update({
+    id: '/outlet/create',
+    path: '/outlet/create',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedBeritaCreateRoute =
+  AuthenticatedBeritaCreateRouteImport.update({
+    id: '/berita/create',
+    path: '/berita/create',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedPromoPromoIdEditRoute =
+  AuthenticatedPromoPromoIdEditRouteImport.update({
+    id: '/promo/$promoId/edit',
+    path: '/promo/$promoId/edit',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedOutletOutletIdEditRoute =
+  AuthenticatedOutletOutletIdEditRouteImport.update({
+    id: '/outlet/$outletId/edit',
+    path: '/outlet/$outletId/edit',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedBeritaBeritaIdEditRoute =
+  AuthenticatedBeritaBeritaIdEditRouteImport.update({
+    id: '/berita/$beritaId/edit',
+    path: '/berita/$beritaId/edit',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/brand': typeof BrandRoute
+  '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
-  '/user-career': typeof UserCareerRoute
-  '/about': typeof AboutLazyRoute
-  '/berita/create': typeof BeritaCreateRoute
-  '/outlet/create': typeof OutletCreateRoute
-  '/promo/create': typeof PromoCreateRoute
-  '/berita': typeof BeritaIndexRoute
-  '/outlet': typeof OutletIndexRoute
-  '/promo': typeof PromoIndexRoute
-  '/berita/$beritaId/edit': typeof BeritaBeritaIdEditRoute
-  '/outlet/$outletId/edit': typeof OutletOutletIdEditRoute
-  '/promo/$promoId/edit': typeof PromoPromoIdEditRoute
+  '/berita/create': typeof AuthenticatedBeritaCreateRoute
+  '/outlet/create': typeof AuthenticatedOutletCreateRoute
+  '/promo/create': typeof AuthenticatedPromoCreateRoute
+  '/berita': typeof AuthenticatedBeritaIndexRoute
+  '/brand': typeof AuthenticatedBrandIndexRoute
+  '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/outlet': typeof AuthenticatedOutletIndexRoute
+  '/promo': typeof AuthenticatedPromoIndexRoute
+  '/user-career': typeof AuthenticatedUserCareerIndexRoute
+  '/berita/$beritaId/edit': typeof AuthenticatedBeritaBeritaIdEditRoute
+  '/outlet/$outletId/edit': typeof AuthenticatedOutletOutletIdEditRoute
+  '/promo/$promoId/edit': typeof AuthenticatedPromoPromoIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/brand': typeof BrandRoute
+  '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
-  '/user-career': typeof UserCareerRoute
-  '/about': typeof AboutLazyRoute
-  '/berita/create': typeof BeritaCreateRoute
-  '/outlet/create': typeof OutletCreateRoute
-  '/promo/create': typeof PromoCreateRoute
-  '/berita': typeof BeritaIndexRoute
-  '/outlet': typeof OutletIndexRoute
-  '/promo': typeof PromoIndexRoute
-  '/berita/$beritaId/edit': typeof BeritaBeritaIdEditRoute
-  '/outlet/$outletId/edit': typeof OutletOutletIdEditRoute
-  '/promo/$promoId/edit': typeof PromoPromoIdEditRoute
+  '/berita/create': typeof AuthenticatedBeritaCreateRoute
+  '/outlet/create': typeof AuthenticatedOutletCreateRoute
+  '/promo/create': typeof AuthenticatedPromoCreateRoute
+  '/berita': typeof AuthenticatedBeritaIndexRoute
+  '/brand': typeof AuthenticatedBrandIndexRoute
+  '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/outlet': typeof AuthenticatedOutletIndexRoute
+  '/promo': typeof AuthenticatedPromoIndexRoute
+  '/user-career': typeof AuthenticatedUserCareerIndexRoute
+  '/berita/$beritaId/edit': typeof AuthenticatedBeritaBeritaIdEditRoute
+  '/outlet/$outletId/edit': typeof AuthenticatedOutletOutletIdEditRoute
+  '/promo/$promoId/edit': typeof AuthenticatedPromoPromoIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/brand': typeof BrandRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
-  '/user-career': typeof UserCareerRoute
-  '/about': typeof AboutLazyRoute
-  '/berita/create': typeof BeritaCreateRoute
-  '/outlet/create': typeof OutletCreateRoute
-  '/promo/create': typeof PromoCreateRoute
-  '/berita/': typeof BeritaIndexRoute
-  '/outlet/': typeof OutletIndexRoute
-  '/promo/': typeof PromoIndexRoute
-  '/berita/$beritaId/edit': typeof BeritaBeritaIdEditRoute
-  '/outlet/$outletId/edit': typeof OutletOutletIdEditRoute
-  '/promo/$promoId/edit': typeof PromoPromoIdEditRoute
+  '/_authenticated/berita/create': typeof AuthenticatedBeritaCreateRoute
+  '/_authenticated/outlet/create': typeof AuthenticatedOutletCreateRoute
+  '/_authenticated/promo/create': typeof AuthenticatedPromoCreateRoute
+  '/_authenticated/berita/': typeof AuthenticatedBeritaIndexRoute
+  '/_authenticated/brand/': typeof AuthenticatedBrandIndexRoute
+  '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/outlet/': typeof AuthenticatedOutletIndexRoute
+  '/_authenticated/promo/': typeof AuthenticatedPromoIndexRoute
+  '/_authenticated/user-career/': typeof AuthenticatedUserCareerIndexRoute
+  '/_authenticated/berita/$beritaId/edit': typeof AuthenticatedBeritaBeritaIdEditRoute
+  '/_authenticated/outlet/$outletId/edit': typeof AuthenticatedOutletOutletIdEditRoute
+  '/_authenticated/promo/$promoId/edit': typeof AuthenticatedPromoPromoIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/brand'
+    | '/login'
     | '/settings'
-    | '/user-career'
-    | '/about'
     | '/berita/create'
     | '/outlet/create'
     | '/promo/create'
     | '/berita'
+    | '/brand'
+    | '/dashboard'
     | '/outlet'
     | '/promo'
+    | '/user-career'
     | '/berita/$beritaId/edit'
     | '/outlet/$outletId/edit'
     | '/promo/$promoId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/brand'
+    | '/login'
     | '/settings'
-    | '/user-career'
-    | '/about'
     | '/berita/create'
     | '/outlet/create'
     | '/promo/create'
     | '/berita'
+    | '/brand'
+    | '/dashboard'
     | '/outlet'
     | '/promo'
+    | '/user-career'
     | '/berita/$beritaId/edit'
     | '/outlet/$outletId/edit'
     | '/promo/$promoId/edit'
   id:
     | '__root__'
     | '/'
-    | '/brand'
+    | '/_authenticated'
+    | '/login'
     | '/settings'
-    | '/user-career'
-    | '/about'
-    | '/berita/create'
-    | '/outlet/create'
-    | '/promo/create'
-    | '/berita/'
-    | '/outlet/'
-    | '/promo/'
-    | '/berita/$beritaId/edit'
-    | '/outlet/$outletId/edit'
-    | '/promo/$promoId/edit'
+    | '/_authenticated/berita/create'
+    | '/_authenticated/outlet/create'
+    | '/_authenticated/promo/create'
+    | '/_authenticated/berita/'
+    | '/_authenticated/brand/'
+    | '/_authenticated/dashboard/'
+    | '/_authenticated/outlet/'
+    | '/_authenticated/promo/'
+    | '/_authenticated/user-career/'
+    | '/_authenticated/berita/$beritaId/edit'
+    | '/_authenticated/outlet/$outletId/edit'
+    | '/_authenticated/promo/$promoId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BrandRoute: typeof BrandRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
   SettingsRoute: typeof SettingsRoute
-  UserCareerRoute: typeof UserCareerRoute
-  AboutLazyRoute: typeof AboutLazyRoute
-  BeritaCreateRoute: typeof BeritaCreateRoute
-  OutletCreateRoute: typeof OutletCreateRoute
-  PromoCreateRoute: typeof PromoCreateRoute
-  BeritaIndexRoute: typeof BeritaIndexRoute
-  OutletIndexRoute: typeof OutletIndexRoute
-  PromoIndexRoute: typeof PromoIndexRoute
-  BeritaBeritaIdEditRoute: typeof BeritaBeritaIdEditRoute
-  OutletOutletIdEditRoute: typeof OutletOutletIdEditRoute
-  PromoPromoIdEditRoute: typeof PromoPromoIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/user-career': {
-      id: '/user-career'
-      path: '/user-career'
-      fullPath: '/user-career'
-      preLoaderRoute: typeof UserCareerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -238,11 +240,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/brand': {
-      id: '/brand'
-      path: '/brand'
-      fullPath: '/brand'
-      preLoaderRoute: typeof BrandRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -252,87 +261,132 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/promo/': {
-      id: '/promo/'
+    '/_authenticated/user-career/': {
+      id: '/_authenticated/user-career/'
+      path: '/user-career'
+      fullPath: '/user-career'
+      preLoaderRoute: typeof AuthenticatedUserCareerIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/promo/': {
+      id: '/_authenticated/promo/'
       path: '/promo'
       fullPath: '/promo'
-      preLoaderRoute: typeof PromoIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPromoIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/outlet/': {
-      id: '/outlet/'
+    '/_authenticated/outlet/': {
+      id: '/_authenticated/outlet/'
       path: '/outlet'
       fullPath: '/outlet'
-      preLoaderRoute: typeof OutletIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedOutletIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/berita/': {
-      id: '/berita/'
+    '/_authenticated/dashboard/': {
+      id: '/_authenticated/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/brand/': {
+      id: '/_authenticated/brand/'
+      path: '/brand'
+      fullPath: '/brand'
+      preLoaderRoute: typeof AuthenticatedBrandIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/berita/': {
+      id: '/_authenticated/berita/'
       path: '/berita'
       fullPath: '/berita'
-      preLoaderRoute: typeof BeritaIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedBeritaIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/promo/create': {
-      id: '/promo/create'
+    '/_authenticated/promo/create': {
+      id: '/_authenticated/promo/create'
       path: '/promo/create'
       fullPath: '/promo/create'
-      preLoaderRoute: typeof PromoCreateRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPromoCreateRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/outlet/create': {
-      id: '/outlet/create'
+    '/_authenticated/outlet/create': {
+      id: '/_authenticated/outlet/create'
       path: '/outlet/create'
       fullPath: '/outlet/create'
-      preLoaderRoute: typeof OutletCreateRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedOutletCreateRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/berita/create': {
-      id: '/berita/create'
+    '/_authenticated/berita/create': {
+      id: '/_authenticated/berita/create'
       path: '/berita/create'
       fullPath: '/berita/create'
-      preLoaderRoute: typeof BeritaCreateRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedBeritaCreateRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/promo/$promoId/edit': {
-      id: '/promo/$promoId/edit'
+    '/_authenticated/promo/$promoId/edit': {
+      id: '/_authenticated/promo/$promoId/edit'
       path: '/promo/$promoId/edit'
       fullPath: '/promo/$promoId/edit'
-      preLoaderRoute: typeof PromoPromoIdEditRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPromoPromoIdEditRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/outlet/$outletId/edit': {
-      id: '/outlet/$outletId/edit'
+    '/_authenticated/outlet/$outletId/edit': {
+      id: '/_authenticated/outlet/$outletId/edit'
       path: '/outlet/$outletId/edit'
       fullPath: '/outlet/$outletId/edit'
-      preLoaderRoute: typeof OutletOutletIdEditRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedOutletOutletIdEditRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/berita/$beritaId/edit': {
-      id: '/berita/$beritaId/edit'
+    '/_authenticated/berita/$beritaId/edit': {
+      id: '/_authenticated/berita/$beritaId/edit'
       path: '/berita/$beritaId/edit'
       fullPath: '/berita/$beritaId/edit'
-      preLoaderRoute: typeof BeritaBeritaIdEditRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedBeritaBeritaIdEditRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedBeritaCreateRoute: typeof AuthenticatedBeritaCreateRoute
+  AuthenticatedOutletCreateRoute: typeof AuthenticatedOutletCreateRoute
+  AuthenticatedPromoCreateRoute: typeof AuthenticatedPromoCreateRoute
+  AuthenticatedBeritaIndexRoute: typeof AuthenticatedBeritaIndexRoute
+  AuthenticatedBrandIndexRoute: typeof AuthenticatedBrandIndexRoute
+  AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedOutletIndexRoute: typeof AuthenticatedOutletIndexRoute
+  AuthenticatedPromoIndexRoute: typeof AuthenticatedPromoIndexRoute
+  AuthenticatedUserCareerIndexRoute: typeof AuthenticatedUserCareerIndexRoute
+  AuthenticatedBeritaBeritaIdEditRoute: typeof AuthenticatedBeritaBeritaIdEditRoute
+  AuthenticatedOutletOutletIdEditRoute: typeof AuthenticatedOutletOutletIdEditRoute
+  AuthenticatedPromoPromoIdEditRoute: typeof AuthenticatedPromoPromoIdEditRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedBeritaCreateRoute: AuthenticatedBeritaCreateRoute,
+  AuthenticatedOutletCreateRoute: AuthenticatedOutletCreateRoute,
+  AuthenticatedPromoCreateRoute: AuthenticatedPromoCreateRoute,
+  AuthenticatedBeritaIndexRoute: AuthenticatedBeritaIndexRoute,
+  AuthenticatedBrandIndexRoute: AuthenticatedBrandIndexRoute,
+  AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+  AuthenticatedOutletIndexRoute: AuthenticatedOutletIndexRoute,
+  AuthenticatedPromoIndexRoute: AuthenticatedPromoIndexRoute,
+  AuthenticatedUserCareerIndexRoute: AuthenticatedUserCareerIndexRoute,
+  AuthenticatedBeritaBeritaIdEditRoute: AuthenticatedBeritaBeritaIdEditRoute,
+  AuthenticatedOutletOutletIdEditRoute: AuthenticatedOutletOutletIdEditRoute,
+  AuthenticatedPromoPromoIdEditRoute: AuthenticatedPromoPromoIdEditRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BrandRoute: BrandRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
   SettingsRoute: SettingsRoute,
-  UserCareerRoute: UserCareerRoute,
-  AboutLazyRoute: AboutLazyRoute,
-  BeritaCreateRoute: BeritaCreateRoute,
-  OutletCreateRoute: OutletCreateRoute,
-  PromoCreateRoute: PromoCreateRoute,
-  BeritaIndexRoute: BeritaIndexRoute,
-  OutletIndexRoute: OutletIndexRoute,
-  PromoIndexRoute: PromoIndexRoute,
-  BeritaBeritaIdEditRoute: BeritaBeritaIdEditRoute,
-  OutletOutletIdEditRoute: OutletOutletIdEditRoute,
-  PromoPromoIdEditRoute: PromoPromoIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

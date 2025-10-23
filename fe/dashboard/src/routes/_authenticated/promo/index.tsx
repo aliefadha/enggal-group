@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Calendar as CalendarIcon,
@@ -12,27 +12,9 @@ import {
 import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import { ApiError, apiClient } from "@/lib/api-client";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -48,30 +30,47 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { ApiError, apiClient } from "@/lib/api-client";
 import { toast } from "sonner";
 import Edit from "@/assets/icons/edit.svg";
 
-export const Route = createFileRoute("/berita/")({
+export const Route = createFileRoute("/_authenticated/promo/")({
   component: RouteComponent,
 });
 
-type BeritaItem = {
+type PromoItem = {
   id: string;
-  judul: string;
-  image?: string;
-  createdDate?: string;
-  penulis: string;
-  content: string;
+  title: string;
+  berlakuHingga: string;
+  brandId: string;
+  namaBrand: string;
 };
 
-type BeritaListMeta = {
+type PromoListMeta = {
   page?: number;
   limit?: number;
   total?: number;
   totalPages?: number;
 };
 
-async function fetchNews({
+async function fetchPromo({
   page,
   limit,
   startDate,
@@ -95,8 +94,8 @@ async function fetchNews({
     params.set("endDate", endDate);
   }
 
-  const response = await apiClient.get<BeritaItem[], BeritaListMeta>(
-    `/berita?${params}`,
+  const response = await apiClient.get<PromoItem[], PromoListMeta>(
+    `/promo?${params}`,
   );
 
   const items = response.data ?? [];
@@ -128,9 +127,9 @@ function formatDisplayDate(date?: string) {
 function RouteComponent() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [pagination, setPagination] = React.useState({ page: 1, limit: 15 });
-
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>();
-
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(
+    undefined,
+  );
   const queryClient = useQueryClient();
   const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(
     null,
@@ -145,26 +144,25 @@ function RouteComponent() {
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: [
-      "berita",
+      "promos",
       pagination.page,
       pagination.limit,
       startDateParam ?? null,
       endDateParam ?? null,
     ],
     queryFn: () =>
-      fetchNews({
+      fetchPromo({
         ...pagination,
         startDate: startDateParam,
         endDate: endDateParam,
       }),
   });
 
-  const news = React.useMemo(() => {
+  const promos = React.useMemo(() => {
     const items = data?.data ?? [];
-    const filtered = items.filter((item: BeritaItem) =>
-      (item.judul ?? "").toLowerCase().includes(searchTerm.toLowerCase()),
+    return items.filter((item) =>
+      (item.namaBrand ?? "").toLowerCase().includes(searchTerm.toLowerCase()),
     );
-    return filtered;
   }, [data?.data, searchTerm]);
 
   const handleLimitChange = (value: string) => {
@@ -180,21 +178,21 @@ function RouteComponent() {
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
-  const deleteNewsMutation = useMutation({
+  const deletePromoMutation = useMutation({
     mutationFn: async (id: string) => {
-      await apiClient.delete(`/berita/${id}`);
+      await apiClient.delete(`/promo/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["berita"] });
-      toast.success("Berita berhasil dihapus.");
+      queryClient.invalidateQueries({ queryKey: ["promos"] });
+      toast.success("Promo berhasil dihapus.");
     },
     onError: (mutationError: unknown) => {
       const message =
         mutationError instanceof ApiError
-          ? mutationError.message || "Gagal menghapus berita."
+          ? mutationError.message || "Gagal menghapus promo."
           : mutationError instanceof Error
             ? mutationError.message
-            : "Gagal menghapus berita. Silakan coba lagi.";
+            : "Gagal menghapus promo. Silakan coba lagi.";
 
       toast.error(message);
     },
@@ -203,18 +201,19 @@ function RouteComponent() {
     },
   });
 
-  const { mutate: deleteNews, isPending: isDeletePending } = deleteNewsMutation;
+  const { mutate: deletePromo, isPending: isDeletePending } =
+    deletePromoMutation;
 
   const handleDelete = (id: string) => {
     setDeleteTargetId(id);
-    deleteNews(id);
+    deletePromo(id);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between">
-        <h1 className="text-2xl font-semibold text-[#9C1A1C]">Daftar Berita</h1>
-        <div className="flex justify-between space-x-6">
+        <h1 className="text-2xl font-semibold text-[#9C1A1C]">Daftar Promo</h1>
+        <div className="flex space-x-6">
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -252,9 +251,9 @@ function RouteComponent() {
             asChild
             className="h-12 rounded-2xl bg-[#6E0112] px-6 text-sm font-semibold text-white hover:bg-[#5a010e]"
           >
-            <Link to="/berita/create">
+            <Link to="/promo/create">
               <Plus className="mr-2 size-4" />
-              Tambah Berita
+              Tambah Promo
             </Link>
           </Button>
         </div>
@@ -262,33 +261,31 @@ function RouteComponent() {
       <Card className="border-none shadow-sm">
         <CardContent className="space-y-6 p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
-              <div className="relative w-full max-w-sm">
-                <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#A25C67]" />
-                <Input
-                  placeholder="Cari Berita"
-                  className="h-12 rounded-2xl border border-[#F0F1F3] bg-[#F9FBFD] pl-11 text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                  value={searchTerm}
-                  onChange={(event) => setSearchTerm(event.target.value)}
-                />
-              </div>
+            <div className="relative w-full max-w-sm">
+              <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[#A25C67]" />
+              <Input
+                placeholder="Cari Promo"
+                className="h-12 rounded-2xl border border-[#F0F1F3] bg-[#F9FBFD] pl-11 text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+            </div>
 
-              <div className="flex items-center gap-3 text-sm text-[#A25C67]">
-                <span>Page</span>
-                <Select
-                  value={String(pagination.limit)}
-                  onValueChange={handleLimitChange}
-                >
-                  <SelectTrigger className="h-12 w-24 rounded-2xl border border-[#F0F1F3] bg-[#F9FBFD] text-[#4F4F4F]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="15">15</SelectItem>
-                    <SelectItem value="20">20</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="flex items-center gap-3 text-sm text-[#A25C67]">
+              <span>Page</span>
+              <Select
+                value={String(pagination.limit)}
+                onValueChange={handleLimitChange}
+              >
+                <SelectTrigger className="h-12 w-24 rounded-2xl border border-[#F0F1F3] bg-[#F9FBFD] text-[#4F4F4F]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="15">15</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -299,11 +296,11 @@ function RouteComponent() {
                   <TableHead className="w-16 text-center text-[#9C1A1C]">
                     No
                   </TableHead>
+                  <TableHead className="text-[#9C1A1C]">Nama Promo</TableHead>
+                  <TableHead className="text-[#9C1A1C]">Brand</TableHead>
                   <TableHead className="w-40 text-[#9C1A1C]">
-                    Tanggal Publish
+                    Berlaku Hingga
                   </TableHead>
-                  <TableHead className="text-[#9C1A1C]">Judul Berita</TableHead>
-                  <TableHead className="w-40 text-[#9C1A1C]">Penulis</TableHead>
                   <TableHead className="w-32 text-center text-[#9C1A1C]">
                     Aksi
                   </TableHead>
@@ -313,66 +310,66 @@ function RouteComponent() {
                 {isLoading ? (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={4}
                       className="py-12 text-center text-sm text-[#6B7280]"
                     >
                       <div className="flex items-center justify-center gap-2">
                         <Loader2 className="size-4 animate-spin" />
-                        Memuat data berita...
+                        Memuat data promo...
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : isError ? (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={4}
                       className="py-12 text-center text-sm text-[#C1272D]"
                     >
-                      Terjadi kesalahan saat memuat data berita.
+                      Terjadi kesalahan saat memuat data promo.
                       <br />
                       <span className="text-xs text-[#9C1A1C]/70">
                         {(error as Error)?.message ?? "Silakan coba lagi."}
                       </span>
                     </TableCell>
                   </TableRow>
-                ) : news.length === 0 ? (
+                ) : promos.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={4}
                       className="py-12 text-center text-sm text-[#6B7280]"
                     >
-                      Tidak ada data berita yang tersedia.
+                      Tidak ada data promo yang tersedia.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  news.map((item: BeritaItem, index: number) => (
+                  promos.map((promo, index) => (
                     <TableRow
-                      key={item.id}
+                      key={promo.id}
                       className="border-b border-[#F0F1F3]"
                     >
                       <TableCell className="text-center text-sm text-[#4F4F4F]">
                         {(pagination.page - 1) * pagination.limit + index + 1}
                       </TableCell>
-                      <TableCell className="text-sm text-[#4F4F4F]">
-                        {formatDisplayDate(item.createdDate)}
-                      </TableCell>
                       <TableCell className="text-sm font-medium text-[#4F4F4F]">
-                        {item.judul}
+                        {promo.title}
                       </TableCell>
                       <TableCell className="text-sm text-[#6B7280]">
-                        {item.penulis}
+                        {promo.namaBrand}
+                      </TableCell>
+                      <TableCell className="text-sm text-[#6B7280]">
+                        {formatDisplayDate(promo.berlakuHingga)}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center justify-center gap-3">
                           <Button
                             size="icon"
-                            className="h-10 w-10 rounded-xl bg-[#FFECC9] hover:bg-[#FFD700]"
                             type="button"
                             asChild
+                            className="h-10 w-10 rounded-xl bg-[#FFECC9] hover:bg-[#FFD700]"
                           >
                             <Link
-                              to="/berita/$beritaId/edit"
-                              params={{ beritaId: item.id }}
+                              to="/promo/$promoId/edit"
+                              params={{ promoId: promo.id }}
                             >
                               <img
                                 src={Edit}
@@ -388,11 +385,11 @@ function RouteComponent() {
                                 type="button"
                                 className="h-10 w-10 rounded-xl bg-[#C1272D] hover:bg-[#a01f24]"
                                 disabled={
-                                  isDeletePending && deleteTargetId === item.id
+                                  isDeletePending && deleteTargetId === promo.id
                                 }
                               >
                                 {isDeletePending &&
-                                deleteTargetId === item.id ? (
+                                deleteTargetId === promo.id ? (
                                   <Loader2 className="size-4 animate-spin text-white" />
                                 ) : (
                                   <Trash2 className="size-4 text-white" />
@@ -402,10 +399,10 @@ function RouteComponent() {
                             <AlertDialogContent className="rounded-2xl">
                               <AlertDialogHeader>
                                 <AlertDialogTitle>
-                                  Hapus berita ini?
+                                  Hapus promo ini?
                                 </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Tindakan ini tidak dapat dibatalkan. Berita
+                                  Tindakan ini tidak dapat dibatalkan. Promo
                                   yang dihapus akan hilang secara permanen.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
@@ -417,12 +414,12 @@ function RouteComponent() {
                                   className="rounded-2xl bg-[#C1272D] hover:bg-[#a01f24]"
                                   disabled={
                                     isDeletePending &&
-                                    deleteTargetId === item.id
+                                    deleteTargetId === promo.id
                                   }
-                                  onClick={() => handleDelete(item.id)}
+                                  onClick={() => handleDelete(promo.id)}
                                 >
                                   {isDeletePending &&
-                                  deleteTargetId === item.id ? (
+                                  deleteTargetId === promo.id ? (
                                     <Loader2 className="mr-2 size-4 animate-spin" />
                                   ) : null}
                                   Hapus

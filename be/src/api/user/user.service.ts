@@ -1,19 +1,22 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
-import {
-  RequestUseCreateDto,
-} from '@/api/user/dto/requests/create.dto';
+import { RequestUserCreateDto } from '@/api/user/dto/requests/create.dto';
 import { RequestUserUpdateDto } from '@/api/user/dto/requests/update.dto';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async create(dto: RequestUseCreateDto ) {
+  async create(dto: RequestUserCreateDto) {
     const existingEmail = await this.prisma.user.findFirst({
       where: { email: dto.email },
-    })
+    });
 
     if (existingEmail) {
       throw new HttpException('Email already exists', HttpStatus.CONFLICT);
@@ -26,7 +29,7 @@ export class UserService {
         email: dto.email,
         nama: dto.nama,
         password: password,
-      }
+      },
     });
   }
 
@@ -39,7 +42,10 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return user;
+    return {
+      email: user.email,
+      nama: user.nama,
+    };
   }
 
   async update(id: string, dto: RequestUserUpdateDto) {
@@ -49,7 +55,9 @@ export class UserService {
     }
 
     if (dto.email && dto.email !== existing.email) {
-      const emailTaken = await this.prisma.user.findFirst({ where: { email: dto.email } });
+      const emailTaken = await this.prisma.user.findFirst({
+        where: { email: dto.email },
+      });
       if (emailTaken) {
         throw new HttpException('Email already exists', HttpStatus.CONFLICT);
       }
