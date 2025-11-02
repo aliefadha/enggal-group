@@ -1,7 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '@/prisma/prisma.service';
-import { RequestBrandCreateDto } from '@/api/brand/dto/requests/create.dto';
-import { RequestBrandUpdateDto } from '@/api/brand/dto/requests/update.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { RequestBrandCreateDto } from 'src/api/brand/dto/requests/create.dto';
+import { RequestBrandUpdateDto } from 'src/api/brand/dto/requests/update.dto';
 
 @Injectable()
 export class BrandService {
@@ -16,7 +20,14 @@ export class BrandService {
       data: {
         nama: dto.nama,
         logo: dto.logo,
+        coverImage: dto.coverImage,
+        title: dto.title,
         description: dto.description,
+        content: dto.content,
+        instagramLink: dto.instagramLink,
+        facebookLink: dto.facebookLink,
+        twitterLink: dto.twitterLink,
+        menuLink: dto.menuLink,
       },
     });
   }
@@ -62,7 +73,14 @@ export class BrandService {
       data: {
         nama: dto.nama ?? undefined,
         logo: dto.logo ?? undefined,
+        coverImage: dto.coverImage ?? undefined,
+        title: dto.title ?? undefined,
         description: dto.description ?? undefined,
+        content: dto.content ?? undefined,
+        instagramLink: dto.instagramLink ?? undefined,
+        facebookLink: dto.facebookLink ?? undefined,
+        twitterLink: dto.twitterLink ?? undefined,
+        menuLink: dto.menuLink ?? undefined,
       },
     });
   }

@@ -15,7 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Textarea } from "@/components/ui/textarea";
+import { Editor } from "@/components/ui/editor";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -80,6 +80,7 @@ function RouteComponent() {
   const [selectedImageFile, setSelectedImageFile] = React.useState<File | null>(
     null,
   );
+  const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string | null>(null);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
 
   const updateNewsMutation = useMutation({
@@ -131,6 +132,20 @@ function RouteComponent() {
     const file = event.target.files?.[0] ?? null;
     setSelectedImageName(file ? file.name : "");
     setSelectedImageFile(file);
+
+    // Clean up old preview URL
+    if (imagePreviewUrl && !imagePreviewUrl.startsWith('/uploads/')) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+
+    // Create new preview URL
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreviewUrl(previewUrl);
+    } else {
+      setImagePreviewUrl(null);
+    }
+
     setSubmitError(null);
     if (isUpdateSuccess || isUpdateError) {
       resetNewsMutation();
@@ -190,6 +205,7 @@ function RouteComponent() {
     setIsFormInitialized(false);
     setSelectedImageName("");
     setSelectedImageFile(null);
+    setImagePreviewUrl(null);
     setSubmitError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -208,17 +224,30 @@ function RouteComponent() {
       content: data.content ?? "",
     });
 
+    // Set existing image preview from server
+    if (data.image) {
+      setImagePreviewUrl(data.image);
+    }
+
     if (data.createdDate) {
       const parsedDate = new Date(data.createdDate);
       setPublishDate(
-        Number.isNaN(parsedDate.getTime()) ? undefined : parsedDate,
+        Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate,
       );
     } else {
-      setPublishDate(undefined);
+      setPublishDate(new Date());
     }
 
     setIsFormInitialized(true);
   }, [data, isFormInitialized]);
+
+  React.useEffect(() => {
+    return () => {
+      if (imagePreviewUrl && !imagePreviewUrl.startsWith('/uploads/')) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
 
   const isSubmitDisabled = isFormDisabled || isUpdatePending;
 
@@ -232,34 +261,58 @@ function RouteComponent() {
           <p className="text-sm text-[#D74E4E]">
             Disarankan menggunakan foto dengan ukuran rasio 3:4
           </p>
-          <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-6 text-center">
-            <Upload className="size-8 text-[#C1272D]" />
-            <div className="text-sm text-[#6B7280]">
-              Pilih Foto atau Drop Disini
+          {imagePreviewUrl ? (
+            <div className="space-y-4">
+              <div className="relative rounded-3xl border border-[#D6DAE1] bg-[#F9FBFD] p-4">
+                <img
+                  src={`${import.meta.env.VITE_API_BASE_URL}${imagePreviewUrl}`}
+                  alt="Preview"
+                  className="mx-auto max-h-96 rounded-2xl object-contain"
+                />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
+                disabled={isSubmitDisabled}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Ganti Foto
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                disabled={isSubmitDisabled}
+                onChange={handleFileChange}
+                className="hidden"
+              />
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              className="rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
-              disabled={isSubmitDisabled}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              Browse File
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              disabled={isSubmitDisabled}
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            {selectedImageName ? (
-              <p className="text-xs text-[#4F4F4F]">
-                File dipilih: {selectedImageName}
-              </p>
-            ) : null}
-          </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-6 text-center">
+              <Upload className="size-8 text-[#C1272D]" />
+              <div className="text-sm text-[#6B7280]">
+                Pilih Foto atau Drop Disini
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
+                disabled={isSubmitDisabled}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Browse File
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                disabled={isSubmitDisabled}
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
+          )}
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -325,12 +378,11 @@ function RouteComponent() {
           <Label className="text-sm font-medium text-[#2E2E2E]">
             Isi Berita<span className="text-[#C1272D]">*</span>
           </Label>
-          <Textarea
+          <Editor
             value={formState.content}
-            onChange={(event) => handleChange("content", event.target.value)}
+            onChange={(value) => handleChange("content", value)}
             placeholder="Masukan Isi Berita Disini"
             disabled={isSubmitDisabled}
-            className="min-h-[200px] rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
           />
         </div>
 

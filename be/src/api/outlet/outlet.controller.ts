@@ -13,10 +13,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { OutletService } from '@/api/outlet/outlet.service';
-import { RequestOutletCreateDto } from '@/api/outlet/dto/requests/create.dto';
-import { RequestOutletUpdateDto } from '@/api/outlet/dto/requests/update.dto';
-import { OutletListQueryDto } from '@/api/outlet/dto/requests/list.query.dto';
+import { OutletService } from 'src/api/outlet/outlet.service';
+import { RequestOutletCreateDto } from 'src/api/outlet/dto/requests/create.dto';
+import { RequestOutletUpdateDto } from 'src/api/outlet/dto/requests/update.dto';
+import { OutletListQueryDto } from 'src/api/outlet/dto/requests/list.query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadDiskStorage } from '../upload/upload.storage';
 import { StoredFile } from '../upload/upload.types';
@@ -36,7 +36,6 @@ export class OutletController {
       type: 'object',
       properties: {
         nama: { type: 'string', example: 'Bakso Enggal Jakarta' },
-        kota: { type: 'string', example: 'Jakarta' },
         jamOperasional: { type: 'string', example: '08:00 - 22:00' },
         lokasi: {
           type: 'string',
@@ -55,7 +54,6 @@ export class OutletController {
       },
       required: [
         'nama',
-        'kota',
         'jamOperasional',
         'lokasi',
         'googleMapsLink',
@@ -108,7 +106,6 @@ export class OutletController {
       type: 'object',
       properties: {
         nama: { type: 'string', example: 'Bakso Enggal Jakarta' },
-        kota: { type: 'string', example: 'Jakarta' },
         jamOperasional: { type: 'string', example: '08:00 - 22:00' },
         lokasi: {
           type: 'string',

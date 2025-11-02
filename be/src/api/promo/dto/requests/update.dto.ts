@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsDateString, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
 
 export class RequestPromoUpdateDto {
   @ApiPropertyOptional({ example: 'Promo Spesial Akhir Tahun' })
@@ -36,6 +37,21 @@ export class RequestPromoUpdateDto {
   @IsOptional()
   @IsNotEmpty()
   image?: string;
+
+  @ApiPropertyOptional({ example: '/uploads/promo-banner.png' })
+  @IsOptional()
+  @IsNotEmpty()
+  banner?: string;
+
+  @ApiPropertyOptional({ example: false })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
+  showBanner?: boolean;
 
   constructor(dto: RequestPromoUpdateDto) {
     Object.assign(this, dto);

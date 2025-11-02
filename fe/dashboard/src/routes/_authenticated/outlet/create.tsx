@@ -37,13 +37,12 @@ type BrandListMeta = {
 type OutletItem = {
   id: string;
   brandId: string;
-  kota: string;
+  nama: string;
   jamOperasional: string;
   lokasi: string;
   googleMapsLink: string;
   whatsappUrl?: string;
   image: string;
-  nama: string;
 };
 
 type OperationalHours = {
@@ -132,7 +131,6 @@ function RouteComponent() {
   );
   const [formState, setFormState] = React.useState({
     name: "",
-    city: "",
     address: "",
     operationalHours: "",
     mapsUrl: "",
@@ -142,6 +140,7 @@ function RouteComponent() {
   const [selectedImageFile, setSelectedImageFile] = React.useState<File | null>(
     null,
   );
+  const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string | null>(null);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
   const [operationalHours, setOperationalHours] =
     React.useState<OperationalHours>({ ...defaultOperationalHours });
@@ -164,7 +163,6 @@ function RouteComponent() {
       setSelectedBrand(undefined);
       setFormState({
         name: "",
-        city: "",
         address: "",
         operationalHours: "",
         mapsUrl: "",
@@ -173,6 +171,7 @@ function RouteComponent() {
       setOperationalHours({ ...defaultOperationalHours });
       setSelectedImageName("");
       setSelectedImageFile(null);
+      setImagePreviewUrl(null);
       setSubmitError(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -228,6 +227,20 @@ function RouteComponent() {
     const file = event.target.files?.[0] ?? null;
     setSelectedImageName(file ? file.name : "");
     setSelectedImageFile(file);
+
+    // Clean up old preview URL
+    if (imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+
+    // Create new preview URL
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreviewUrl(previewUrl);
+    } else {
+      setImagePreviewUrl(null);
+    }
+
     setSubmitError(null);
     if (isCreateSuccess || isCreateError) {
       resetOutletMutation();
@@ -266,7 +279,6 @@ function RouteComponent() {
 
   const handleSubmit = () => {
     const trimmedName = formState.name.trim();
-    const trimmedCity = formState.city.trim();
     const trimmedAddress = formState.address.trim();
     const formattedOperationalHours = formatOperationalHours(
       operationalHours.start,
@@ -294,7 +306,6 @@ function RouteComponent() {
     if (
       !selectedBrand ||
       !trimmedName ||
-      !trimmedCity ||
       !trimmedAddress ||
       !trimmedOperationalHours ||
       !trimmedMapsUrl ||
@@ -312,7 +323,6 @@ function RouteComponent() {
 
     const formData = new FormData();
     formData.append("nama", trimmedName);
-    formData.append("kota", trimmedCity);
     formData.append("lokasi", trimmedAddress);
     formData.append("jamOperasional", trimmedOperationalHours);
     formData.append("googleMapsLink", trimmedMapsUrl);
@@ -324,6 +334,14 @@ function RouteComponent() {
   };
 
   const isSubmitDisabled = isCreatePending;
+
+  React.useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
 
   return (
     <div className="space-y-6">
@@ -347,34 +365,58 @@ function RouteComponent() {
             <p className="text-sm text-[#D74E4E]">
               Disarankan menggunakan foto dengan ukuran rasio 1:1
             </p>
-            <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-6 text-center">
-              <Upload className="size-8 text-[#C1272D]" />
-              <div className="text-sm text-[#6B7280]">
-                Pilih Foto atau Drop Disini
+            {imagePreviewUrl ? (
+              <div className="space-y-4">
+                <div className="relative rounded-3xl border border-[#D6DAE1] bg-[#F9FBFD] p-4">
+                  <img
+                    src={imagePreviewUrl}
+                    alt="Preview"
+                    className="mx-auto max-h-96 rounded-2xl object-contain"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
+                  disabled={isCreatePending}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Ganti Foto
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  disabled={isCreatePending}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                className="rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
-                disabled={isCreatePending}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Browse File
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                disabled={isCreatePending}
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              {selectedImageName ? (
-                <p className="text-xs text-[#4F4F4F]">
-                  File dipilih: {selectedImageName}
-                </p>
-              ) : null}
-            </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-6 text-center">
+                <Upload className="size-8 text-[#C1272D]" />
+                <div className="text-sm text-[#6B7280]">
+                  Pilih Foto atau Drop Disini
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
+                  disabled={isCreatePending}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Browse File
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  disabled={isCreatePending}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </div>
+            )}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -421,31 +463,20 @@ function RouteComponent() {
               ) : null}
             </div>
           </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-[#2E2E2E]">
+              Alamat Outlet<span className="text-[#C1272D]">*</span>
+            </Label>
+            <Input
+              value={formState.address}
+              onChange={(event) => handleChange("address", event.target.value)}
+              placeholder="Jln. A Yani, Bandung"
+              disabled={isCreatePending}
+              className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
+            />
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-[#2E2E2E]">
-                Kota<span className="text-[#C1272D]">*</span>
-              </Label>
-              <Input
-                value={formState.city}
-                onChange={(event) => handleChange("city", event.target.value)}
-                placeholder="Bandung"
-                disabled={isCreatePending}
-                className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-[#2E2E2E]">
-                Alamat Outlet<span className="text-[#C1272D]">*</span>
-              </Label>
-              <Input
-                value={formState.address}
-                onChange={(event) => handleChange("address", event.target.value)}
-                placeholder="Jln. A Yani"
-                disabled={isCreatePending}
-                className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
-              />
-            </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[#2E2E2E]">
                 Jam Operasional<span className="text-[#C1272D]">*</span>

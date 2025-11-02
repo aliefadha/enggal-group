@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsStrongPassword } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class RequestLoginDto {
   @ApiProperty()
@@ -8,13 +8,7 @@ export class RequestLoginDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsStrongPassword({
-    minLength: 8,
-    minLowercase: 1,
-    minUppercase: 1,
-    minNumbers: 1,
-    minSymbols: 1,
-  })
+  @IsString()
   password!: string;
 
   constructor(dto: RequestLoginDto) {

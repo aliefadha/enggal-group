@@ -1,10 +1,98 @@
 import { useEffect, useState } from "react";
 import PromoCard from "../components/PromoCard";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "../lib/api-client";
+
+type Brand = {
+  id: string;
+  nama: string;
+  logo: string;
+  description: string;
+};
+
+type BrandListMeta = {
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+};
+
+type Promo = {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  syaratKetentuan: string;
+  berlakuHingga: string;
+  brandId: string;
+  image: string;
+  banner?: string;
+  showBanner: boolean;
+  brand: {
+    id: string;
+    nama: string;
+  };
+};
+
+type PromoListMeta = {
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+};
+
+async function fetchBrands() {
+  const response = await apiClient.get<Brand[], BrandListMeta>(
+    `/brand?page=1&limit=100`,
+  );
+
+  const items = response.data ?? [];
+  const meta = response.meta ?? {};
+
+  return {
+    data: items,
+    meta: {
+      total: meta.total ?? items.length,
+      page: 1,
+      limit: 100
+    },
+  };
+}
+
+async function fetchPromos(brandId?: string) {
+  const url = brandId && brandId !== "all"
+    ? `/promo?page=1&limit=100&brandId=${brandId}`
+    : `/promo?page=1&limit=100`;
+
+  const response = await apiClient.get<Promo[], PromoListMeta>(url);
+
+  const items = response.data ?? [];
+  const meta = response.meta ?? {};
+
+  return {
+    data: items,
+    meta: {
+      total: meta.total ?? items.length,
+      page: 1,
+      limit: 100
+    },
+  };
+}
 
 function Promo() {
   const [selectedBrand, setSelectedBrand] = useState<string>("all");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [currentSlide, setCurrentSlide] = useState<number>(0);
+
+  const { data: brandsData, isLoading: brandsLoading } = useQuery({
+    queryKey: ["brands"],
+    queryFn: () => fetchBrands()
+  });
+
+  const { data: promosData, isLoading: promosLoading } = useQuery({
+    queryKey: ["promos", selectedBrand],
+    queryFn: () => fetchPromos(selectedBrand)
+  });
 
   const banners = [
     "/images/banner-1.png",
@@ -19,56 +107,27 @@ function Promo() {
     return () => clearInterval(id);
   }, [banners.length]);
 
-  // Sample brand data - replace with actual data from API or props
+  // Build brand dropdown options
   const brands = [
     { id: "all", name: "Semua Brand" },
-    { id: "brand1", name: "Enggal Bakery" },
-    { id: "brand2", name: "Enggal Cafe" },
-    { id: "brand3", name: "Enggal Resto" },
-    { id: "brand4", name: "Enggal Mart" },
+    ...(brandsData?.data?.map((brand) => ({
+      id: brand.id,
+      name: brand.nama,
+    })) || []),
   ];
 
-  // Sample promo data - replace with actual data from API
-  const promoItems = [
-    {
-      id: 1,
-      description: "Dapatkan Bakso Gratis untuk 50 customer pertama",
-      brandId: "brand3", // Enggal Resto
-      title: "Promo Re Opening",
-      validUntil: "1 Oktober 2026",
-      image: "/images/promo.png",
-    },
-    {
-      id: 2,
-      description: "Diskon 30% untuk pembelian roti kedua",
-      brandId: "brand1", // Enggal Bakery
-      title: "Promo Spesial",
-      validUntil: "15 November 2026",
-      image: "/images/promo.png",
-    },
-    {
-      id: 3,
-      description: "Buy 1 Get 1 untuk semua minuman kopi",
-      brandId: "brand2", // Enggal Cafe
-      title: "Promo Weekend",
-      validUntil: "31 Desember 2026",
-      image: "/images/promo.png",
-    },
-    {
-      id: 4,
-      description: "Diskon 20% untuk semua produk segar",
-      brandId: "brand4", // Enggal Mart
-      title: "Promo Bulanan",
-      validUntil: "5 Januari 2027",
-      image: "/images/promo.png",
-    },
-  ];
+  // Get promo items from API
+  const promoItems = promosData?.data || [];
 
-  // Filter promos based on selected brand
-  const filteredPromos =
-    selectedBrand === "all"
-      ? promoItems
-      : promoItems.filter((promo) => promo.brandId === selectedBrand);
+  // Format date helper
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
 
   const handleBrandSelect = (brandId: string) => {
     setSelectedBrand(brandId);
@@ -257,18 +316,24 @@ function Promo() {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-x-20 lg:gap-y-16 relative">
-            {filteredPromos.length > 0 ? (
-              filteredPromos.map((promo) => (
+            {promosLoading ? (
+              <div className="col-span-1 md:col-span-2 lg:col-span-3 py-10 text-center">
+                <p className="text-gray-500 font-medium">
+                  Memuat promo...
+                </p>
+              </div>
+            ) : promoItems.length > 0 ? (
+              promoItems.map((promo) => (
                 <div
                   key={promo.id}
                   className="cursor-pointer"
-                  onClick={() => (window.location.href = "/promo/1")}
+                  onClick={() => (window.location.href = `/promo/${promo.id}`)}
                 >
                   <PromoCard
                     id={promo.id}
                     title={promo.title}
-                    description={promo.description}
-                    validUntil={promo.validUntil}
+                    description={promo.subtitle}
+                    validUntil={formatDate(promo.berlakuHingga)}
                     image={promo.image}
                   />
                 </div>

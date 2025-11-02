@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsEmail, IsNotEmpty, IsUrl } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsDateString, IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class RequestUserCareerCreateDto {
   @ApiProperty({ example: '2024-05-20' })
@@ -18,10 +18,14 @@ export class RequestUserCareerCreateDto {
   @IsEmail()
   email!: string
 
-  @ApiProperty({ example: 'https://example.com/cv/budi.pdf' })
+  @ApiProperty({ example: 'Jl. Merdeka No. 123, Jakarta' })
   @IsNotEmpty()
-  @IsUrl()
-  cv_link!: string
+  alamat!: string
+
+  @ApiPropertyOptional({ example: '/uploads/cv-budi.pdf' })
+  @IsOptional()
+  @IsNotEmpty()
+  cv_link?: string
 
   constructor(dto: RequestUserCareerCreateDto) {
     Object.assign(this, dto);

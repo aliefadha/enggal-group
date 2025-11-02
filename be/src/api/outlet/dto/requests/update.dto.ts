@@ -6,11 +6,6 @@ export class RequestOutletUpdateDto {
   @IsNotEmpty()
   nama?: string;
 
-  @ApiPropertyOptional({ example: 'Jakarta' })
-  @IsOptional()
-  @IsNotEmpty()
-  kota?: string;
-
   @ApiPropertyOptional({ example: '08:00 - 22:00 WIB' })
   @IsOptional()
   @IsNotEmpty()

@@ -1,12 +1,174 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import vectorLine from "../assets/images/vector_line.svg";
+import placeholderImage from "../assets/images/placeholder.svg";
 import TeamCard from "../components/TeamCard";
+import { motion, useInView, useMotionValue, useMotionValueEvent, useTransform } from "motion/react";
+import { animate } from "motion";
+
+type CountUpNumberProps = {
+  end: number;
+  className?: string;
+  duration?: number;
+  suffix?: string;
+  formatter?: (value: number) => string;
+  start?: number;
+  once?: boolean;
+  amount?: number;
+};
+
+function CountUpNumber({
+  end,
+  className,
+  duration = 1.2,
+  suffix = "",
+  formatter,
+  start = 0,
+  once = true,
+  amount = 0.6,
+}: CountUpNumberProps) {
+  const spanRef = useRef<HTMLSpanElement | null>(null);
+  const [displayValue, setDisplayValue] = useState(start);
+  const motionValue = useMotionValue(start);
+  const isInView = useInView(spanRef, { once, amount });
+
+  useEffect(() => {
+    motionValue.set(start);
+    setDisplayValue(start);
+  }, [motionValue, start]);
+
+  useMotionValueEvent(motionValue, "change", (latest) => {
+    setDisplayValue(latest);
+  });
+
+  useEffect(() => {
+    if (!isInView) {
+      return;
+    }
+
+    const controls = animate(motionValue, end, {
+      duration,
+      ease: [0.22, 1, 0.36, 1],
+    });
+
+    return () => controls.stop();
+  }, [duration, end, isInView, motionValue]);
+
+  const formattedValue = formatter
+    ? formatter(Math.round(displayValue))
+    : Math.round(displayValue).toString();
+
+  return (
+    <span ref={spanRef} className={className}>
+      {formattedValue}
+      {suffix}
+    </span>
+  );
+}
+
+type BrandHighlight = {
+  id: string;
+  name: string;
+  logo: string;
+  alt: string;
+  description?: string;
+  rounded?: boolean;
+};
+
+const BRAND_HIGHLIGHTS: BrandHighlight[] = [
+  {
+    id: "bakso-malang",
+    name: "Bakso Malang",
+    logo: "/images/bakso_malang.png",
+    alt: "Bakso Malang Enggal",
+    description: "Bakso Prasmanan Pertama di Indonesia",
+  },
+  {
+    id: "bakso-raja",
+    name: "Bakso Raja",
+    logo: "/images/bakso_raja.png",
+    alt: "Bakso Raja",
+    description: "Bakso premium dengan kuah kaldu kaya rempah",
+  },
+  {
+    id: "enhaii",
+    name: "Soerabi Bandung Enhaii",
+    logo: "/images/enhaii.png",
+    alt: "Enhaii",
+    description: "Kuliner hotel berbintang dengan harga bersahabat",
+  },
+  {
+    id: "rang-kapau",
+    name: "Lapau Rang Kapau",
+    logo: "/images/rang_kapau.png",
+    alt: "Rang Kapau",
+    description: "Masakan Minang otentik dengan cita rasa mendalam",
+  },
+  {
+    id: "warung-kondang",
+    name: "Warung Kondang",
+    logo: "/images/warung_kondang.svg",
+    alt: "Warung Kondang",
+    rounded: true,
+    description: "Hidangan rumahan hangat penuh nostalgia",
+  },
+  {
+    id: "ambun-suri",
+    name: "Sarapan Pagi Ambun Suri",
+    logo: "/images/ambun_suri.png",
+    alt: "Sarapan Pagi",
+    description: "Menu sarapan Nusantara praktis dan mengenyangkan",
+  },
+  {
+    id: "warkop-agam",
+    name: "Warkop Putra Agam",
+    logo: "/images/warkop_agam.png",
+    alt: "Kedai Pical Agam",
+    description: "Warkop legendaris khas Sumbar",
+  },
+  {
+    id: "bebek-sawahan",
+    name: "Bebek Sawahan",
+    logo: "/images/bebek_sawahan.png",
+    alt: "Bebek Sawahan",
+    description: "Bebek goreng renyah dengan bumbu Sawahan autentik",
+  },
+  {
+    id: "kebab-zababa",
+    name: "Kebab Zabbab",
+    logo: "/images/kebab_zabab.png",
+    alt: "Kebab Zabbab",
+    description: "Kebab juicy dengan saus rahasia Timur Tengah",
+  },
+]
 
 function Home() {
   const [selectedBrand, setSelectedBrand] = useState<string>("all");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [selectedCity, setSelectedCity] = useState<string>("all");
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState<boolean>(false);
+  const [activeBrand, setActiveBrand] = useState<BrandHighlight>(BRAND_HIGHLIGHTS[0]);
+
+  const navigateBrand = (direction: "next" | "prev") => {
+    const currentIndex = BRAND_HIGHLIGHTS.findIndex(
+      (brand) => brand.id === activeBrand.id,
+    );
+    if (currentIndex === -1) {
+      return;
+    }
+
+    const offset = direction === "next" ? 1 : -1;
+    const nextIndex =
+      (currentIndex + offset + BRAND_HIGHLIGHTS.length) %
+      BRAND_HIGHLIGHTS.length;
+    setActiveBrand(BRAND_HIGHLIGHTS[nextIndex]);
+  };
+
+  const handlePrevBrand = () => navigateBrand("prev");
+  const handleNextBrand = () => navigateBrand("next");
+  const brandGridColumns = 4;
+  const brandPlaceholderCount =
+    (brandGridColumns - (BRAND_HIGHLIGHTS.length % brandGridColumns)) %
+    brandGridColumns;
 
   // Sample brand data - replace with actual data from API or props
   const brands = [
@@ -130,6 +292,34 @@ function Home() {
     setSelectedCity(cityId);
     setIsCityDropdownOpen(false);
   };
+
+  const [brandCountValue, setBrandCountValue] = useState<number>(0);
+  const brandCountRef = useRef<HTMLSpanElement | null>(null);
+  const brandCountMotionValue = useMotionValue(0);
+  const brandCountRounded = useTransform(brandCountMotionValue, (latest) =>
+    Math.round(latest)
+  );
+  const brandCountInView = useInView(brandCountRef, {
+    once: true,
+    amount: 0.8,
+  });
+
+  useMotionValueEvent(brandCountRounded, "change", (latest) => {
+    setBrandCountValue(latest);
+  });
+
+  useEffect(() => {
+    if (!brandCountInView) {
+      return;
+    }
+
+    const controls = animate(brandCountMotionValue, 8, {
+      duration: 1.2,
+      ease: [0.22, 1, 0.36, 1],
+    });
+
+    return () => controls.stop();
+  }, [brandCountInView, brandCountMotionValue]);
 
   return (
     <section className="">
@@ -388,7 +578,11 @@ function Home() {
             </div>
             <div className="p-4 flex flex-col items-start justify-center bg-[#A71D28] text-[#FFB835]">
               <span className="text-4xl font-bold leading-none flex gap-x-1">
-                8
+                <span
+                  ref={brandCountRef}
+                >
+                  {brandCountValue}
+                </span>
                 <svg
                   width="18"
                   height="18"
@@ -408,7 +602,13 @@ function Home() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-10 md:gap-16 py-8 md:py-16 max-w-6xl container px-4 md:px-8 w-full mx-auto">
+      <motion.div
+        initial={{ opacity: 0, y: 64 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="flex flex-col md:flex-row gap-10 md:gap-16 py-8 md:py-16 max-w-6xl container px-4 md:px-8 w-full mx-auto"
+      >
         <div className="w-full lg:w-4/12 relative">
           <div className="bg-[#FFB835] rounded-md relative h-full ">
             <div className="absolute inset-0 z-10 pointer-events-none bg-[url('/images/dots_spaced.png')] bg-left bg-contain bg-no-repeat opacity-30"></div>
@@ -427,7 +627,7 @@ function Home() {
                 />
               </svg>
             </div>
-            <div className="absolute right-4 sm:right-8 top-1/4">
+            <motion.div whileInView={{ opacity: 1 }} initial={{ opacity: 0 }} className="absolute right-4 sm:right-8 top-1/4">
               <svg
                 className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8"
                 viewBox="0 0 31 31"
@@ -439,8 +639,8 @@ function Home() {
                   fill="white"
                 />
               </svg>
-            </div>
-            <div className="absolute left-4 sm:left-8 top-1/4">
+            </motion.div>
+            <motion.div whileInView={{ opacity: 1 }} initial={{ opacity: 0 }} className="absolute left-4 sm:left-8 top-1/4">
               <svg
                 className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8"
                 viewBox="0 0 31 31"
@@ -452,16 +652,16 @@ function Home() {
                   fill="white"
                 />
               </svg>
-            </div>
-            <div className="flex items-end justify-center h-full">
+            </motion.div>
+            <motion.div whileInView={{ opacity: 1, transition: { duration: 0.5 } }} initial={{ opacity: 0 }} className="flex items-end justify-center h-full">
               <img
                 src="/images/ceo.png"
                 alt="Enggal Group CEO"
                 className="relative z-10 h-5/6 w-auto object-cover"
               />
-            </div>
+            </motion.div>
 
-            <div className="absolute top-4 sm:top-6 -left-3 sm:-left-6 z-20 bg-[#A71D28] text-white px-3 sm:px-6 py-2 sm:py-4 rounded-md flex items-center shadow-lg">
+            <motion.div whileInView={{ scale: 1, transition: { duration: 0.1 } }} initial={{ scale: 0 }} className="absolute top-4 sm:top-6 -left-3 sm:-left-6 z-20 bg-[#A71D28] text-white px-3 sm:px-6 py-2 sm:py-4 rounded-md flex items-center shadow-lg">
               <svg
                 width="19"
                 height="20"
@@ -481,9 +681,13 @@ function Home() {
                   Outlet
                 </sup>
               </span>
-            </div>
+            </motion.div>
 
-            <div className="absolute bottom-1/3 sm:bottom-1/4 -right-3 sm:-right-6 z-20 bg-[#A71D28] text-white px-3 sm:px-6 py-2 sm:py-4 rounded-md flex items-center shadow-lg">
+            <motion.div
+              whileInView={{ scale: 1, transition: { duration: 0.2 } }}
+              initial={{ scale: 0 }}
+              viewport={{ amount: 0.4 }}
+              className="absolute bottom-1/3 sm:bottom-1/4 -right-3 sm:-right-6 z-20 bg-[#A71D28] text-white px-3 sm:px-6 py-2 sm:py-4 rounded-md flex items-center shadow-lg">
               <svg
                 width="21"
                 className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 flex-shrink-0"
@@ -503,9 +707,9 @@ function Home() {
                   Brand
                 </sup>
               </span>
-            </div>
+            </motion.div>
 
-            <div className="absolute bottom-4 sm:bottom-6 -left-3 sm:-left-6 z-20 bg-[#A71D28] text-white px-3 sm:px-6 py-2 sm:py-4 rounded-md flex items-center shadow-lg">
+            <motion.div whileInView={{ scale: 1, transition: { duration: 0.3 } }} initial={{ scale: 0 }} className="absolute bottom-4 sm:bottom-6 -left-3 sm:-left-6 z-20 bg-[#A71D28] text-white px-3 sm:px-6 py-2 sm:py-4 rounded-md flex items-center shadow-lg">
               <svg
                 width="16"
                 height="20"
@@ -525,11 +729,18 @@ function Home() {
                   Kota Besar
                 </sup>
               </span>
-            </div>
+            </motion.div>
+
           </div>
         </div>
 
-        <div className="w-full lg:w-7/12 flex flex-col justify-center bg-[#F7F7F7F8] p-4 lg:p-6 rounded-xl">
+        <motion.div
+          initial={{ opacity: 0, y: 48 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          viewport={{ amount: 0.4, once: true }}
+          className="w-full lg:w-7/12 flex flex-col justify-center bg-[#F7F7F7F8] p-4 lg:p-6 rounded-xl"
+        >
           <div className="flex items-start justify-start mb-4">
             <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
           </div>
@@ -588,21 +799,23 @@ function Home() {
               </a>
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       <section id="tentang" className="pt-10 flex justify-between max-w-6xl container px-4 w-full mx-auto">
-        <div className="hidden md:flex flex-col items-start justify-start w-full md:w-1/4">
-          <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
-          <h2 className="font-runestars mb-2">
-            <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl md:text-4xl text-white whitespace-nowrap">
-              Cerita Kami
-            </span>
-          </h2>
-          <p className="font-jakarta font-medium ">
-            Dari Bakso Prasmanan Pertama di Indonesia hingga Multi-brand Kuliner
-            untuk Semua Kalangan
-          </p>
+        <div className="hidden md:block w-full md:w-1/4">
+          <div className="sticky top-24 flex flex-col items-start justify-start py-10">
+            <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
+            <h2 className="font-runestars mb-2">
+              <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl md:text-4xl text-white whitespace-nowrap">
+                Cerita Kami
+              </span>
+            </h2>
+            <p className="font-jakarta font-medium ">
+              Dari Bakso Prasmanan Pertama di Indonesia hingga Multi-brand Kuliner
+              untuk Semua Kalangan
+            </p>
+          </div>
         </div>
         <div className="flex flex-col w-full lg:w-7/12">
           <div className="flex items-stretch gap-8">
@@ -610,7 +823,13 @@ function Home() {
               <div className="w-3 h-3 bg-[#9C0000]"></div>
               <div className="h-full w-0.5 bg-[#FFB835]"></div>
             </div>
-            <div className="flex flex-col gap-y-4 xl:gap-y-10 w-full pb-10 mb-10 md:pb-16 md:mb-16 border-b-2 border-dashed border-[#CDCDCD]">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col gap-y-4 xl:gap-y-10 w-full pb-10 mb-10 md:pb-16 md:mb-16 border-b-2 border-dashed border-[#CDCDCD]"
+            >
               <p className="text-[#9C0000] font-jakarta font-bold text-xl">
                 2008
               </p>
@@ -624,42 +843,47 @@ function Home() {
               <div className="flex justify-between gap-4">
                 <img
                   src="/images/2008.jpg"
-                  className="w-[100px] md:w-[250px] rounded-md object-cover"
+                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[200px] rounded-md object-cover"
                 />
                 <img
                   src="/images/2008.jpg"
-                  className="w-[100px] md:w-[250px] rounded-md object-cover"
+                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[200px] rounded-md object-cover"
                 />
               </div>
-            </div>
+            </motion.div>
           </div>
           <div className="flex items-stretch gap-8">
             <div className="flex flex-col items-center justify-center h-full">
               <div className="w-3 h-3 bg-[#9C0000]"></div>
               <div className="h-full w-0.5 bg-[#FFB835]"></div>
             </div>
-            <div className="flex flex-col gap-y-4 xl:gap-y-10 w-full pb-10 mb-10 md:pb-16 md:mb-16 border-b-2 border-dashed border-[#CDCDCD]">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col gap-y-4 xl:gap-y-10 w-full pb-10 mb-10 md:pb-16 md:mb-16 border-b-2 border-dashed border-[#CDCDCD]"
+            >
               <p className="text-[#9C0000] font-jakarta font-bold text-xl">
-                2008
+                2023
               </p>
               <div className="block lg:flex justify-between">
-                <h1 className="font-runestars text-2xl">LAHIRNYA PERJALANAN</h1>
+                <h1 className="font-runestars text-2xl">BABAK BARU DIMULAI</h1>
                 <p className="font-jakarta text-sm lg:max-w-[250px]">
-                  Awal mula Enggal Group dimulai dari Bakso Malang Enggal tahun
-                  di Palembang.
+                  Re-launch brand pertama Bakso Malang Enggal dengan konsep restoran bakso prasmanan pertama di Indonesia di Pekanbaru
                 </p>
               </div>
               <div className="flex justify-between gap-4">
                 <img
-                  src="/images/2008.jpg"
-                  className="w-[100px] md:w-[250px] rounded-md object-cover"
+                  src="/images/2023.jpg"
+                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[200px] rounded-md object-cover"
                 />
                 <img
                   src="/images/2008.jpg"
-                  className="w-[100px] md:w-[250px] rounded-md object-cover"
+                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[200px] rounded-md object-cover"
                 />
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -680,7 +904,12 @@ function Home() {
         <div className="max-w-6xl container px-4 w-full mx-auto relative z-10">
           <div className="flex justify-between w-full">
             <div className="hidden lg:flex flex-col items-start justify-start w-full lg:w-1/3">
-              <div className="bg-[#9C0000] p-4 rounded-xl my-10 relative">
+              <motion.div
+                initial={{ opacity: 0, y: 0 }}
+                whileInView={{ opacity: 1, y: 40 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="bg-[#9C0000] p-4 rounded-xl my-10 relative">
                 <div className="pointer-events-none absolute inset-0  bg-[url('/images/dots.png')] bg-cover bg-center bg-repeat-x opacity-20" />
                 <h2 className="font-runestars text-[#FFB835] mb-2 text-3xl">
                   Visi
@@ -688,7 +917,7 @@ function Home() {
                 <p className="font-jakarta font-semibold text-white text-sm">
                   Menjadi F&B group terkemuka di Indonesia yang nyaman untuk semua kalangan.
                 </p>
-              </div>
+              </motion.div>
             </div>
             <div className="flex flex-col w-full lg:w-7/12">
               <div className="flex items-stretch gap-8">
@@ -706,7 +935,7 @@ function Home() {
                     </h1>
                   </div>
                   <div>
-                    <p className="font-jakarta font-medium text-[#3F2900] mt-4 md:mt-24 md:text-xs">Grup restoran yang kasih pengalaman kuliner terbaik untuk kamu yang datang.</p>
+                    <p className="font-jakarta font-medium text-[#3F2900] mt-4 md:mt-24 md:text-xs max-w-md text-justify">Memulai ekspansi ke Pulau Jawa, Yong Bengkalis, kedai kopi berkonsep Melayu dengan 14 outlet di Riau dan Kepri, kini hadir di Kota Wisata.</p>
                   </div>
                 </div>
               </div>
@@ -714,36 +943,44 @@ function Home() {
           </div>
           <div className="flex justify-center py-20">
             <div className="md:block hidden">
-              <img src="/images/map.png" className="w-5/6 h-auto" />
+              <img src="/images/fullmap.svg" className="w-5/6 h-auto" />
             </div>
             <div>
               <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6 mx-auto">
-                {/* 2 Tahun */}
+                {/* 3 Tahun */}
                 <div className="bg-white rounded-lg p-6 flex items-start gap-x-6">
                   <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-800 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center">
+                      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 0C24.8368 0 32 7.1632 32 16C32 24.8368 24.8368 32 16 32C7.1632 32 0 24.8368 0 16C0 7.1632 7.1632 0 16 0ZM16 6.4C15.5757 6.4 15.1687 6.56857 14.8686 6.86863C14.5686 7.16869 14.4 7.57565 14.4 8V16C14.4001 16.4243 14.5687 16.8312 14.8688 17.1312L19.6688 21.9312C19.9706 22.2227 20.3747 22.3839 20.7942 22.3803C21.2138 22.3766 21.6151 22.2084 21.9117 21.9117C22.2084 21.6151 22.3766 21.2138 22.3803 20.7942C22.3839 20.3747 22.2227 19.9706 21.9312 19.6688L17.6 15.3376V8C17.6 7.57565 17.4314 7.16869 17.1314 6.86863C16.8313 6.56857 16.4243 6.4 16 6.4Z" fill="#9C0000" />
                       </svg>
+
                     </div>
                   </div>
                   <div className="flex flex-col gap-4">
-                    <span className="text-4xl text-[#1E1E1E] font-runestars">2</span>
+                    <CountUpNumber
+                      end={3}
+                      className="text-4xl text-[#1E1E1E] font-runestars"
+                    />
                     <p className="font-jakarta text-[#585858]">Tahun</p>
                   </div>
                 </div>
 
-                {/* 8 Brand */}
+                {/* 10 Brand */}
                 <div className="bg-white rounded-lg p-6 flex items-start gap-x-6">
                   <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-800 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center">
+                      <svg width="33" height="32" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.4148 0.365767C17.1856 -0.121922 15.8144 -0.121922 14.5852 0.365767L10.2209 2.09745L25.6798 8.23934L31.7386 5.83496C31.4552 5.60207 31.1371 5.41433 30.7956 5.27846L18.4148 0.365767ZM22.9045 9.34087L7.4448 3.19898L2.2044 5.27765C1.85625 5.41677 1.53945 5.605 1.26142 5.83496L16.5 11.8819L22.9045 9.34087ZM0 8.50695C0 8.19106 0.0429 7.88171 0.124575 7.5871L15.4688 13.6758V32C15.1667 31.9402 14.8708 31.8525 14.5852 31.7381L2.2044 26.8246C1.55397 26.5666 0.996353 26.1212 0.603448 25.546C0.210543 24.9707 0.000361015 24.2918 0 23.5969V8.50695ZM18.4148 31.7373C18.1266 31.8519 17.8321 31.9394 17.5312 32V13.6758L32.8754 7.5871C32.9571 7.88253 33 8.19187 33 8.50777V23.5969C32.9998 24.292 32.7897 24.971 32.3968 25.5464C32.0039 26.1219 31.4462 26.5674 30.7956 26.8254L18.4148 31.7373Z" fill="#9C0000" />
                       </svg>
+
                     </div>
                   </div>
                   <div className="flex flex-col gap-4">
-                    <span className="text-4xl text-[#1E1E1E] font-runestars">8</span>
+                    <CountUpNumber
+                      end={10}
+                      className="text-4xl text-[#1E1E1E] font-runestars"
+                    />
                     <p className="font-jakarta text-[#585858]">Brand</p>
                   </div>
                 </div>
@@ -751,45 +988,59 @@ function Home() {
                 {/* 12 Kota */}
                 <div className="bg-white rounded-lg p-6 flex items-start gap-x-6">
                   <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-800 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-6a1 1 0 00-1-1H9a1 1 0 00-1 1v6a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clipRule="evenodd" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center">
+                      <svg width="27" height="32" viewBox="0 0 27 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14.6912 1.19976C14.6912 0.881564 14.5657 0.5764 14.3423 0.351401C14.1189 0.126403 13.8159 0 13.5 0C13.1841 0 12.8811 0.126403 12.6577 0.351401C12.4343 0.5764 12.3088 0.881564 12.3088 1.19976V3.20576H9.13235C8.39521 3.20576 7.68825 3.5007 7.16701 4.0257C6.64577 4.55069 6.35294 5.26274 6.35294 6.0052V9.45251C8.76706 9.23175 11.1176 11.1098 11.1176 13.8404V30.8002C11.1176 30.8429 11.1166 30.8845 11.1145 30.925V32H15.8792V30.0004H15.8824V18.0028C15.8824 16.8361 16.3425 15.7171 17.1616 14.8922C17.9807 14.0672 19.0916 13.6037 20.25 13.6037H20.6471V6.0052C20.6471 5.26274 20.3542 4.55069 19.833 4.0257C19.3117 3.5007 18.6048 3.20576 17.8676 3.20576H14.6912V1.19976ZM17.4674 32H24.2206C24.9577 32 25.6647 31.7051 26.1859 31.1801C26.7072 30.6551 27 29.943 27 29.2006V18.0028C27 17.2603 26.7072 16.5483 26.1859 16.0233C25.6647 15.4983 24.9577 15.2034 24.2206 15.2034H20.25C19.5129 15.2034 18.8059 15.4983 18.2847 16.0233C17.7634 16.5483 17.4706 17.2603 17.4706 18.0028V30.0004H17.4674V32ZM9.52941 30.0004H9.52624V32H2.77941C2.04227 32 1.33531 31.7051 0.814071 31.1801C0.29283 30.6551 0 29.943 0 29.2006V16.4671C0 15.5233 0.471706 14.6435 1.25471 14.1268L5.22529 11.5017C7.07241 10.2779 9.52941 11.6137 9.52941 13.8404V30.0004Z" fill="#9C0000" />
                       </svg>
+
                     </div>
                   </div>
                   <div className="flex flex-col gap-4">
-                    <span className="text-4xl text-[#1E1E1E] font-runestars">12</span>
+                    <CountUpNumber
+                      end={12}
+                      className="text-4xl text-[#1E1E1E] font-runestars"
+                    />
                     <p className="font-jakarta text-[#585858]">Kota</p>
                   </div>
                 </div>
 
-                {/* 24 Outlet */}
+                {/* 30 Outlet */}
                 <div className="bg-white rounded-lg p-6 flex items-start gap-x-6">
                   <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-800 rounded-full flex items-center justify-center">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center">
+                      <svg width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1.78426 2.64919C1.49333 3.22545 1.35027 3.93937 1.06416 5.36401L0.102959 10.1502C-0.0332672 10.8027 -0.0343223 11.4761 0.0998579 12.1291C0.234038 12.7821 0.50063 13.401 0.883314 13.9478C1.266 14.4946 1.75672 14.9579 2.32544 15.3093C2.89416 15.6607 3.52892 15.8928 4.19084 15.9914C4.85277 16.09 5.52794 16.0531 6.17502 15.8828C6.82211 15.7125 7.42749 15.4125 7.95411 15.0012C8.48073 14.5898 8.9175 14.0758 9.23769 13.4905C9.55788 12.9051 9.75475 12.2609 9.81625 11.5972L9.92877 10.4927C9.86785 11.1952 9.95475 11.9026 10.1839 12.5697C10.4131 13.2368 10.7794 13.849 11.2596 14.3671C11.7398 14.8852 12.3232 15.2979 12.9726 15.5788C13.622 15.8597 14.3231 16.0025 15.0311 15.9983C15.7391 15.994 16.4384 15.8428 17.0843 15.5541C17.7303 15.2655 18.3087 14.8458 18.7826 14.322C19.2564 13.7981 19.6154 13.1816 19.8364 12.5118C20.0575 11.8419 20.1358 11.1336 20.0664 10.4319L20.1837 11.5972C20.2452 12.2609 20.4421 12.9051 20.7623 13.4905C21.0825 14.0758 21.5193 14.5898 22.0459 15.0012C22.5725 15.4125 23.1779 15.7125 23.825 15.8828C24.4721 16.0531 25.1472 16.09 25.8092 15.9914C26.4711 15.8928 27.1058 15.6607 27.6746 15.3093C28.2433 14.9579 28.734 14.4946 29.1167 13.9478C29.4994 13.401 29.766 12.7821 29.9001 12.1291C30.0343 11.4761 30.0333 10.8027 29.897 10.1502L28.9358 5.36401C28.6497 3.93937 28.5067 3.22705 28.2157 2.64919C27.9126 2.04738 27.4858 1.51578 26.963 1.08889C26.4401 0.662001 25.833 0.349366 25.181 0.171277C24.5542 1.78814e-07 23.8244 0 22.3649 0H7.63506C6.17558 0 5.44583 1.78814e-07 4.81896 0.171277C4.16696 0.349366 3.55985 0.662001 3.03704 1.08889C2.51423 1.51578 2.0874 2.04738 1.78426 2.64919ZM25.0766 18.4083C26.3324 18.4114 27.5678 18.0911 28.6626 17.4783V19.2086C28.6626 25.245 28.6626 28.2639 26.7788 30.1384C25.263 31.6494 23.0047 31.9424 19.0184 32V26.4119C19.0184 24.9152 19.0184 24.1677 18.6953 23.6106C18.4837 23.2456 18.1794 22.9426 17.8129 22.7318C17.2535 22.4101 16.5029 22.4101 15 22.4101C13.4971 22.4101 12.7465 22.4101 12.1871 22.7318C11.8206 22.9426 11.5163 23.2456 11.3047 23.6106C10.9816 24.1677 10.9816 24.9152 10.9816 26.4119V32C6.99533 31.9424 4.73699 31.6478 3.22124 30.1384C1.33741 28.2639 1.33741 25.245 1.33741 19.2086V17.4783C2.43269 18.0913 3.66863 18.4117 4.92505 18.4083C6.78258 18.4094 8.57096 17.7067 9.92716 16.4426C11.309 17.7109 13.1208 18.4129 15 18.4083C16.8792 18.4129 18.691 17.7109 20.0728 16.4426C21.429 17.7067 23.219 18.4094 25.0766 18.4083Z" fill="#9C0000" />
                       </svg>
                     </div>
                   </div>
                   <div className="flex flex-col gap-4">
-                    <span className="text-4xl text-[#1E1E1E] font-runestars">24</span>
+                    <CountUpNumber
+                      end={30}
+                      className="text-4xl text-[#1E1E1E] font-runestars"
+                    />
                     <p className="font-jakarta text-[#585858]">Outlet</p>
                   </div>
                 </div>
               </div>
 
-              {/* 10.000.000+ Makanan Tersajikan */}
+              {/* 11.000.000+ Makanan Tersajikan */}
               <div className="bg-white rounded-lg p-6 flex items-start gap-x-6">
                 <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-800 rounded-full flex items-center justify-center">
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center">
+                    <svg width="26" height="32" viewBox="0 0 26 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0.382909 1.3058C0.412161 0.944664 0.577364 0.608881 0.844161 0.36828C1.11096 0.127678 1.45881 0.000776768 1.81538 0.0139669C2.17196 0.0271571 2.5098 0.179424 2.75865 0.4391C3.0075 0.698776 3.14821 1.04588 3.15152 1.40821V8.59969C3.15152 8.86495 3.25528 9.11934 3.43997 9.3069C3.62467 9.49447 3.87517 9.59984 4.13636 9.59984C4.39756 9.59984 4.64806 9.49447 4.83276 9.3069C5.01745 9.11934 5.12121 8.86495 5.12121 8.59969V1.20018C5.12121 0.881873 5.24572 0.576602 5.46736 0.351524C5.68899 0.126447 5.98959 0 6.30303 0C6.61647 0 6.91707 0.126447 7.1387 0.351524C7.36034 0.576602 7.48485 0.881873 7.48485 1.20018V8.59969C7.48485 8.86495 7.58861 9.11934 7.7733 9.3069C7.958 9.49447 8.2085 9.59984 8.4697 9.59984C8.7309 9.59984 8.9814 9.49447 9.16609 9.3069C9.35079 9.11934 9.45455 8.86495 9.45455 8.59969V1.40821C9.45785 1.04588 9.59856 0.698776 9.84741 0.4391C10.0963 0.179424 10.4341 0.0271571 10.7907 0.0139669C11.1472 0.000776768 11.4951 0.127678 11.7619 0.36828C12.0287 0.608881 12.1939 0.944664 12.2232 1.3058C12.2909 2.28514 12.6061 6.99305 12.6061 9.60144C12.6061 11.7618 11.5503 13.6725 9.93988 14.8294C9.59951 15.0743 9.51758 15.3335 9.52545 15.4647C9.71927 18.47 10.2424 26.6952 10.2424 27.9994C10.2424 29.0604 9.82738 30.078 9.0886 30.8283C8.34982 31.5785 7.34782 32 6.30303 32C5.25824 32 4.25624 31.5785 3.51746 30.8283C2.77868 30.078 2.36364 29.0604 2.36364 27.9994C2.36364 26.6936 2.88679 18.47 3.08061 15.4647C3.08848 15.3335 3.00655 15.0743 2.66618 14.8294C1.84223 14.2383 1.17003 13.4549 0.706087 12.5452C0.242139 11.6355 -5.90556e-06 10.6259 1.08022e-10 9.60144C1.08022e-10 6.99305 0.315152 2.28514 0.382909 1.3058ZM14.9697 9.20138C14.9697 6.76102 15.9243 4.42062 17.6235 2.69502C19.3227 0.969428 21.6273 0 24.0303 0C24.3437 0 24.6443 0.126447 24.866 0.351524C25.0876 0.576602 25.2121 0.881873 25.2121 1.20018V14.8022C25.2121 15.3111 25.3792 17.8347 25.5667 20.6303L25.5745 20.7631C25.7794 23.8164 26 27.1369 26 27.9994C26 29.0604 25.585 30.078 24.8462 30.8283C24.1074 31.5785 23.1054 32 22.0606 32C21.0158 32 20.0138 31.5785 19.275 30.8283C18.5363 30.078 18.1212 29.0604 18.1212 27.9994C18.1212 27.1769 18.3229 23.8212 18.5183 20.7439C18.616 19.1901 18.7153 17.6843 18.7893 16.5673L18.8256 16.0024H17.7273C17.3651 16.0024 17.0066 15.93 16.672 15.7892C16.3374 15.6485 16.0334 15.4422 15.7774 15.1822C15.5213 14.9221 15.3182 14.6134 15.1796 14.2737C15.041 13.9339 14.9697 13.5697 14.9697 13.202V9.20138Z" fill="#9C0000" />
                     </svg>
+
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
-                  <span className="text-4xl text-[#1E1E1E] font-runestars">10.000.000+</span>
+                  <CountUpNumber
+                    end={11000000}
+                    suffix="+"
+                    duration={1.6}
+                    formatter={(value) => value.toLocaleString("id-ID")}
+                    className="text-4xl text-[#1E1E1E] font-runestars"
+                  />
                   <p className="font-jakarta text-[#585858]">Makanan Tersajikan</p>
                 </div>
               </div>
@@ -828,93 +1079,124 @@ function Home() {
             />
           </svg>
         </div>
-        <div className="lg:flex justify-center gap-x-8 hidden">
-          <div className="bg-white border border-[#D9D9D9] rounded-md w-1/2 flex-1">
-            <div className="grid grid-cols-3 h-full">
-              <div className="border border-gray-100 flex items-center justify-center aspect-square bg-white">
-                <img
-                  src="/images/bakso_malang.png"
-                  className="max-w-[80%] max-h-[80%] object-contain"
-                  alt="Bakso Malang Enggal"
-                />
-              </div>
-              <div className="border border-gray-100 flex items-center justify-center aspect-square bg-white">
-                <img
-                  src="/images/bakso_raja.png"
-                  className="max-w-[80%] max-h-[80%] object-contain"
-                  alt="Bakso Raja"
-                />
-              </div>
-              <div className="border border-gray-100 flex items-center justify-center aspect-square bg-white">
-                <img
-                  src="/images/enhaii.png"
-                  className="max-w-[80%] max-h-[80%] object-contain"
-                  alt="Enhaii"
-                />
-              </div>
-              <div className="border border-gray-100 flex items-center justify-center aspect-square bg-white">
-                <img
-                  src="/images/rang_kapau.png"
-                  className="max-w-[80%] max-h-[80%] object-contain"
-                  alt="Rang Kapau"
-                />
-              </div>
-              <div className="border border-gray-100 flex items-center justify-center aspect-square bg-white rounded">
-                <img
-                  src="/images/warung_kondang.svg"
-                  className="max-w-[80%] max-h-[80%] object-contain"
-                  alt="Warung Kondang"
-                />
-              </div>
-              <div className="border border-gray-100 flex items-center justify-center aspect-square bg-white">
-                <img
-                  src="/images/ambun_suri.png"
-                  className="max-w-[80%] max-h-[80%] object-contain"
-                  alt="Sarapan Pagi"
-                />
-              </div>
-              <div className="border border-gray-100 flex items-center justify-center aspect-square bg-white">
-                <img
-                  src="/images/warkop_agam.png"
-                  className="max-w-[80%] max-h-[80%] object-contain"
-                  alt="Kedai Pical Agam"
-                />
-              </div>
-              <div className="border border-gray-100 flex items-center justify-center aspect-square bg-white">
-                <img
-                  src="/images/bebek_sawahan.png"
-                  className="max-w-[80%] max-h-[80%] object-contain"
-                  alt="Bebek Sawahan"
-                />
-              </div>
-              <div className="border border-gray-100 flex items-center justify-center aspect-square bg-white">
-                <img
-                  src="/images/kebab_zabab.png"
-                  className="max-w-[80%] max-h-[80%] object-contain"
-                  alt="Kebab Zababa"
-                />
-              </div>
+        <div className="flex justify-center gap-x-8">
+          <div className="bg-white border border-[#D9D9D9] rounded-md w-1/2 lg:flex flex-1 hidden">
+            <div className="grid grid-cols-4 grid-rows-3 auto-rows-fr h-full">
+              {BRAND_HIGHLIGHTS.map((brand) => (
+                <button
+                  key={brand.id}
+                  type="button"
+                  onClick={() => setActiveBrand(brand)}
+                  className={`border border-gray-100 flex items-center justify-center w-full h-full cursor-pointer transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFB835] ${brand.rounded ? "rounded" : ""
+                    } ${activeBrand.id === brand.id
+                      ? "bg-[#FFF4D6] shadow-sm"
+                      : "bg-white hover:bg-gray-50"
+                    }`}
+                  aria-pressed={activeBrand.id === brand.id}
+                >
+                  <img
+                    src={brand.logo}
+                    className="max-w-[80%] max-h-[80%] object-contain"
+                    alt={brand.alt}
+                  />
+                </button>
+              ))}
+              {Array.from({ length: brandPlaceholderCount }).map((_, index) => (
+                <div
+                  key={`brand-placeholder-${index}`}
+                  aria-hidden="true"
+                  className="border border-gray-100 bg-white w-full h-full flex items-center justify-center p-4"
+                >
+                  <img
+                    src={placeholderImage}
+                    className="max-w-[80%] max-h-[80%] object-contain opacity-30"
+                  />
+                </div>
+              ))}
             </div>
           </div>
           <div className="w-1/2 flex-1 flex flex-col">
-            <img
-              src="/images/brand_image.jpg"
-              className="w-full object-cover rounded-t-xl flex-1"
-            />
-            <div className="p-4 bg-[#FFB835] flex items-center rounded-b-xl">
+            <div
+              className="relative flex-1 overflow-hidden rounded-t-xl cursor-pointer"
+              onClick={() => window.location.href = `/brand/${activeBrand.id}`}
+            >
               <img
-                src="/images/bakso_malang.png"
+                src="/images/brand_image.jpg"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute bottom-4 right-4 z-10 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); handlePrevBrand(); }}
+                  className="flex items-center gap-2 rounded-full bg-white p-2 text-sm font-semibold shadow-md transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M11.25 5L6.25 10L11.25 15"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M6.5 10H15"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); handleNextBrand(); }}
+                  className="flex items-center gap-2 rounded-full bg-white p-2 text-sm font-semibold shadow-md transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M8.75 5L13.75 10L8.75 15"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M13.5 10H5"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="bg-[#FFB835] flex items-center rounded-b-xl p-4">
+              <img
+                src={activeBrand.logo}
                 className="max-w-24 aspect-square object-contain"
-                alt="Bakso Malang Enggal"
+                alt={activeBrand.alt}
               />
               <div className="mx-2 w-1 bg-[#EA9800] h-12"></div>
               <div>
                 <h1 className="font-jakarta font-bold text-xl text-[#A71D28]">
-                  Bakso Malang
+                  {activeBrand.name}
                 </h1>
-                <p className="font-jakarta text-[#845600]">
-                  Bakso Prasmanan Pertama di Indonesia
-                </p>
+                {activeBrand.description && (
+                  <p className="font-jakarta text-[#845600]">
+                    {activeBrand.description}
+                  </p>
+                )}
               </div>
             </div>
           </div>

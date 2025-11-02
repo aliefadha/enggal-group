@@ -1,12 +1,12 @@
-import { NestFactory } from '@nestjs/core'
-import { AppModule } from './app.module'
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-import { writeFileSync } from 'node:fs'
-import { apiReference } from '@scalar/nestjs-api-reference'
-import { ValidationPipe } from '@nestjs/common'
-import { LoggingInterceptor } from '@/logging/logging.interceptor'
-import { TransformInterceptor } from '@/interceptors/transform.interceptor';
-import { HttpExceptionFilter } from '@/filters/http-exception.filter';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { writeFileSync } from 'node:fs';
+import { apiReference } from '@scalar/nestjs-api-reference';
+import { ValidationPipe } from '@nestjs/common';
+import { LoggingInterceptor } from 'src/logging/logging.interceptor';
+import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
+import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'node:path';
 
@@ -26,9 +26,13 @@ async function bootstrap() {
     credentials: true,
     preflightContinue: false,
     optionsSuccessStatus: 204,
-  })
-  app.useGlobalPipes(new ValidationPipe())
-  app.useGlobalInterceptors(new LoggingInterceptor())
+  });
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
+  app.useGlobalInterceptors(new LoggingInterceptor());
   app.useStaticAssets(join(process.cwd(), 'uploads'), {
     prefix: '/uploads/',
   });
@@ -44,11 +48,11 @@ async function bootstrap() {
       },
       'token',
     )
-    .build()
+    .build();
 
-  const document = SwaggerModule.createDocument(app, config)
-  writeFileSync('./swagger-spec.json', JSON.stringify(document))
-  SwaggerModule.setup('api', app, document)
+  const document = SwaggerModule.createDocument(app, config);
+  writeFileSync('./swagger-spec.json', JSON.stringify(document));
+  SwaggerModule.setup('api', app, document);
 
   app.use(
     '/swagger',
@@ -58,11 +62,11 @@ async function bootstrap() {
       },
       content: document,
     }),
-  )
+  );
 
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
-  await app.listen(3003)
+  await app.listen(3055);
 }
 
-bootstrap()
+bootstrap();

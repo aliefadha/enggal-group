@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '@/prisma/prisma.service';
-import { RequestTeamCreateDto } from '@/api/team/dto/requests/create.dto';
-import { RequestTeamUpdateDto } from '@/api/team/dto/requests/update.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { RequestTeamCreateDto } from 'src/api/team/dto/requests/create.dto';
+import { RequestTeamUpdateDto } from 'src/api/team/dto/requests/update.dto';
 
 @Injectable()
 export class TeamService {

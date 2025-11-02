@@ -1,9 +1,19 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
+
+@font-face {
+  font-family: "runestars";
+  src: url("/fonts/runestars.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-runestars: "runestars", sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -117,4 +127,66 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Novel Editor Styles */
+.novel-editor .ProseMirror {
+  @apply min-h-[200px] w-full focus:outline-none;
+}
+
+.novel-editor .ProseMirror p.is-editor-empty:first-child::before {
+  @apply text-[#6B7280];
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.novel-editor .prose {
+  @apply max-w-none;
+}
+
+.novel-editor .prose h1 {
+  @apply text-2xl font-bold text-[#2E2E2E] mb-4;
+}
+
+.novel-editor .prose h2 {
+  @apply text-xl font-semibold text-[#2E2E2E] mb-3;
+}
+
+.novel-editor .prose h3 {
+  @apply text-lg font-semibold text-[#2E2E2E] mb-2;
+}
+
+.novel-editor .prose p {
+  @apply text-sm text-[#4F4F4F] mb-3;
+}
+
+.novel-editor .prose ul,
+.novel-editor .prose ol {
+  @apply pl-6 mb-3;
+}
+
+.novel-editor .prose li {
+  @apply text-sm text-[#4F4F4F] mb-1;
+}
+
+.novel-editor .prose a {
+  @apply text-[#6E0112] underline hover:text-[#9C1A1C];
+}
+
+.novel-editor .prose strong {
+  @apply font-semibold text-[#2E2E2E];
+}
+
+.novel-editor .prose em {
+  @apply italic;
+}
+
+.novel-editor .prose blockquote {
+  @apply border-l-4 border-[#D6DAE1] pl-4 italic text-[#6B7280];
+}
+
+.novel-editor .prose code {
+  @apply bg-[#F9FBFD] px-1.5 py-0.5 rounded text-sm text-[#C1272D];
 }

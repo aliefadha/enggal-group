@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,13 +8,18 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { TeamService } from '@/api/team/team.service';
-import { RequestTeamCreateDto } from '@/api/team/dto/requests/create.dto';
-import { RequestTeamUpdateDto } from '@/api/team/dto/requests/update.dto';
-import { TeamListQueryDto } from '@/api/team/dto/requests/list.query.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { TeamService } from 'src/api/team/team.service';
+import { RequestTeamCreateDto } from 'src/api/team/dto/requests/create.dto';
+import { RequestTeamUpdateDto } from 'src/api/team/dto/requests/update.dto';
+import { TeamListQueryDto } from 'src/api/team/dto/requests/list.query.dto';
+import { uploadDiskStorage } from 'src/api/upload/upload.storage';
+import type { StoredFile } from 'src/api/upload/upload.types';
 import { JwtAuthGuard } from '../auth/guard/jwt-guard.auth';
 
 @ApiTags('team')
@@ -23,11 +29,12 @@ export class TeamController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('image', { storage: uploadDiskStorage }))
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        image: { type: 'string', example: '/uploads/team-john-doe.png' },
         nama: { type: 'string', example: 'John Doe' },
         title: { type: 'string', example: 'Chief Executive Officer' },
         linkedinUrl: {
@@ -38,12 +45,25 @@ export class TeamController {
           type: 'string',
           example: 'https://www.instagram.com/johndoe',
         },
+        image: { type: 'string', format: 'binary' },
       },
-      required: ['image', 'nama', 'title', 'linkedinUrl', 'instagramUrl'],
+      required: ['nama', 'title', 'linkedinUrl', 'instagramUrl', 'image'],
     },
   })
-  create(@Body() dto: RequestTeamCreateDto) {
-    return this.teamService.create(dto);
+  create(
+    @Body() dto: RequestTeamCreateDto,
+    @UploadedFile() image?: StoredFile,
+  ) {
+    if (!image) {
+      throw new BadRequestException('Image file is required');
+    }
+
+    const payload: RequestTeamCreateDto = {
+      ...dto,
+      image: `/uploads/${image.filename}`,
+    };
+
+    return this.teamService.create(payload);
   }
 
   @Get()
@@ -62,11 +82,12 @@ export class TeamController {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('image', { storage: uploadDiskStorage }))
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        image: { type: 'string', example: '/uploads/team-john-doe.png' },
         nama: { type: 'string', example: 'John Doe' },
         title: { type: 'string', example: 'Chief Executive Officer' },
         linkedinUrl: {
@@ -77,11 +98,21 @@ export class TeamController {
           type: 'string',
           example: 'https://www.instagram.com/johndoe',
         },
+        image: { type: 'string', format: 'binary' },
       },
     },
   })
-  update(@Param('id') id: string, @Body() dto: RequestTeamUpdateDto) {
-    return this.teamService.update(id, dto);
+  update(
+    @Param('id') id: string,
+    @Body() dto: RequestTeamUpdateDto,
+    @UploadedFile() image?: StoredFile,
+  ) {
+    const payload: RequestTeamUpdateDto = {
+      ...dto,
+      ...(image ? { image: `/uploads/${image.filename}` } : {}),
+    };
+
+    return this.teamService.update(id, payload);
   }
 
   @Delete(':id')

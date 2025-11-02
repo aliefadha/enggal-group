@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
-import { PrismaService } from '@/prisma/prisma.service';
-import { RequestUserCareerCreateDto } from '@/api/user-career/dto/requests/create.dto';
-import { RequestUserCareerUpdateDto } from '@/api/user-career/dto/requests/update.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { RequestUserCareerCreateDto } from 'src/api/user-career/dto/requests/create.dto';
+import { RequestUserCareerUpdateDto } from 'src/api/user-career/dto/requests/update.dto';
 
 @Injectable()
 export class UserCareerService {
@@ -15,6 +15,7 @@ export class UserCareerService {
         nama: dto.nama,
         no_hp: dto.no_hp,
         email: dto.email,
+        alamat: dto.alamat,
         cv_link: dto.cv_link,
       },
     });
@@ -86,6 +87,7 @@ export class UserCareerService {
         nama: dto.nama ?? undefined,
         no_hp: dto.no_hp ?? undefined,
         email: dto.email ?? undefined,
+        alamat: dto.alamat ?? undefined,
         cv_link: dto.cv_link ?? undefined,
       },
     });

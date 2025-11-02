@@ -8,7 +8,7 @@ import { Request } from 'express';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
   @Post('login')
   @ApiBody({
     schema: {
@@ -21,7 +21,7 @@ export class AuthController {
         },
         password: {
           type: 'string',
-          example: 'Str0ngP@ssword!',
+          example: 'password123',
         },
       },
       required: ['email', 'password'],

@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
-import { PrismaService } from '@/prisma/prisma.service';
-import { RequestBeritaCreateDto } from '@/api/berita/dto/requests/create.dto';
-import { RequestBeritaUpdateDto } from '@/api/berita/dto/requests/update.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { RequestBeritaCreateDto } from 'src/api/berita/dto/requests/create.dto';
+import { RequestBeritaUpdateDto } from 'src/api/berita/dto/requests/update.dto';
 
 @Injectable()
 export class BeritaService {

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '@/prisma/prisma.module';
+import { PrismaModule } from 'src/prisma/prisma.module';
 import { UserCareerService } from './user-career.service';
 import { UserCareerController } from './user-career.controller';
 
@@ -10,4 +10,3 @@ import { UserCareerController } from './user-career.controller';
   exports: [UserCareerService],
 })
 export class UserCareerModule {}
-

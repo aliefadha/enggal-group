@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { BrandController } from '@/api/brand/brand.controller';
-import { BrandService } from '@/api/brand/brand.service';
-import { PrismaModule } from '@/prisma/prisma.module';
+import { BrandController } from 'src/api/brand/brand.controller';
+import { BrandService } from 'src/api/brand/brand.service';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],

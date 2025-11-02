@@ -1,10 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsUrl } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsUrl } from 'class-validator';
 
 export class RequestTeamCreateDto {
-  @ApiProperty({ example: '/uploads/team-john-doe.png' })
+  @ApiPropertyOptional({ example: '/uploads/team-john-doe.png' })
+  @IsOptional()
   @IsNotEmpty()
-  image!: string;
+  image?: string;
 
   @ApiProperty({ example: 'John Doe' })
   @IsNotEmpty()

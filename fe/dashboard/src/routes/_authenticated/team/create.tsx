@@ -1,0 +1,294 @@
+import * as React from "react";
+
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Upload, Loader2, ArrowLeft } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ApiError, apiClient } from "@/lib/api-client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+type Team = {
+  id: string;
+  nama: string;
+  title: string;
+  image: string;
+  linkedinUrl: string;
+  instagramUrl: string;
+};
+
+const createTeam = async (formData: FormData) => {
+  const response = await apiClient.post<Team>("/team", formData);
+  return response.data;
+};
+
+export const Route = createFileRoute("/_authenticated/team/create")({
+  component: RouteComponent,
+});
+
+function RouteComponent() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const [formState, setFormState] = React.useState({
+    nama: "",
+    title: "",
+    linkedinUrl: "",
+    instagramUrl: "",
+  });
+
+  const imageFileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const [selectedImageName, setSelectedImageName] = React.useState("");
+  const [selectedImageFile, setSelectedImageFile] =
+    React.useState<File | null>(null);
+
+  const [submitError, setSubmitError] = React.useState<string | null>(null);
+
+  const {
+    mutate: mutateTeam,
+    reset: resetCreateTeam,
+    isPending: isCreatePending,
+  } = useMutation({
+    mutationFn: createTeam,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teams"] });
+      toast.success("Team member berhasil ditambahkan.");
+      navigate({ to: "/team" });
+    },
+    onError: (mutationError: unknown) => {
+      if (mutationError instanceof ApiError) {
+        const message =
+          mutationError.message || "Gagal menambahkan team member.";
+        setSubmitError(message);
+        toast.error(message);
+        return;
+      }
+
+      const fallbackMessage =
+        mutationError instanceof Error
+          ? mutationError.message
+          : "Gagal menambahkan team member. Silakan coba lagi.";
+      setSubmitError(fallbackMessage);
+      toast.error(fallbackMessage);
+    },
+  });
+
+  const handleChange = (key: keyof typeof formState, value: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+    if (submitError) {
+      setSubmitError(null);
+    }
+  };
+
+  const handleImageFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0] ?? null;
+    setSelectedImageName(file ? file.name : "");
+    setSelectedImageFile(file);
+    if (submitError) {
+      setSubmitError(null);
+    }
+  };
+
+  const handleSave = () => {
+    if (isCreatePending) {
+      return;
+    }
+
+    const trimmedNama = formState.nama.trim();
+    const trimmedTitle = formState.title.trim();
+    const trimmedLinkedinUrl = formState.linkedinUrl.trim();
+    const trimmedInstagramUrl = formState.instagramUrl.trim();
+
+    if (
+      !trimmedNama ||
+      !trimmedTitle ||
+      !trimmedLinkedinUrl ||
+      !trimmedInstagramUrl ||
+      !selectedImageFile
+    ) {
+      setSubmitError("Mohon lengkapi semua field yang wajib diisi.");
+      return;
+    }
+
+    setSubmitError(null);
+
+    const formData = new FormData();
+    formData.append("nama", trimmedNama);
+    formData.append("title", trimmedTitle);
+    formData.append("linkedinUrl", trimmedLinkedinUrl);
+    formData.append("instagramUrl", trimmedInstagramUrl);
+    formData.append("image", selectedImageFile);
+
+    mutateTeam(formData);
+  };
+
+  const handleCancel = () => {
+    navigate({ to: "/team" });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={handleCancel}
+          className="h-10 w-10 rounded-xl border border-[#D6DAE1]"
+        >
+          <ArrowLeft className="size-4" />
+        </Button>
+        <h1 className="text-2xl font-semibold text-[#9C1A1C]">
+          Tambah Team Member Baru
+        </h1>
+      </div>
+
+      <Card className="border-none shadow-sm">
+        <CardContent className="space-y-6 p-8">
+          {/* Image Upload */}
+          <div>
+            <Label className="mb-2 block text-sm font-medium text-[#2E2E2E]">
+              Upload Foto<span className="text-[#C1272D]">*</span>
+            </Label>
+            <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-6 text-center">
+              <Upload className="size-8 text-[#C1272D]" />
+              <div className="text-sm text-[#6B7280]">
+                Pilih Foto atau Drop Disini
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
+                disabled={isCreatePending}
+                onClick={() => imageFileInputRef.current?.click()}
+              >
+                Browse File
+              </Button>
+              <input
+                ref={imageFileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageFileChange}
+                disabled={isCreatePending}
+                className="hidden"
+              />
+              {selectedImageName ? (
+                <p className="text-xs text-[#4F4F4F]">
+                  File dipilih: {selectedImageName}
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          {/* Nama */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-[#2E2E2E]">
+              Nama Lengkap<span className="text-[#C1272D]">*</span>
+            </Label>
+            <Input
+              value={formState.nama}
+              onChange={(event) => handleChange("nama", event.target.value)}
+              placeholder="Masukan Nama Lengkap"
+              className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
+              disabled={isCreatePending}
+            />
+          </div>
+
+          {/* Title/Jabatan */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-[#2E2E2E]">
+              Jabatan<span className="text-[#C1272D]">*</span>
+            </Label>
+            <Input
+              value={formState.title}
+              onChange={(event) => handleChange("title", event.target.value)}
+              placeholder="Masukan Jabatan (e.g., Chief Executive Officer)"
+              className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
+              disabled={isCreatePending}
+            />
+          </div>
+
+          {/* Social Media Links Section */}
+          <div className="space-y-4 rounded-2xl border border-[#F0F1F3] bg-[#FAFBFC] p-6">
+            <h3 className="text-base font-semibold text-[#2E2E2E]">
+              Social Media Links
+            </h3>
+
+            {/* LinkedIn Link */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[#2E2E2E]">
+                LinkedIn URL<span className="text-[#C1272D]">*</span>
+              </Label>
+              <Input
+                value={formState.linkedinUrl}
+                onChange={(event) =>
+                  handleChange("linkedinUrl", event.target.value)
+                }
+                placeholder="https://www.linkedin.com/in/johndoe"
+                className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
+                disabled={isCreatePending}
+              />
+            </div>
+
+            {/* Instagram Link */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[#2E2E2E]">
+                Instagram URL<span className="text-[#C1272D]">*</span>
+              </Label>
+              <Input
+                value={formState.instagramUrl}
+                onChange={(event) =>
+                  handleChange("instagramUrl", event.target.value)
+                }
+                placeholder="https://www.instagram.com/johndoe"
+                className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
+                disabled={isCreatePending}
+              />
+            </div>
+          </div>
+
+          {submitError ? (
+            <p className="text-sm text-[#C1272D]">{submitError}</p>
+          ) : null}
+
+          {/* Action Buttons */}
+          <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
+            <Button
+              variant="outline"
+              type="button"
+              className="h-12 rounded-2xl border border-[#D6DAE1] bg-white px-6 text-sm font-medium text-[#4F4F4F]"
+              onClick={handleCancel}
+              disabled={isCreatePending}
+            >
+              Batal
+            </Button>
+            <Button
+              type="button"
+              className="h-12 rounded-2xl bg-[#6E0112] px-6 text-sm font-semibold text-white hover:bg-[#5a010e]"
+              disabled={isCreatePending}
+              onClick={handleSave}
+            >
+              {isCreatePending ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                "Simpan Team Member"
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

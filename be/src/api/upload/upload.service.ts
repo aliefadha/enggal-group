@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { existsSync, mkdirSync } from 'node:fs';
 import { basename, join } from 'node:path';
-import { UPLOAD_DIR } from '@/api/upload/upload.constants';
-import type { StoredFile } from '@/api/upload/upload.types';
+import { UPLOAD_DIR } from 'src/api/upload/upload.constants';
+import type { StoredFile } from 'src/api/upload/upload.types';
 
 @Injectable()
 export class UploadService {

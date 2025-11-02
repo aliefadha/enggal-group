@@ -7,10 +7,10 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { UserService } from '@/api/user/user.service';
+import { UserService } from 'src/api/user/user.service';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { RequestUserCreateDto } from './dto/requests/create.dto';
-import { RequestUserUpdateDto } from './dto/requests/update.dto';
+import { RequestUserCreateDto } from 'src/api/user/dto/requests/create.dto';
+import { RequestUserUpdateDto } from 'src/api/user/dto/requests/update.dto';
 
 @ApiTags('user')
 @Controller('user')

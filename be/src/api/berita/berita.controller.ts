@@ -14,13 +14,13 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { BeritaService } from '@/api/berita/berita.service';
-import { RequestBeritaCreateDto } from '@/api/berita/dto/requests/create.dto';
-import { RequestBeritaUpdateDto } from '@/api/berita/dto/requests/update.dto';
-import { BeritaListQueryDto } from '@/api/berita/dto/requests/list.query.dto';
-import { uploadDiskStorage } from '@/api/upload/upload.storage';
-import type { StoredFile } from '@/api/upload/upload.types';
-import { JwtAuthGuard } from '../auth/guard/jwt-guard.auth';
+import { BeritaService } from 'src/api/berita/berita.service';
+import { RequestBeritaCreateDto } from 'src/api/berita/dto/requests/create.dto';
+import { RequestBeritaUpdateDto } from 'src/api/berita/dto/requests/update.dto';
+import { BeritaListQueryDto } from 'src/api/berita/dto/requests/list.query.dto';
+import { uploadDiskStorage } from 'src/api/upload/upload.storage';
+import type { StoredFile } from 'src/api/upload/upload.types';
+import { JwtAuthGuard } from 'src/api/auth/guard/jwt-guard.auth';
 
 @ApiTags('berita')
 @Controller('berita')

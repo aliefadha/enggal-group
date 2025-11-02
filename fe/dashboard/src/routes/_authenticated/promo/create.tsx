@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Editor } from "@/components/ui/editor";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -84,13 +85,22 @@ function RouteComponent() {
   const [formState, setFormState] = React.useState({
     title: "",
     subtitle: "",
-    details: "",
+    description: "",
+    syaratKetentuan: "",
   });
+  const [showBanner, setShowBanner] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [selectedImageName, setSelectedImageName] = React.useState("");
   const [selectedImageFile, setSelectedImageFile] = React.useState<File | null>(
     null,
   );
+  const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string | null>(null);
+  const bannerInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [selectedBannerName, setSelectedBannerName] = React.useState("");
+  const [selectedBannerFile, setSelectedBannerFile] = React.useState<File | null>(
+    null,
+  );
+  const [bannerPreviewUrl, setBannerPreviewUrl] = React.useState<string | null>(null);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
 
   const {
@@ -113,13 +123,31 @@ function RouteComponent() {
       setFormState({
         title: "",
         subtitle: "",
-        details: "",
+        description: "",
+        syaratKetentuan: "",
       });
+      setShowBanner(false);
       setSelectedImageName("");
       setSelectedImageFile(null);
+      setSelectedBannerName("");
+      setSelectedBannerFile(null);
+
+      // Clean up preview URLs
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+        setImagePreviewUrl(null);
+      }
+      if (bannerPreviewUrl) {
+        URL.revokeObjectURL(bannerPreviewUrl);
+        setBannerPreviewUrl(null);
+      }
+
       setSubmitError(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
+      }
+      if (bannerInputRef.current) {
+        bannerInputRef.current.value = "";
       }
       navigate({ to: "/promo" });
     },
@@ -172,6 +200,52 @@ function RouteComponent() {
     const file = event.target.files?.[0] ?? null;
     setSelectedImageName(file ? file.name : "");
     setSelectedImageFile(file);
+
+    // Clean up old preview URL
+    if (imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+
+    // Create new preview URL
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreviewUrl(previewUrl);
+    } else {
+      setImagePreviewUrl(null);
+    }
+
+    setSubmitError(null);
+    if (isCreateSuccess || isCreateError) {
+      resetPromoMutation();
+    }
+  };
+
+  const handleBannerFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    setSelectedBannerName(file ? file.name : "");
+    setSelectedBannerFile(file);
+
+    // Clean up old preview URL
+    if (bannerPreviewUrl) {
+      URL.revokeObjectURL(bannerPreviewUrl);
+    }
+
+    // Create new preview URL
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setBannerPreviewUrl(previewUrl);
+    } else {
+      setBannerPreviewUrl(null);
+    }
+
+    setSubmitError(null);
+    if (isCreateSuccess || isCreateError) {
+      resetPromoMutation();
+    }
+  };
+
+  const handleShowBannerChange = (checked: boolean | "indeterminate") => {
+    setShowBanner(checked === true);
     setSubmitError(null);
     if (isCreateSuccess || isCreateError) {
       resetPromoMutation();
@@ -189,13 +263,15 @@ function RouteComponent() {
   const handleSubmit = () => {
     const trimmedTitle = formState.title.trim();
     const trimmedSubtitle = formState.subtitle.trim();
-    const trimmedDetails = formState.details.trim();
+    const trimmedDescription = formState.description.trim();
+    const trimmedSyaratKetentuan = formState.syaratKetentuan.trim();
 
     if (
       !selectedBrand ||
       !trimmedTitle ||
       !trimmedSubtitle ||
-      !trimmedDetails ||
+      !trimmedDescription ||
+      !trimmedSyaratKetentuan ||
       !validUntil ||
       !selectedImageFile
     ) {
@@ -211,16 +287,33 @@ function RouteComponent() {
     const formData = new FormData();
     formData.append("title", trimmedTitle);
     formData.append("subtitle", trimmedSubtitle);
-    formData.append("description", trimmedDetails);
-    formData.append("syaratKetentuan", trimmedDetails);
+    formData.append("description", trimmedDescription);
+    formData.append("syaratKetentuan", trimmedSyaratKetentuan);
     formData.append("berlakuHingga", format(validUntil, "yyyy-MM-dd"));
     formData.append("brandId", selectedBrand);
     formData.append("image", selectedImageFile);
+    formData.append("showBanner", showBanner.toString());
+
+    if (selectedBannerFile) {
+      formData.append("banner", selectedBannerFile);
+    }
 
     mutatePromo(formData);
   };
 
   const isSubmitDisabled = isCreatePending;
+
+  // Cleanup preview URLs on unmount
+  React.useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+      if (bannerPreviewUrl) {
+        URL.revokeObjectURL(bannerPreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl, bannerPreviewUrl]);
 
   return (
     <div className="space-y-6">
@@ -244,34 +337,62 @@ function RouteComponent() {
             <p className="text-sm text-[#D74E4E]">
               Disarankan menggunakan foto dengan ukuran rasio 4:5
             </p>
-            <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-6 text-center">
-              <Upload className="size-8 text-[#C1272D]" />
-              <div className="text-sm text-[#6B7280]">
-                Pilih Foto atau Drop Disini
+            {imagePreviewUrl ? (
+              <div className="space-y-4">
+                <div className="relative rounded-3xl border border-[#D6DAE1] bg-[#F9FBFD] p-4">
+                  <img
+                    src={imagePreviewUrl}
+                    alt="Preview"
+                    className="mx-auto max-h-96 rounded-2xl object-contain"
+                  />
+                </div>
+                <div className="flex items-center justify-between rounded-2xl border border-[#D6DAE1] bg-white p-3">
+                  <p className="text-sm text-[#4F4F4F]">{selectedImageName}</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
+                    disabled={isCreatePending}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Upload
+                  </Button>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  disabled={isCreatePending}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                className="rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
-                disabled={isCreatePending}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Browse File
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                disabled={isCreatePending}
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              {selectedImageName ? (
-                <p className="text-xs text-[#4F4F4F]">
-                  File dipilih: {selectedImageName}
-                </p>
-              ) : null}
-            </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-6 text-center">
+                <Upload className="size-8 text-[#C1272D]" />
+                <div className="text-sm text-[#6B7280]">
+                  Pilih Foto atau Drop Disini
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
+                  disabled={isCreatePending}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Browse File
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  disabled={isCreatePending}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </div>
+            )}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -369,16 +490,107 @@ function RouteComponent() {
 
           <div className="space-y-2">
             <Label className="text-sm font-medium text-[#2E2E2E]">
-              Deskripsi Ketentuan dan Mekanisme Promo
+              Deskripsi Promo
               <span className="text-[#C1272D]">*</span>
             </Label>
-            <Textarea
-              value={formState.details}
-              onChange={(event) => handleChange("details", event.target.value)}
-              placeholder="Masukan syarat, ketentuan dan mekanisme Claim Promo"
+            <Editor
+              value={formState.description}
+              onChange={(value) => handleChange("description", value)}
+              placeholder="Masukan deskripsi promo disini"
               disabled={isCreatePending}
-              className="min-h-[200px] rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-[#2E2E2E]">
+              Syarat, Ketentuan dan Mekanisme Promo
+              <span className="text-[#C1272D]">*</span>
+            </Label>
+            <Editor
+              value={formState.syaratKetentuan}
+              onChange={(value) => handleChange("syaratKetentuan", value)}
+              placeholder="Masukan syarat, ketentuan dan mekanisme claim promo"
+              disabled={isCreatePending}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm font-semibold text-[#2E2E2E]">
+              Upload Banner (Opsional)
+            </Label>
+            <p className="text-sm text-[#D74E4E]">
+              Banner akan ditampilkan di halaman utama jika diaktifkan
+            </p>
+            {bannerPreviewUrl ? (
+              <div className="space-y-4">
+                <div className="relative rounded-3xl border border-[#D6DAE1] bg-[#F9FBFD] p-4">
+                  <img
+                    src={bannerPreviewUrl}
+                    alt="Banner Preview"
+                    className="mx-auto max-h-96 rounded-2xl object-contain"
+                  />
+                </div>
+                <div className="flex items-center justify-between rounded-2xl border border-[#D6DAE1] bg-white p-3">
+                  <p className="text-sm text-[#4F4F4F]">{selectedBannerName}</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
+                    disabled={isCreatePending}
+                    onClick={() => bannerInputRef.current?.click()}
+                  >
+                    Upload
+                  </Button>
+                </div>
+                <input
+                  ref={bannerInputRef}
+                  type="file"
+                  accept="image/*"
+                  disabled={isCreatePending}
+                  onChange={handleBannerFileChange}
+                  className="hidden"
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-6 text-center">
+                <Upload className="size-8 text-[#C1272D]" />
+                <div className="text-sm text-[#6B7280]">
+                  Pilih Banner atau Drop Disini
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
+                  disabled={isCreatePending}
+                  onClick={() => bannerInputRef.current?.click()}
+                >
+                  Browse File
+                </Button>
+                <input
+                  ref={bannerInputRef}
+                  type="file"
+                  accept="image/*"
+                  disabled={isCreatePending}
+                  onChange={handleBannerFileChange}
+                  className="hidden"
+                />
+              </div>
+            )}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="showBanner"
+                checked={showBanner}
+                onCheckedChange={handleShowBannerChange}
+                disabled={isCreatePending}
+              />
+              <Label
+                htmlFor="showBanner"
+                className="text-sm font-medium text-[#2E2E2E] cursor-pointer"
+              >
+                Tampilkan banner di halaman utama
+              </Label>
+            </div>
           </div>
 
           <div className="pt-2">

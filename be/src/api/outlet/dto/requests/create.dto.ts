@@ -6,10 +6,6 @@ export class RequestOutletCreateDto {
   @IsNotEmpty()
   nama!: string;
 
-  @ApiProperty({ example: 'Jakarta' })
-  @IsNotEmpty()
-  kota!: string;
-
   @ApiProperty({ example: '08:00 - 22:00 WIB' })
   @IsNotEmpty()
   jamOperasional!: string;

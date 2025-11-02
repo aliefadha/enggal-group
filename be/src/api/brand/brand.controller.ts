@@ -14,12 +14,12 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { BrandService } from '@/api/brand/brand.service';
-import { RequestBrandCreateDto } from '@/api/brand/dto/requests/create.dto';
-import { RequestBrandUpdateDto } from '@/api/brand/dto/requests/update.dto';
-import { BrandListQueryDto } from '@/api/brand/dto/requests/list.query.dto';
-import { uploadDiskStorage } from '@/api/upload/upload.storage';
-import type { StoredFile } from '@/api/upload/upload.types';
+import { BrandService } from 'src/api/brand/brand.service';
+import { RequestBrandCreateDto } from 'src/api/brand/dto/requests/create.dto';
+import { RequestBrandUpdateDto } from 'src/api/brand/dto/requests/update.dto';
+import { BrandListQueryDto } from 'src/api/brand/dto/requests/list.query.dto';
+import { uploadDiskStorage } from 'src/api/upload/upload.storage';
+import type { StoredFile } from 'src/api/upload/upload.types';
 import { JwtAuthGuard } from '../auth/guard/jwt-guard.auth';
 
 @ApiTags('brand')
@@ -36,11 +36,21 @@ export class BrandController {
       type: 'object',
       properties: {
         nama: { type: 'string', example: 'Bakso Enggal' },
+        title: { type: 'string', example: 'Restoran Bakso Terbaik di Indonesia' },
         description: {
           type: 'string',
           example: 'Restoran bakso prasmanan pertama di Indonesia.',
         },
+        content: {
+          type: 'string',
+          example: 'Bakso Enggal adalah restoran yang menyediakan berbagai macam bakso dengan kualitas terbaik...'
+        },
         logo: { type: 'string', format: 'binary' },
+        coverImage: { type: 'string' },
+        instagramLink: { type: 'string' },
+        facebookLink: { type: 'string' },
+        twitterLink: { type: 'string' },
+        menuLink: { type: 'string' },
       },
       required: ['nama', 'description', 'logo'],
     },
@@ -83,11 +93,21 @@ export class BrandController {
       type: 'object',
       properties: {
         nama: { type: 'string', example: 'Bakso Enggal' },
+        title: { type: 'string', example: 'Restoran Bakso Terbaik di Indonesia' },
         description: {
           type: 'string',
           example: 'Restoran bakso prasmanan pertama di Indonesia.',
         },
+        content: {
+          type: 'string',
+          example: 'Bakso Enggal adalah restoran yang menyediakan berbagai macam bakso dengan kualitas terbaik...'
+        },
         logo: { type: 'string', format: 'binary' },
+        coverImage: { type: 'string' },
+        instagramLink: { type: 'string' },
+        facebookLink: { type: 'string' },
+        twitterLink: { type: 'string' },
+        menuLink: { type: 'string' },
       },
     },
   })

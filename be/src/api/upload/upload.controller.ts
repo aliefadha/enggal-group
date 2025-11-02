@@ -10,10 +10,10 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { UploadService } from '@/api/upload/upload.service';
+import { UploadService } from 'src/api/upload/upload.service';
 import { Response } from 'express';
-import type { StoredFile } from '@/api/upload/upload.types';
-import { uploadDiskStorage } from '@/api/upload/upload.storage';
+import type { StoredFile } from 'src/api/upload/upload.types';
+import { uploadDiskStorage } from 'src/api/upload/upload.storage';
 
 @ApiTags('upload')
 @Controller('upload')

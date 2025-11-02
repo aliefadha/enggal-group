@@ -181,6 +181,7 @@ function RouteComponent() {
   const [selectedImageFile, setSelectedImageFile] = React.useState<File | null>(
     null,
   );
+  const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string | null>(null);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
   const [operationalHours, setOperationalHours] =
     React.useState<OperationalHours>({ ...defaultOperationalHours });
@@ -268,6 +269,20 @@ function RouteComponent() {
     const file = event.target.files?.[0] ?? null;
     setSelectedImageName(file ? file.name : "");
     setSelectedImageFile(file);
+
+    // Clean up old preview URL
+    if (imagePreviewUrl && !imagePreviewUrl.startsWith('/uploads/')) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+
+    // Create new preview URL
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreviewUrl(previewUrl);
+    } else {
+      setImagePreviewUrl(null);
+    }
+
     setSubmitError(null);
     if (isUpdateSuccess || isUpdateError) {
       resetOutletMutation();
@@ -377,6 +392,7 @@ function RouteComponent() {
     setFormState({ ...emptyOutlet });
     setSelectedImageName("");
     setSelectedImageFile(null);
+    setImagePreviewUrl(null);
     setSubmitError(null);
     setOperationalHours({ ...defaultOperationalHours });
     setIsFormInitialized(false);
@@ -404,9 +420,23 @@ function RouteComponent() {
       whatsappUrl: data.whatsappUrl ?? "",
       image: data.image ?? "",
     });
+
+    // Set existing image preview from server
+    if (data.image) {
+      setImagePreviewUrl(data.image);
+    }
+
     setOperationalHours(parsedHours);
     setIsFormInitialized(true);
   }, [data, isFormInitialized]);
+
+  React.useEffect(() => {
+    return () => {
+      if (imagePreviewUrl && !imagePreviewUrl.startsWith('/uploads/')) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
 
   const isFormDisabled = !data || isUpdatePending;
   const isSubmitDisabled = isFormDisabled || isUpdatePending;
@@ -421,38 +451,58 @@ function RouteComponent() {
           <p className="text-sm text-[#D74E4E]">
             Disarankan menggunakan foto dengan ukuran rasio 1:1
           </p>
-          <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-6 text-center">
-            <Upload className="size-8 text-[#C1272D]" />
-            <div className="text-sm text-[#6B7280]">
-              Pilih Foto atau Drop Disini
+          {imagePreviewUrl ? (
+            <div className="space-y-4">
+              <div className="relative rounded-3xl border border-[#D6DAE1] bg-[#F9FBFD] p-4">
+                <img
+                  src={`${import.meta.env.VITE_API_BASE_URL}${imagePreviewUrl}`}
+                  alt="Preview"
+                  className="mx-auto max-h-96 rounded-2xl object-contain"
+                />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
+                disabled={isSubmitDisabled}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Ganti Foto
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                disabled={isSubmitDisabled}
+                onChange={handleFileChange}
+                className="hidden"
+              />
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              className="rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
-              disabled={isSubmitDisabled}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              Browse File
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              disabled={isSubmitDisabled}
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            {selectedImageName ? (
-              <p className="text-xs text-[#4F4F4F]">
-                File dipilih: {selectedImageName}
-              </p>
-            ) : data?.image ? (
-              <p className="text-xs text-[#4F4F4F]">
-                Foto saat ini akan tetap digunakan jika tidak mengganti.
-              </p>
-            ) : null}
-          </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-6 text-center">
+              <Upload className="size-8 text-[#C1272D]" />
+              <div className="text-sm text-[#6B7280]">
+                Pilih Foto atau Drop Disini
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F]"
+                disabled={isSubmitDisabled}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Browse File
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                disabled={isSubmitDisabled}
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
+          )}
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">

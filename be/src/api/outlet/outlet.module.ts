@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '@/prisma/prisma.module';
-import { OutletController } from '@/api/outlet/outlet.controller';
-import { OutletService } from '@/api/outlet/outlet.service';
+import { PrismaModule } from 'src/prisma/prisma.module';
+import { OutletController } from 'src/api/outlet/outlet.controller';
+import { OutletService } from 'src/api/outlet/outlet.service';
 
 @Module({
   imports: [PrismaModule],

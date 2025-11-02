@@ -5,7 +5,6 @@ import {
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
 import { UserRound } from "lucide-react";
 
@@ -38,6 +37,7 @@ import beritaIcon from "@/assets/icons/berita.svg";
 import dashboardIcon from "@/assets/icons/dashboard.svg";
 import outletIcon from "@/assets/icons/outlet.svg";
 import promoIcon from "@/assets/icons/promo.svg";
+import teamIcon from "@/assets/icons/team.svg";
 import userCareerIcon from "@/assets/icons/usercareer.svg";
 import { useAuth } from "@/auth";
 
@@ -80,6 +80,11 @@ const primaryNav: NavItem[] = [
     href: "/outlet",
     icon: outletIcon,
   },
+  {
+    title: "Team",
+    href: "/team",
+    icon: teamIcon,
+  },
 ];
 
 const sidebarTheme = {
@@ -113,9 +118,8 @@ function DashboardNavItem({ item }: { item: NavItem }) {
     .filter(Boolean)
     .join(" ");
 
-  const iconClasses = `h-6 w-6 transition-opacity ${
-    isActive ? "opacity-100" : "opacity-70"
-  }`;
+  const iconClasses = `h-6 w-6 transition-opacity ${isActive ? "opacity-100" : "opacity-70"
+    }`;
 
   return (
     <SidebarMenuItem>
@@ -165,11 +169,11 @@ function AppSidebar() {
 
 export function DashboardLayout() {
   const auth = useAuth();
-  const navigate = useNavigate({ from: "/dashboard" });
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     auth.logout();
-    navigate({ to: "/login" });
+    navigate({ to: "/" });
   };
   return (
     <SidebarProvider style={sidebarTheme}>

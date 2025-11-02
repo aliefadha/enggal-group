@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { LoggingInterceptor } from '@/logging/logging.interceptor';
+import { LoggingInterceptor } from 'src/logging/logging.interceptor';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './api/user/user.module';
@@ -15,6 +15,7 @@ import { UploadModule } from './api/upload/upload.module';
 import { BeritaModule } from './api/berita/berita.module';
 import { DashboardModule } from './api/dashboard/dashboard.module';
 import { AuthModule } from './api/auth/auth.module';
+import { GalleryModule } from './api/gallery/gallery.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuthModule } from './api/auth/auth.module';
     BeritaModule,
     DashboardModule,
     AuthModule,
+    GalleryModule,
   ],
   controllers: [AppController],
   providers: [

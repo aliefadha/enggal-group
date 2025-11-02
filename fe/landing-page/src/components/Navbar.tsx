@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router";
+import { motion } from "motion/react";
 
 const PRIMARY_LINKS = [
   { label: "Home", to: "/", isAnchor: false },
@@ -47,7 +48,12 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
+    <motion.header
+      initial={{ y: -120 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      className="sticky top-0 z-50 w-full bg-white shadow-sm"
+    >
       <div className="mx-auto flex max-w-6xl items-center px-6 ">
         <a href="/" className="flex items-center mr-auto" onClick={closeMobileMenu}>
           <img src="/images/logo_navbar.png" className="w-24" alt="Enggal Group" />
@@ -113,7 +119,7 @@ const Navbar: React.FC = () => {
           {PRIMARY_LINKS.map(({ label, to, isAnchor }) => renderLink(label, to, isAnchor))}
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 };
 

@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { apiClient, ApiError } from "./lib/api-client";
 
-interface User {
+export interface User {
   id: string;
   nama: string;
   email: string;
 }
 
-interface AuthState {
+export interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
@@ -24,12 +25,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const token = localStorage.getItem("auth-token");
 
     if (token) {
-      fetch("http://localhost:3003/auth/validate-token", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((response) => response.json())
+      apiClient
+        .get<{ valid: boolean; user: User }>("/auth/validate-token")
         .then((result) => {
-          if (result.statusCode === 200 && result.data?.valid) {
+          if (result.data?.valid) {
             setUser(result.data.user);
             setIsAuthenticated(true);
           } else {
@@ -56,22 +55,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const login = async (email: string, password: string) => {
-    const response = await fetch("http://localhost:3003/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const result = await apiClient.post<{ auth_token: string; user: User }>(
+        "/auth/login",
+        { email, password }
+      );
 
-    const result = await response.json();
-
-    if (response.ok && result.statusCode === 201) {
       const { auth_token, user } = result.data;
 
       setUser(user);
       setIsAuthenticated(true);
       localStorage.setItem("auth-token", auth_token);
-    } else {
-      throw new Error(result.message || "Authentication failed");
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw new Error(error.message || "Authentication failed");
+      }
+      throw error;
     }
   };
 

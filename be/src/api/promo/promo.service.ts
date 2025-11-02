@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
-import { PrismaService } from '@/prisma/prisma.service';
-import { RequestPromoCreateDto } from '@/api/promo/dto/requests/create.dto';
-import { RequestPromoUpdateDto } from '@/api/promo/dto/requests/update.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { RequestPromoCreateDto } from 'src/api/promo/dto/requests/create.dto';
+import { RequestPromoUpdateDto } from 'src/api/promo/dto/requests/update.dto';
 
 @Injectable()
 export class PromoService {
@@ -37,6 +37,8 @@ export class PromoService {
         berlakuHingga: new Date(dto.berlakuHingga),
         brandId: dto.brandId,
         image: dto.image,
+        banner: dto.banner,
+        showBanner: dto.showBanner ?? false,
       },
       include: { brand: true },
     });
@@ -146,6 +148,8 @@ export class PromoService {
           : undefined,
         brandId: dto.brandId ?? undefined,
         image: dto.image ?? undefined,
+        banner: dto.banner ?? undefined,
+        showBanner: dto.showBanner ?? undefined,
       },
       include: { brand: true },
     });

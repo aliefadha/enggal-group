@@ -3,13 +3,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '@/prisma/prisma.service';
-import { RequestOutletCreateDto } from '@/api/outlet/dto/requests/create.dto';
-import { RequestOutletUpdateDto } from '@/api/outlet/dto/requests/update.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { RequestOutletCreateDto } from 'src/api/outlet/dto/requests/create.dto';
+import { RequestOutletUpdateDto } from 'src/api/outlet/dto/requests/update.dto';
 
 @Injectable()
 export class OutletService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(dto: RequestOutletCreateDto) {
     if (!dto.brandId) {
@@ -35,7 +35,6 @@ export class OutletService {
       data: {
         brandId: dto.brandId,
         nama: dto.nama,
-        kota: dto.kota,
         jamOperasional: dto.jamOperasional,
         lokasi: dto.lokasi,
         image: dto.image,
@@ -63,7 +62,7 @@ export class OutletService {
       this.prisma.outlet.findMany({
         skip,
         take: limit,
-        orderBy: { kota: 'asc' },
+        orderBy: { nama: 'asc' },
         where,
         include: { brand: { select: { id: true, nama: true } } },
       }),
@@ -116,7 +115,6 @@ export class OutletService {
       data: {
         nama: dto.nama ?? undefined,
         brandId: dto.brandId ?? undefined,
-        kota: dto.kota ?? undefined,
         jamOperasional: dto.jamOperasional ?? undefined,
         lokasi: dto.lokasi ?? undefined,
         image: dto.image ?? undefined,

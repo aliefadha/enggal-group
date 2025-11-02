@@ -8,18 +8,18 @@ import {
   Post,
   Put,
   Query,
-  UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { PromoService } from '@/api/promo/promo.service';
-import { RequestPromoCreateDto } from '@/api/promo/dto/requests/create.dto';
-import { RequestPromoUpdateDto } from '@/api/promo/dto/requests/update.dto';
-import { PromoListQueryDto } from '@/api/promo/dto/requests/list.query.dto';
-import { uploadDiskStorage } from '@/api/upload/upload.storage';
-import type { StoredFile } from '@/api/upload/upload.types';
+import { PromoService } from 'src/api/promo/promo.service';
+import { RequestPromoCreateDto } from 'src/api/promo/dto/requests/create.dto';
+import { RequestPromoUpdateDto } from 'src/api/promo/dto/requests/update.dto';
+import { PromoListQueryDto } from 'src/api/promo/dto/requests/list.query.dto';
+import { uploadDiskStorage } from 'src/api/upload/upload.storage';
+import type { StoredFile } from 'src/api/upload/upload.types';
 import { JwtAuthGuard } from '../auth/guard/jwt-guard.auth';
 
 @ApiTags('promo')
@@ -29,7 +29,15 @@ export class PromoController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('image', { storage: uploadDiskStorage }))
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'banner', maxCount: 1 },
+      ],
+      { storage: uploadDiskStorage },
+    ),
+  )
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -53,6 +61,8 @@ export class PromoController {
         berlakuHingga: { type: 'string', example: '2024-12-31' },
         brandId: { type: 'string', format: 'uuid' },
         image: { type: 'string', format: 'binary' },
+        banner: { type: 'string', format: 'binary' },
+        showBanner: { type: 'boolean', example: false },
       },
       required: [
         'title',
@@ -67,15 +77,22 @@ export class PromoController {
   })
   create(
     @Body() dto: RequestPromoCreateDto,
-    @UploadedFile() image?: StoredFile,
+    @UploadedFiles()
+    files?: {
+      image?: StoredFile[];
+      banner?: StoredFile[];
+    },
   ) {
-    if (!image) {
+    if (!files?.image?.[0]) {
       throw new BadRequestException('Image file is required');
     }
 
     const payload: RequestPromoCreateDto = {
       ...dto,
-      image: `/uploads/${image.filename}`,
+      image: `/uploads/${files.image[0].filename}`,
+      ...(files.banner?.[0]
+        ? { banner: `/uploads/${files.banner[0].filename}` }
+        : {}),
     };
 
     return this.promoService.create(payload);
@@ -104,7 +121,15 @@ export class PromoController {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('image', { storage: uploadDiskStorage }))
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'banner', maxCount: 1 },
+      ],
+      { storage: uploadDiskStorage },
+    ),
+  )
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -128,17 +153,24 @@ export class PromoController {
         berlakuHingga: { type: 'string', example: '2024-12-31' },
         brandId: { type: 'string', format: 'uuid' },
         image: { type: 'string', format: 'binary' },
+        banner: { type: 'string', format: 'binary' },
+        showBanner: { type: 'boolean', example: false },
       },
     },
   })
   update(
     @Param('id') id: string,
     @Body() dto: RequestPromoUpdateDto,
-    @UploadedFile() image?: StoredFile,
+    @UploadedFiles()
+    files?: {
+      image?: StoredFile[];
+      banner?: StoredFile[];
+    },
   ) {
     const payload: RequestPromoUpdateDto = {
       ...dto,
-      ...(image ? { image: `/uploads/${image.filename}` } : {}),
+      ...(files?.image?.[0] ? { image: `/uploads/${files.image[0].filename}` } : {}),
+      ...(files?.banner?.[0] ? { banner: `/uploads/${files.banner[0].filename}` } : {}),
     };
     return this.promoService.update(id, payload);
   }

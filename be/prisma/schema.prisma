@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -26,28 +27,41 @@ model UserCareer {
   nama    String
   no_hp   String
   email   String
+  alamat  String
   cv_link String
 }
 
 model Promo {
-  id               String   @id @default(uuid())
-  title            String
-  subtitle         String
-  description      String
-  syaratKetentuan  String
-  berlakuHingga    DateTime
-  brandId          String
-  brand            Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  image            String
+  id              String   @id @default(uuid())
+  title           String
+  subtitle        String
+  description     String
+  syaratKetentuan String
+  berlakuHingga   DateTime
+  brandId         String
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  image           String
+  banner          String?
+  showBanner      Boolean  @default(false)
 }
 
 model Brand {
-  id          String @id @default(uuid())
-  nama        String
-  logo        String
-  description String
-  promos      Promo[]
-  outlets     Outlet[]
+  id            String    @id @default(uuid())
+  nama          String
+  logo          String
+  coverImage    String?
+  title         String?
+  description   String
+  content       String?
+  instagramLink String?
+  facebookLink  String?
+  twitterLink   String?
+  menuLink      String?
+  promos        Promo[]
+  outlets       Outlet[]
+  galleries     Gallery[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Berita {
@@ -64,7 +78,6 @@ model Outlet {
   nama           String
   brandId        String
   brand          Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  kota           String
   jamOperasional String
   lokasi         String
   image          String
@@ -75,12 +88,23 @@ model Outlet {
 }
 
 model Team {
-  id            String   @id @default(uuid())
-  nama          String
-  title         String
-  image         String
-  linkedinUrl   String
-  instagramUrl  String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(uuid())
+  nama         String
+  title        String
+  image        String
+  linkedinUrl  String
+  instagramUrl String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Gallery {
+  id           String   @id @default(uuid())
+  brandId      String
+  brand        Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  image        String
+  caption      String
+  instagramUrl String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
