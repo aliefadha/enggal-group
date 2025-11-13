@@ -19,13 +19,11 @@ export class RequestTeamUpdateDto {
 
   @ApiPropertyOptional({ example: 'https://www.linkedin.com/in/john-doe' })
   @IsOptional()
-  @IsNotEmpty()
   @IsUrl()
   linkedinUrl?: string;
 
   @ApiPropertyOptional({ example: 'https://www.instagram.com/johndoe' })
   @IsOptional()
-  @IsNotEmpty()
   @IsUrl()
   instagramUrl?: string;
 

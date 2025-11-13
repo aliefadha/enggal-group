@@ -16,6 +16,24 @@ const TeamCard: React.FC<TeamCardProps> = ({
   linkedinUrl,
   instagramUrl
 }) => {
+  // Ensure URLs are absolute
+  const getAbsoluteUrl = (url: string | undefined) => {
+    if (!url) return undefined;
+
+    // If already absolute URL, return as is
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+
+    // If it's a relative URL, make it absolute by adding https://
+    // Remove leading slash if present
+    const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
+    return `https://${cleanUrl}`;
+  };
+
+  const absoluteLinkedinUrl = getAbsoluteUrl(linkedinUrl);
+  const absoluteInstagramUrl = getAbsoluteUrl(instagramUrl);
+
   return (
     <div className="bg-white rounded-xl overflow-hidden max-w-sm mx-auto relative">
       <div className="absolute inset-0  pointer-events-none w-full bg-[url('/images/dots.png')] bg-center bg-cover opacity-80"></div>
@@ -50,9 +68,9 @@ const TeamCard: React.FC<TeamCardProps> = ({
 
           {/* Social media icons */}
           <div className="flex gap-2 mt-3">
-            {linkedinUrl && (
+            {absoluteLinkedinUrl && (
               <a
-                href={linkedinUrl}
+                href={absoluteLinkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white hover:bg-[#A71D28] hover:text-white text-[#A71D28] p-2 rounded-md transition-colors flex items-center justify-center w-10 h-10"
@@ -63,9 +81,9 @@ const TeamCard: React.FC<TeamCardProps> = ({
               </a>
             )}
 
-            {instagramUrl && (
+            {absoluteInstagramUrl && (
               <a
-                href={instagramUrl}
+                href={absoluteInstagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white hover:bg-[#A71D28] hover:text-white text-[#A71D28] p-2 rounded-md transition-colors flex items-center justify-center w-10 h-10"

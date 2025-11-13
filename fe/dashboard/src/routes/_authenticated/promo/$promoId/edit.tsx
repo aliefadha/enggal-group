@@ -110,13 +110,11 @@ function RouteComponent() {
   const [showBanner, setShowBanner] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [isFormInitialized, setIsFormInitialized] = React.useState(false);
-  const [selectedImageName, setSelectedImageName] = React.useState("");
   const [selectedImageFile, setSelectedImageFile] = React.useState<File | null>(
     null,
   );
   const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string | null>(null);
   const bannerInputRef = React.useRef<HTMLInputElement | null>(null);
-  const [selectedBannerName, setSelectedBannerName] = React.useState("");
   const [selectedBannerFile, setSelectedBannerFile] = React.useState<File | null>(
     null,
   );
@@ -198,7 +196,6 @@ function RouteComponent() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
-    setSelectedImageName(file ? file.name : "");
     setSelectedImageFile(file);
 
     // Clean up old preview URL
@@ -222,7 +219,6 @@ function RouteComponent() {
 
   const handleBannerFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
-    setSelectedBannerName(file ? file.name : "");
     setSelectedBannerFile(file);
 
     // Clean up old preview URL
@@ -321,9 +317,7 @@ function RouteComponent() {
     });
     setShowBanner(false);
     setIsFormInitialized(false);
-    setSelectedImageName("");
     setSelectedImageFile(null);
-    setSelectedBannerName("");
     setSelectedBannerFile(null);
     setImagePreviewUrl(null);
     setBannerPreviewUrl(null);
@@ -350,7 +344,7 @@ function RouteComponent() {
     });
 
     setSelectedBrand(data.brandId ?? undefined);
-    setShowBanner(data.showBanner === true || data.showBanner === "true");
+    setShowBanner(data.showBanner === true);
 
     // Set existing image preview from server
     if (data.image) {

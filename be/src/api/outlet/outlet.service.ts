@@ -68,13 +68,8 @@ export class OutletService {
       }),
     ]);
 
-    const data = rows.map(({ brand, ...rest }) => ({
-      ...rest,
-      namaBrand: brand?.nama ?? null,
-    }));
-
     return {
-      data,
+      data: rows,
       meta: {
         page,
         limit,

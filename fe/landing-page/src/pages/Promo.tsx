@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PromoCard from "../components/PromoCard";
 import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "../lib/api-client";
+import { apiClient, API_BASE_URL } from "../lib/api-client";
 
 type Brand = {
   id: string;
@@ -39,6 +39,17 @@ type PromoListMeta = {
   limit?: number;
   total?: number;
   totalPages?: number;
+};
+
+type PromoBanner = {
+  id: string;
+  title: string;
+  banner: string;
+  berlakuHingga: string;
+  brand: {
+    id: string;
+    nama: string;
+  };
 };
 
 async function fetchBrands() {
@@ -79,12 +90,17 @@ async function fetchPromos(brandId?: string) {
   };
 }
 
+async function fetchPromoBanners() {
+  const response = await apiClient.get<PromoBanner[]>(`/promo/banner/list`);
+  return response.data ?? [];
+}
+
 function Promo() {
   const [selectedBrand, setSelectedBrand] = useState<string>("all");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [currentSlide, setCurrentSlide] = useState<number>(0);
 
-  const { data: brandsData, isLoading: brandsLoading } = useQuery({
+  const { data: brandsData } = useQuery({
     queryKey: ["brands"],
     queryFn: () => fetchBrands()
   });
@@ -94,11 +110,14 @@ function Promo() {
     queryFn: () => fetchPromos(selectedBrand)
   });
 
-  const banners = [
-    "/images/banner-1.png",
-    "/images/banner-1.png",
-    "/images/banner-1.png",
-  ];
+  const { data: bannersData = [] } = useQuery({
+    queryKey: ["promo-banners"],
+    queryFn: () => fetchPromoBanners()
+  });
+
+  const banners = bannersData.length > 0
+    ? bannersData.map(banner => `${API_BASE_URL}${banner.banner}`)
+    : ["/images/banner-1.png"];
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -334,7 +353,7 @@ function Promo() {
                     title={promo.title}
                     description={promo.subtitle}
                     validUntil={formatDate(promo.berlakuHingga)}
-                    image={promo.image}
+                    image={`${API_BASE_URL}${promo.image}`}
                   />
                 </div>
               ))

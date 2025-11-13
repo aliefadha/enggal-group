@@ -1,4 +1,9 @@
 import React, { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { apiClient, API_BASE_URL } from '../lib/api-client';
 import brandIcon from '../assets/images/brand_icon.svg';
 import outletIcon from '../assets/images/outlet_icon.svg';
 import cityIcon from '../assets/images/city_icon.svg';
@@ -11,30 +16,169 @@ import multibrandIcon from '../assets/images/multibrand_icon.svg';
 import uploadIcon from '../assets/images/upload_icon.svg';
 import careerGroup from '../assets/images/career_group.png';
 import LogoCarousel from '../components/LogoCarousel';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '../components/ui/dialog';
+
+type Brand = {
+  id: string;
+  nama: string;
+  logo: string;
+  coverImage?: string;
+  description: string;
+};
+
+type BrandListMeta = {
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+};
+
+// Zod validation schema
+const careerFormSchema = z.object({
+  name: z.string()
+    .min(3, 'Nama minimal 3 karakter')
+    .max(100, 'Nama maksimal 100 karakter')
+    .regex(/^[a-zA-Z\s]+$/, 'Nama hanya boleh berisi huruf dan spasi'),
+  whatsapp: z.string()
+    .min(10, 'Nomor WhatsApp minimal 10 digit')
+    .max(15, 'Nomor WhatsApp maksimal 15 digit')
+    .regex(/^[0-9]+$/, 'Nomor WhatsApp hanya boleh berisi angka'),
+  email: z.string()
+    .email('Format email tidak valid')
+    .min(5, 'Email terlalu pendek')
+    .max(100, 'Email terlalu panjang'),
+  address: z.string()
+    .min(10, 'Alamat minimal 10 karakter')
+    .max(500, 'Alamat maksimal 500 karakter'),
+  cv: z.instanceof(File, { message: 'CV harus diupload' })
+    .refine((file) => file.size <= 5 * 1024 * 1024, 'Ukuran file CV maksimal 5MB')
+    .refine((file) => file.type === 'application/pdf', 'File CV harus berformat PDF')
+});
+
+type CareerFormData = z.infer<typeof careerFormSchema>;
+
+async function fetchBrands() {
+  const response = await apiClient.get<Brand[], BrandListMeta>(
+    `/brand?page=1&limit=100`,
+  );
+
+  const items = response.data ?? [];
+  const meta = response.meta ?? {};
+
+  return {
+    data: items,
+    meta: {
+      total: meta.total ?? items.length,
+      page: 1,
+      limit: 100
+    },
+  };
+}
+
+type UserCareerFormData = {
+  tanggal: string;
+  nama: string;
+  no_hp: string;
+  email: string;
+  alamat: string;
+  cv: File;
+};
+
+async function submitCareerApplication(formData: UserCareerFormData) {
+  const data = new FormData();
+  data.append('tanggal', formData.tanggal);
+  data.append('nama', formData.nama);
+  data.append('no_hp', formData.no_hp);
+  data.append('email', formData.email);
+  data.append('alamat', formData.alamat);
+  data.append('cv', formData.cv);
+
+  const response = await apiClient.post('/user-career', data);
+  return response.data;
+}
 
 function Career() {
-  const [formData, setFormData] = useState({
-    name: '',
-    whatsapp: '',
-    email: '',
-    address: '',
-    cv: null as File | null
+  const {
+    register,
+    handleSubmit: handleFormSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    setValue,
+    watch
+  } = useForm<CareerFormData>({
+    resolver: zodResolver(careerFormSchema),
+    mode: 'onBlur'
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  const cvFile = watch('cv');
+
+  const [dialogState, setDialogState] = useState({
+    open: false,
+    type: 'success' as 'success' | 'error',
+    title: '',
+    message: ''
+  });
+
+  const { data: brandsData, isLoading: brandsLoading } = useQuery({
+    queryKey: ["brands"],
+    queryFn: () => fetchBrands()
+  });
+
+  const brands = brandsData?.data ?? [];
+  const totalBrands = brandsData?.meta?.total ?? 0;
+
+  const brandLogos = brands.map(brand => ({
+    src: `${API_BASE_URL}${brand.logo}`,
+    alt: brand.nama
+  }));
+
+  const careerMutation = useMutation({
+    mutationFn: submitCareerApplication,
+    onSuccess: () => {
+      setDialogState({
+        open: true,
+        type: 'success',
+        title: 'Lamaran Berhasil Dikirim!',
+        message: 'Terima kasih telah melamar. Kami akan menghubungi Anda segera jika profil Anda sesuai dengan kebutuhan kami.'
+      });
+      reset();
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.message || 'Terjadi kesalahan saat mengirim lamaran';
+      setDialogState({
+        open: true,
+        type: 'error',
+        title: 'Gagal Mengirim Lamaran',
+        message: errorMessage
+      });
+    }
+  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setFormData(prev => ({ ...prev, cv: file }));
+    const file = e.target.files?.[0];
+    if (file) {
+      setValue('cv', file, { shouldValidate: true });
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formData);
+  const onSubmit = (data: CareerFormData) => {
+    const today = new Date().toISOString().split('T')[0];
+
+    careerMutation.mutate({
+      tanggal: today,
+      nama: data.name,
+      no_hp: data.whatsapp,
+      email: data.email,
+      alamat: data.address,
+      cv: data.cv
+    });
   };
 
   return (
@@ -47,7 +191,9 @@ function Career() {
               <div className="flex flex-wrap gap-3 sm:gap-4">
                 <div className="bg-white rounded-lg py-2 px-3 sm:px-4 shadow-sm flex items-center space-x-3">
                   <img src={brandIcon} alt="Brand" className="w-5 h-5" />
-                  <span className="font-semibold text-xs sm:text-sm text-[#6E0112] font-jakarta">8 Brand Besar</span>
+                  <span className="font-semibold text-xs sm:text-sm text-[#6E0112] font-jakarta">
+                    {brandsLoading ? '...' : totalBrands} Brand Besar
+                  </span>
                 </div>
                 <div className="bg-white rounded-lg py-2 px-3 sm:px-4 shadow-sm flex items-center space-x-3">
                   <img src={outletIcon} alt="Outlet" className="w-5 h-5" />
@@ -79,7 +225,7 @@ function Career() {
               </div>
 
               <button className="bg-black hover:bg-[#333] text-white font-semibold px-8 py-3 rounded-xl transition-colors w-3/4 sm:w-auto">
-                Lamar Disini!
+                Lamar Di sini!
               </button>
             </div>
 
@@ -91,7 +237,7 @@ function Career() {
       </section>
 
       <div className="w-full py-9">
-        <LogoCarousel />
+        <LogoCarousel brands={brandLogos} isLoading={brandsLoading} />
       </div>
 
       {/* Why Join Us Section */}
@@ -171,19 +317,21 @@ function Career() {
 
             {/* Right Side - Application Form */}
             <div className="h-full flex flex-col">
-              <form onSubmit={handleSubmit} className="space-y-6 flex-1 flex flex-col justify-between">
+              <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-6 flex-1 flex flex-col justify-between">
                 {/* Name Field */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Nama*</label>
                   <input
                     type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
+                    {...register('name')}
                     placeholder="Masukan nama kamu disini"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    required
+                    className={`w-full px-4 py-3 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 ${errors.name ? 'border-red-500' : 'border-gray-200'
+                      }`}
+                    disabled={careerMutation.isPending || isSubmitting}
                   />
+                  {errors.name && (
+                    <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+                  )}
                 </div>
 
                 {/* WhatsApp Field */}
@@ -191,13 +339,15 @@ function Career() {
                   <label className="text-sm font-medium text-gray-700">Nomor Whatsapp*</label>
                   <input
                     type="tel"
-                    name="whatsapp"
-                    value={formData.whatsapp}
-                    onChange={handleInputChange}
+                    {...register('whatsapp')}
                     placeholder="Masukan nomor WA Kamu disini"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    required
+                    className={`w-full px-4 py-3 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 ${errors.whatsapp ? 'border-red-500' : 'border-gray-200'
+                      }`}
+                    disabled={careerMutation.isPending || isSubmitting}
                   />
+                  {errors.whatsapp && (
+                    <p className="text-red-500 text-xs mt-1">{errors.whatsapp.message}</p>
+                  )}
                 </div>
 
                 {/* Email Field */}
@@ -205,27 +355,31 @@ function Career() {
                   <label className="text-sm font-medium text-gray-700">Email*</label>
                   <input
                     type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
+                    {...register('email')}
                     placeholder="Masukan Email"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    required
+                    className={`w-full px-4 py-3 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 ${errors.email ? 'border-red-500' : 'border-gray-200'
+                      }`}
+                    disabled={careerMutation.isPending || isSubmitting}
                   />
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+                  )}
                 </div>
 
                 {/* Address Field */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Alamat Rumah*</label>
                   <textarea
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
+                    {...register('address')}
                     placeholder="Masukan Alamat Lengkap"
                     rows={3}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
-                    required
+                    className={`w-full px-4 py-3 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none disabled:opacity-50 ${errors.address ? 'border-red-500' : 'border-gray-200'
+                      }`}
+                    disabled={careerMutation.isPending || isSubmitting}
                   />
+                  {errors.address && (
+                    <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>
+                  )}
                 </div>
 
                 {/* CV Upload Field */}
@@ -235,39 +389,67 @@ function Career() {
                     <input
                       type="file"
                       onChange={handleFileChange}
-                      accept=".pdf,.doc,.docx"
+                      accept=".pdf"
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      required
+                      disabled={careerMutation.isPending || isSubmitting}
                     />
-                    <div className="w-full px-4 py-6 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg text-center hover:border-orange-500 transition-colors">
+                    <div className={`w-full px-4 py-6 bg-gray-50 border-2 border-dashed rounded-lg text-center hover:border-orange-500 transition-colors ${errors.cv ? 'border-red-500' : 'border-gray-300'
+                      }`}>
                       <div className="flex flex-col items-center space-y-2">
                         <img src={uploadIcon} alt="Upload" className="w-8 h-9" />
                         <div className="text-sm text-gray-600">
-                          {formData.cv ? (
-                            <span className="text-orange-500 font-medium">{formData.cv.name}</span>
+                          {cvFile ? (
+                            <span className="text-orange-500 font-medium">{cvFile.name}</span>
                           ) : (
                             <>
                               <span> Pilih file atau drop CV kamu disini!</span>
                             </>
                           )}
                         </div>
-                        <p className="text-xs text-gray-500">PDF, DOC, DOCX (Max. 5MB)</p>
+                        <p className="text-xs text-gray-500">PDF (Max. 5MB)</p>
                       </div>
                     </div>
                   </div>
+                  {errors.cv && (
+                    <p className="text-red-500 text-xs mt-1">{errors.cv.message}</p>
+                  )}
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-black hover:bg-[#333] text-white text-base/relaxed py-3 rounded-lg transition-colors mt-auto"
+                  disabled={careerMutation.isPending || isSubmitting}
+                  className="w-full bg-black hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-base/relaxed py-3 rounded-lg transition-colors mt-auto"
                 >
-                  Submit
+                  {careerMutation.isPending || isSubmitting ? 'Mengirim...' : 'Submit'}
                 </button>
               </form>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Success/Error Dialog */}
+      <Dialog open={dialogState.open} onOpenChange={(open) => setDialogState({ ...dialogState, open })}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-gray-900 font-bold">
+              {dialogState.title}
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 pt-2">
+              {dialogState.message}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center">
+            <button
+              type="button"
+              onClick={() => setDialogState({ ...dialogState, open: false })}
+              className="px-6 py-2 rounded-lg font-medium transition-colors bg-black hover:bg-gray-800 text-white"
+            >
+              Tutup
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

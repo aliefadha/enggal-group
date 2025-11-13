@@ -136,7 +136,6 @@ function RouteComponent() {
     mapsUrl: "",
     whatsappUrl: "",
   });
-  const [selectedImageName, setSelectedImageName] = React.useState("");
   const [selectedImageFile, setSelectedImageFile] = React.useState<File | null>(
     null,
   );
@@ -169,7 +168,6 @@ function RouteComponent() {
         whatsappUrl: "",
       });
       setOperationalHours({ ...defaultOperationalHours });
-      setSelectedImageName("");
       setSelectedImageFile(null);
       setImagePreviewUrl(null);
       setSubmitError(null);
@@ -225,7 +223,6 @@ function RouteComponent() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
-    setSelectedImageName(file ? file.name : "");
     setSelectedImageFile(file);
 
     // Clean up old preview URL

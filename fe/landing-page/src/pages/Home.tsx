@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import vectorLine from "../assets/images/vector_line.svg";
 import placeholderImage from "../assets/images/placeholder.svg";
 import TeamCard from "../components/TeamCard";
-import { motion, useInView, useMotionValue, useMotionValueEvent, useTransform } from "motion/react";
+import InteractiveMap from "../components/InteractiveMap";
+import { motion, useInView, useMotionValue, useMotionValueEvent } from "motion/react";
 import { animate } from "motion";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient, API_BASE_URL } from "../lib/api-client";
 
 type CountUpNumberProps = {
   end: number;
@@ -69,87 +72,184 @@ type BrandHighlight = {
   id: string;
   name: string;
   logo: string;
+  coverImage?: string;
   alt: string;
   description?: string;
   rounded?: boolean;
 };
 
-const BRAND_HIGHLIGHTS: BrandHighlight[] = [
-  {
-    id: "bakso-malang",
-    name: "Bakso Malang",
-    logo: "/images/bakso_malang.png",
-    alt: "Bakso Malang Enggal",
-    description: "Bakso Prasmanan Pertama di Indonesia",
-  },
-  {
-    id: "bakso-raja",
-    name: "Bakso Raja",
-    logo: "/images/bakso_raja.png",
-    alt: "Bakso Raja",
-    description: "Bakso premium dengan kuah kaldu kaya rempah",
-  },
-  {
-    id: "enhaii",
-    name: "Soerabi Bandung Enhaii",
-    logo: "/images/enhaii.png",
-    alt: "Enhaii",
-    description: "Kuliner hotel berbintang dengan harga bersahabat",
-  },
-  {
-    id: "rang-kapau",
-    name: "Lapau Rang Kapau",
-    logo: "/images/rang_kapau.png",
-    alt: "Rang Kapau",
-    description: "Masakan Minang otentik dengan cita rasa mendalam",
-  },
-  {
-    id: "warung-kondang",
-    name: "Warung Kondang",
-    logo: "/images/warung_kondang.svg",
-    alt: "Warung Kondang",
-    rounded: true,
-    description: "Hidangan rumahan hangat penuh nostalgia",
-  },
-  {
-    id: "ambun-suri",
-    name: "Sarapan Pagi Ambun Suri",
-    logo: "/images/ambun_suri.png",
-    alt: "Sarapan Pagi",
-    description: "Menu sarapan Nusantara praktis dan mengenyangkan",
-  },
-  {
-    id: "warkop-agam",
-    name: "Warkop Putra Agam",
-    logo: "/images/warkop_agam.png",
-    alt: "Kedai Pical Agam",
-    description: "Warkop legendaris khas Sumbar",
-  },
-  {
-    id: "bebek-sawahan",
-    name: "Bebek Sawahan",
-    logo: "/images/bebek_sawahan.png",
-    alt: "Bebek Sawahan",
-    description: "Bebek goreng renyah dengan bumbu Sawahan autentik",
-  },
-  {
-    id: "kebab-zababa",
-    name: "Kebab Zabbab",
-    logo: "/images/kebab_zabab.png",
-    alt: "Kebab Zabbab",
-    description: "Kebab juicy dengan saus rahasia Timur Tengah",
-  },
-]
+type Brand = {
+  id: string;
+  nama: string;
+  logo: string;
+  coverImage?: string;
+  description: string;
+};
+
+type Outlet = {
+  id: string;
+  nama: string;
+  jamOperasional: string;
+  lokasi: string;
+  image: string;
+  googleMapsLink: string;
+  whatsappUrl: string;
+  brandId: string;
+  brand: {
+    id: string;
+    nama: string;
+  };
+};
+
+type BrandListMeta = {
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+};
+
+type OutletListMeta = {
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+};
+
+type Team = {
+  id: string;
+  nama: string;
+  title: string;
+  image: string;
+  linkedinUrl: string;
+  instagramUrl: string;
+};
+
+type TeamListMeta = {
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+};
+
+type DashboardCounts = {
+  totalUserCareer: number;
+  totalBrand: number;
+  totalBerita: number;
+  totalOutlet: number;
+};
+
+async function fetchDashboardCounts() {
+  const response = await apiClient.get<DashboardCounts>(
+    `/dashboard`,
+  );
+
+  return response.data;
+}
+
+async function fetchBrands() {
+  const response = await apiClient.get<Brand[], BrandListMeta>(
+    `/brand?page=1&limit=100`,
+  );
+
+  const items = response.data ?? [];
+  const meta = response.meta ?? {};
+
+  return {
+    data: items,
+    meta: {
+      total: meta.total ?? items.length,
+      page: 1,
+      limit: 100
+    },
+  };
+}
+
+async function fetchOutlets(brandId?: string) {
+  const url = brandId && brandId !== "all"
+    ? `/outlet?page=1&limit=100&brandId=${brandId}`
+    : `/outlet?page=1&limit=100`;
+
+  const response = await apiClient.get<Outlet[], OutletListMeta>(url);
+
+  const items = response.data ?? [];
+  const meta = response.meta ?? {};
+
+  return {
+    data: items,
+    meta: {
+      total: meta.total ?? items.length,
+      page: 1,
+      limit: 100
+    },
+  };
+}
+
+async function fetchTeam() {
+  const response = await apiClient.get<Team[], TeamListMeta>(
+    `/team?page=1&limit=100`,
+  );
+
+  const items = response.data ?? [];
+  const meta = response.meta ?? {};
+
+  return {
+    data: items,
+    meta: {
+      total: meta.total ?? items.length,
+      page: 1,
+      limit: 100
+    },
+  };
+}
 
 function Home() {
   const [selectedBrand, setSelectedBrand] = useState<string>("all");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-  const [selectedCity, setSelectedCity] = useState<string>("all");
-  const [isCityDropdownOpen, setIsCityDropdownOpen] = useState<boolean>(false);
-  const [activeBrand, setActiveBrand] = useState<BrandHighlight>(BRAND_HIGHLIGHTS[0]);
+  const [activeBrand, setActiveBrand] = useState<BrandHighlight | null>(null);
+
+  const { data: brandsData } = useQuery({
+    queryKey: ["brands"],
+    queryFn: () => fetchBrands()
+  });
+
+  const { data: outletsData, isLoading: outletsLoading } = useQuery({
+    queryKey: ["outlets", selectedBrand],
+    queryFn: () => fetchOutlets(selectedBrand)
+  });
+
+  const { data: teamData } = useQuery({
+    queryKey: ["team"],
+    queryFn: () => fetchTeam()
+  });
+
+  const { data: dashboardCounts } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: () => fetchDashboardCounts()
+  });
+
+  // Transform API brands to BrandHighlight format (limit to first 12)
+  const brandHighlights: BrandHighlight[] = useMemo(() =>
+    (brandsData?.data?.map((brand) => ({
+      id: brand.id,
+      name: brand.nama,
+      logo: `${API_BASE_URL}${brand.logo}`,
+      coverImage: brand.coverImage ? `${API_BASE_URL}${brand.coverImage}` : undefined,
+      alt: brand.nama,
+      description: brand.description,
+    })).slice(0, 12)) || []
+  , [brandsData]);
+
+  // Initialize activeBrand with first brand from API
+  useEffect(() => {
+    if (brandHighlights.length > 0 && !activeBrand) {
+      setActiveBrand(brandHighlights[0]);
+    }
+  }, [brandHighlights, activeBrand]);
 
   const navigateBrand = (direction: "next" | "prev") => {
-    const currentIndex = BRAND_HIGHLIGHTS.findIndex(
+    if (!activeBrand) return;
+
+    const currentIndex = brandHighlights.findIndex(
       (brand) => brand.id === activeBrand.id,
     );
     if (currentIndex === -1) {
@@ -158,168 +258,36 @@ function Home() {
 
     const offset = direction === "next" ? 1 : -1;
     const nextIndex =
-      (currentIndex + offset + BRAND_HIGHLIGHTS.length) %
-      BRAND_HIGHLIGHTS.length;
-    setActiveBrand(BRAND_HIGHLIGHTS[nextIndex]);
+      (currentIndex + offset + brandHighlights.length) %
+      brandHighlights.length;
+    setActiveBrand(brandHighlights[nextIndex]);
   };
 
   const handlePrevBrand = () => navigateBrand("prev");
   const handleNextBrand = () => navigateBrand("next");
-  const brandGridColumns = 4;
-  const brandPlaceholderCount =
-    (brandGridColumns - (BRAND_HIGHLIGHTS.length % brandGridColumns)) %
-    brandGridColumns;
+  const brandPlaceholderCount = Math.max(0, 12 - brandHighlights.length);
 
-  // Sample brand data - replace with actual data from API or props
+  // Build brand dropdown options
   const brands = [
     { id: "all", name: "Semua Brand" },
-    { id: "brand1", name: "Enggal Bakery" },
-    { id: "brand2", name: "Enggal Cafe" },
-    { id: "brand3", name: "Enggal Resto" },
-    { id: "brand4", name: "Enggal Mart" },
+    ...(brandsData?.data?.map((brand) => ({
+      id: brand.id,
+      name: brand.nama,
+    })) || []),
   ];
 
-  // Major cities in Indonesia
-  const cities = [
-    { id: "all", name: "Semua Kota" },
-    { id: "jakarta", name: "Jakarta" },
-    { id: "surabaya", name: "Surabaya" },
-    { id: "bandung", name: "Bandung" },
-    { id: "medan", name: "Medan" },
-    { id: "semarang", name: "Semarang" },
-    { id: "makassar", name: "Makassar" },
-    { id: "palembang", name: "Palembang" },
-    { id: "tangerang", name: "Tangerang" },
-    { id: "depok", name: "Depok" },
-    { id: "bekasi", name: "Bekasi" },
-    { id: "yogyakarta", name: "Yogyakarta" },
-    { id: "malang", name: "Malang" },
-  ];
 
-  // Sample outlet data
-  const outlets = [
-    {
-      id: 1,
-      city: "BANDUNG",
-      name: "Bakso Malang Enggal",
-      address:
-        "Jl. Gatot Subroto, Lkr. Sel., Kec. Lengkong, Kota Bandung, Jawa Barat 40263",
-      hours: "10:00 - 20:00",
-      image: "/images/outlet.png",
-      cityId: "bandung",
-    },
-    {
-      id: 2,
-      city: "JAKARTA",
-      name: "Enggal Bakery",
-      address:
-        "Jl. Sudirman No. 123, Kec. Tanah Abang, Jakarta Pusat, DKI Jakarta 10220",
-      hours: "08:00 - 22:00",
-      image: "/images/outlet.png",
-      cityId: "jakarta",
-    },
-    {
-      id: 3,
-      city: "SURABAYA",
-      name: "Enggal Cafe",
-      address: "Jl. Pemuda No. 45, Kec. Genteng, Surabaya, Jawa Timur 60271",
-      hours: "09:00 - 21:00",
-      image: "/images/outlet.png",
-      cityId: "surabaya",
-    },
-    {
-      id: 4,
-      city: "MEDAN",
-      name: "Enggal Resto",
-      address:
-        "Jl. Imam Bonjol No. 67, Kec. Medan Petisah, Medan, Sumatera Utara 20154",
-      hours: "11:00 - 23:00",
-      image: "/images/outlet.png",
-      cityId: "medan",
-    },
-  ];
 
-  // Team members data
-  const teamMembers = [
-    {
-      id: 1,
-      name: "Muhammad Firdan",
-      position: "CEO",
-      image: "/images/ceo.png",
-      linkedinUrl: "https://linkedin.com/in/muhammad-firdan",
-      instagramUrl: "https://instagram.com/muhammad.firdan",
-    },
-    {
-      id: 2,
-      name: "Sarah Wijaya",
-      position: "COO",
-      image: "/images/ceo.png",
-      linkedinUrl: "https://linkedin.com/in/sarah-wijaya",
-      instagramUrl: "https://instagram.com/sarah.wijaya",
-    },
-    {
-      id: 3,
-      name: "Ahmad Rahman",
-      position: "Head of Marketing",
-      image: "/images/ceo.png",
-      linkedinUrl: "https://linkedin.com/in/ahmad-rahman",
-      instagramUrl: "https://instagram.com/ahmad.rahman",
-    },
-    {
-      id: 4,
-      name: "Ahmad Rahman",
-      position: "Head of Marketing",
-      image: "/images/ceo.png",
-      linkedinUrl: "https://linkedin.com/in/ahmad-rahman",
-      instagramUrl: "https://instagram.com/ahmad.rahman",
-    },
-    {
-      id: 5,
-      name: "Ahmad Rahman",
-      position: "Head of Marketing",
-      image: "/images/ceo.png",
-      linkedinUrl: "https://linkedin.com/in/ahmad-rahman",
-      instagramUrl: "https://instagram.com/ahmad.rahman",
-    },
-  ];
+  // Get outlet items from API
+  const outlets = outletsData?.data || [];
+
+  // Get team members from API
+  const teamMembers = teamData?.data || [];
 
   const handleBrandSelect = (brandId: string) => {
     setSelectedBrand(brandId);
     setIsDropdownOpen(false);
   };
-
-  const handleCitySelect = (cityId: string) => {
-    setSelectedCity(cityId);
-    setIsCityDropdownOpen(false);
-  };
-
-  const [brandCountValue, setBrandCountValue] = useState<number>(0);
-  const brandCountRef = useRef<HTMLSpanElement | null>(null);
-  const brandCountMotionValue = useMotionValue(0);
-  const brandCountRounded = useTransform(brandCountMotionValue, (latest) =>
-    Math.round(latest)
-  );
-  const brandCountInView = useInView(brandCountRef, {
-    once: true,
-    amount: 0.8,
-  });
-
-  useMotionValueEvent(brandCountRounded, "change", (latest) => {
-    setBrandCountValue(latest);
-  });
-
-  useEffect(() => {
-    if (!brandCountInView) {
-      return;
-    }
-
-    const controls = animate(brandCountMotionValue, 8, {
-      duration: 1.2,
-      ease: [0.22, 1, 0.36, 1],
-    });
-
-    return () => controls.stop();
-  }, [brandCountInView, brandCountMotionValue]);
 
   return (
     <section className="">
@@ -359,7 +327,7 @@ function Home() {
                     fill="#FFB835"
                   />
                 </svg>
-                8 Brand Besar
+                {dashboardCounts?.totalBrand ?? 8} Brand Besar
               </div>
               <div className="px-4 py-2 bg-[#9C0000] text-white rounded-sm font-jakarta text-sm flex items-center">
                 <svg
@@ -375,7 +343,7 @@ function Home() {
                     fill="#FFB835"
                   />
                 </svg>
-                25 Outlet
+                {dashboardCounts?.totalOutlet ?? 25} Outlet
               </div>
               <div className="px-4 py-2 bg-[#9C0000] text-white rounded-sm font-jakarta text-sm flex items-center">
                 <svg
@@ -427,7 +395,7 @@ function Home() {
               pengalaman makan otentik dan hangat untuk semua.
             </div>
             <a
-              href="/brand"
+              href="#brand"
               className="mt-6 inline-flex w-fit items-center justify-center gap-2 rounded-md bg-white px-6 py-3 font-jakarta text-sm font-semibold  text-[#303030] transition hover:bg-[#FFB835] hover:text-[#6E0112]"
             >
               Jelajahi Brand
@@ -578,10 +546,8 @@ function Home() {
             </div>
             <div className="p-4 flex flex-col items-start justify-center bg-[#A71D28] text-[#FFB835]">
               <span className="text-4xl font-bold leading-none flex gap-x-1">
-                <span
-                  ref={brandCountRef}
-                >
-                  {brandCountValue}
+                <span>
+                  {dashboardCounts?.totalBrand ?? 8}
                 </span>
                 <svg
                   width="18"
@@ -676,7 +642,7 @@ function Home() {
                 />
               </svg>
               <span className="font-bold mr-1 sm:mr-2 text-lg sm:text-xl lg:text-2xl">
-                25{" "}
+                {dashboardCounts?.totalOutlet ?? 25}
                 <sup className="font-normal text-xs sm:text-sm lg:text-base">
                   Outlet
                 </sup>
@@ -701,8 +667,11 @@ function Home() {
                   fill="#FFB835"
                 />
               </svg>
-              <span className="font-bold mr-1 sm:mr-2 text-lg sm:text-xl lg:text-2xl">
-                8{" "}
+              <span className="font-bold mr-1 sm:mr-2 text-lg sm:text-xl lg:text-2xl flex gap-x-1">
+                <span
+                >
+                  {dashboardCounts?.totalBrand ?? 8}
+                </span>
                 <sup className="font-normal text-xs sm:text-sm lg:text-base">
                   Brand
                 </sup>
@@ -763,7 +732,7 @@ function Home() {
               <h3 className="text-[#303030] font-jakarta text-sm lg:text-lg font-semibold">
                 Muhammad Firdan
               </h3>
-              <p className="text-[#666666] font-jakarta">Enggal Group CEO</p>
+              <p className="text-[#666666] font-jakarta">CEO Enggal Group Indonesia</p>
             </div>
 
             <div className="flex gap-x-3 items-center">
@@ -879,8 +848,41 @@ function Home() {
                   className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[200px] rounded-md object-cover"
                 />
                 <img
-                  src="/images/2008.jpg"
-                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[200px] rounded-md object-cover"
+                  src="/images/bakso_malang.png"
+                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[200px] rounded-md object-contain"
+                />
+              </div>
+            </motion.div>
+          </div>
+          <div className="flex items-stretch gap-8">
+            <div className="flex flex-col items-center justify-center h-full">
+              <div className="w-3 h-3 bg-[#9C0000]"></div>
+              <div className="h-full w-0.5 bg-[#FFB835]"></div>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col gap-y-4 xl:gap-y-10 w-full pb-10 mb-10 md:pb-16 md:mb-16 border-b-2 border-dashed border-[#CDCDCD]"
+            >
+              <p className="text-[#9C0000] font-jakarta font-bold text-xl">
+                2023
+              </p>
+              <div className="block lg:flex justify-between">
+                <h1 className="font-runestars text-2xl">MENYEBAR KE BANYAK KOTA</h1>
+                <p className="font-jakarta text-sm lg:max-w-[250px]">
+                  Bakso Raja di Pekanbaru, Bebek Sawahan di Palembang, Warkop Putra Agam di Jakarta Timur dan Sarapan Pagi Ambun Suri di Kota Wisata
+                </p>
+              </div>
+              <div className="flex justify-between gap-4">
+                <img
+                  src="/images/20232.png"
+                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[450px] rounded-md object-contain"
+                />
+                <img
+                  src="/images/20233.png"
+                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[450px] rounded-md object-contain"
                 />
               </div>
             </motion.div>
@@ -942,8 +944,8 @@ function Home() {
             </div>
           </div>
           <div className="flex justify-center py-20">
-            <div className="md:block hidden">
-              <img src="/images/fullmap.svg" className="w-5/6 h-auto" />
+            <div className="lg:block hidden">
+              <InteractiveMap />
             </div>
             <div>
               <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6 mx-auto">
@@ -978,7 +980,7 @@ function Home() {
                   </div>
                   <div className="flex flex-col gap-4">
                     <CountUpNumber
-                      end={10}
+                      end={dashboardCounts?.totalBrand ?? 8}
                       className="text-4xl text-[#1E1E1E] font-runestars"
                     />
                     <p className="font-jakarta text-[#585858]">Brand</p>
@@ -1015,7 +1017,7 @@ function Home() {
                   </div>
                   <div className="flex flex-col gap-4">
                     <CountUpNumber
-                      end={30}
+                      end={dashboardCounts?.totalOutlet ?? 30}
                       className="text-4xl text-[#1E1E1E] font-runestars"
                     />
                     <p className="font-jakarta text-[#585858]">Outlet</p>
@@ -1082,17 +1084,17 @@ function Home() {
         <div className="flex justify-center gap-x-8">
           <div className="bg-white border border-[#D9D9D9] rounded-md w-1/2 lg:flex flex-1 hidden">
             <div className="grid grid-cols-4 grid-rows-3 auto-rows-fr h-full">
-              {BRAND_HIGHLIGHTS.map((brand) => (
+              {brandHighlights.map((brand) => (
                 <button
                   key={brand.id}
                   type="button"
                   onClick={() => setActiveBrand(brand)}
                   className={`border border-gray-100 flex items-center justify-center w-full h-full cursor-pointer transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFB835] ${brand.rounded ? "rounded" : ""
-                    } ${activeBrand.id === brand.id
+                    } ${activeBrand?.id === brand.id
                       ? "bg-[#FFF4D6] shadow-sm"
                       : "bg-white hover:bg-gray-50"
                     }`}
-                  aria-pressed={activeBrand.id === brand.id}
+                  aria-pressed={activeBrand?.id === brand.id}
                 >
                   <img
                     src={brand.logo}
@@ -1115,89 +1117,98 @@ function Home() {
               ))}
             </div>
           </div>
-          <div className="w-1/2 flex-1 flex flex-col">
+          <div className="w-1/2 flex-1 flex flex-col" style={{ height: '500px' }}>
             <div
               className="relative flex-1 overflow-hidden rounded-t-xl cursor-pointer"
-              onClick={() => window.location.href = `/brand/${activeBrand.id}`}
+              onClick={() => activeBrand && (window.location.href = `/brand/${activeBrand.id}`)}
             >
               <img
-                src="/images/brand_image.jpg"
-                className="h-full w-full object-cover"
+                src={activeBrand?.coverImage || "/images/brand_image.jpg"}
+                className="h-full object-cover w-full"
               />
-              <div className="absolute bottom-4 right-4 z-10 flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); handlePrevBrand(); }}
-                  className="flex items-center gap-2 rounded-full bg-white p-2 text-sm font-semibold shadow-md transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2"
-                >
-                  <svg
-                    className="h-4 w-4"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+              {brandHighlights.length > 1 && (
+                <div className="absolute bottom-4 right-4 z-10 flex items-center gap-3 lg:hidden">
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handlePrevBrand(); }}
+                    className="flex items-center gap-2 rounded-full bg-white p-2 text-sm font-semibold shadow-md transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2"
                   >
-                    <path
-                      d="M11.25 5L6.25 10L11.25 15"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M6.5 10H15"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); handleNextBrand(); }}
-                  className="flex items-center gap-2 rounded-full bg-white p-2 text-sm font-semibold shadow-md transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2"
-                >
-                  <svg
-                    className="h-4 w-4"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11.25 5L6.25 10L11.25 15"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M6.5 10H15"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleNextBrand(); }}
+                    className="flex items-center gap-2 rounded-full bg-white p-2 text-sm font-semibold shadow-md transition hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2"
                   >
-                    <path
-                      d="M8.75 5L13.75 10L8.75 15"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M13.5 10H5"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
-              </div>
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8.75 5L13.75 10L8.75 15"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M13.5 10H5"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
-            <div className="bg-[#FFB835] flex items-center rounded-b-xl p-4">
-              <img
-                src={activeBrand.logo}
-                className="max-w-24 aspect-square object-contain"
-                alt={activeBrand.alt}
-              />
-              <div className="mx-2 w-1 bg-[#EA9800] h-12"></div>
-              <div>
-                <h1 className="font-jakarta font-bold text-xl text-[#A71D28]">
-                  {activeBrand.name}
-                </h1>
-                {activeBrand.description && (
-                  <p className="font-jakarta text-[#845600]">
-                    {activeBrand.description}
-                  </p>
-                )}
-              </div>
+            <div
+              className="bg-[#FFB835] flex items-center rounded-b-xl p-4 cursor-pointer"
+              onClick={() => activeBrand && (window.location.href = `/brand/${activeBrand.id}`)}
+            >
+              {activeBrand && (
+                <>
+                  <img
+                    src={activeBrand.logo}
+                    className="max-w-24 aspect-square object-contain"
+                    alt={activeBrand.alt}
+                  />
+                  <div className="mx-2 w-1 bg-[#EA9800] h-12"></div>
+                  <div>
+                    <h1 className="font-jakarta font-bold text-xl text-[#A71D28]">
+                      {activeBrand.name}
+                    </h1>
+                    {activeBrand.description && (
+                      <p className="font-jakarta text-[#845600]">
+                        {activeBrand.description}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -1282,79 +1293,17 @@ function Home() {
                 </div>
               )}
             </div>
-
-            {/* City Dropdown */}
-            <div className="relative w-full sm:w-auto">
-              <div
-                className="inline-flex items-center bg-white border border-gray-300 rounded-md px-3 md:px-4 py-2 gap-2 cursor-pointer hover:bg-gray-50 z-50 w-full sm:w-auto justify-between sm:justify-start"
-                onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
-              >
-                <div className="flex items-center gap-2">
-                  <svg
-                    width="14"
-                    height="18"
-                    viewBox="0 0 16 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="md:w-4 md:h-5"
-                  >
-                    <path
-                      d="M6.32444 18.7368C6.86311 19.187 7.42489 19.5985 8 20C8.57635 19.6038 9.1354 19.1823 9.67556 18.7368C10.576 17.988 11.4234 17.176 12.2116 16.3068C14.0284 14.2946 16 11.3775 16 8.103C16 7.0389 15.7931 5.98522 15.391 5.00211C14.989 4.01901 14.3997 3.12575 13.6569 2.37331C12.914 1.62088 12.0321 1.02402 11.0615 0.616804C10.0909 0.20959 9.05058 0 8 0C6.94943 0 5.90914 0.20959 4.93853 0.616804C3.96793 1.02402 3.08601 1.62088 2.34315 2.37331C1.60028 3.12575 1.011 4.01901 0.608964 5.00211C0.206926 5.98522 -1.56548e-08 7.0389 0 8.103C0 11.3775 1.97156 14.2937 3.78844 16.3068C4.57655 17.1763 5.42397 17.9877 6.32444 18.7368ZM8 11.0291C7.23382 11.0291 6.49902 10.7208 5.95725 10.1721C5.41548 9.6233 5.11111 8.87904 5.11111 8.103C5.11111 7.32695 5.41548 6.58269 5.95725 6.03395C6.49902 5.4852 7.23382 5.17692 8 5.17692C8.76618 5.17692 9.50098 5.4852 10.0428 6.03395C10.5845 6.58269 10.8889 7.32695 10.8889 8.103C10.8889 8.87904 10.5845 9.6233 10.0428 10.1721C9.50098 10.7208 8.76618 11.0291 8 11.0291Z"
-                      fill="#9C0000"
-                    />
-                  </svg>
-                  <span className="text-xs md:text-sm font-jakarta truncate">
-                    {cities.find((city) => city.id === selectedCity)?.name ||
-                      "Pilih Kota"}
-                  </span>
-                </div>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`transition-transform flex-shrink-0 md:w-4 md:h-4 ${isCityDropdownOpen ? "rotate-180" : ""}`}
-                >
-                  <path
-                    d="M4 6L8 10L12 6"
-                    stroke="#303030"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-
-              {/* City Dropdown Menu */}
-              {isCityDropdownOpen && (
-                <div className="absolute left-0 sm:right-0 mt-2 w-full sm:w-48 bg-white rounded-md shadow-lg z-50 py-1 border border-gray-200">
-                  {cities.map((city) => (
-                    <div
-                      key={city.id}
-                      className={`px-4 py-2 text-xs md:text-sm cursor-pointer hover:bg-gray-100 ${selectedCity === city.id
-                        ? "bg-gray-50 font-medium text-[#9C0000]"
-                        : ""
-                        }`}
-                      onClick={() => handleCitySelect(city.id)}
-                    >
-                      {city.name}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </div>
 
         {/* Outlet Cards Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          {outlets
-            .filter(
-              (outlet) =>
-                selectedCity === "all" || outlet.cityId === selectedCity,
-            )
-            .map((outlet) => (
+          {outletsLoading ? (
+            <div className="col-span-1 md:col-span-2 py-10 text-center">
+              <p className="text-gray-500 font-medium">Memuat outlet...</p>
+            </div>
+          ) : outlets.length > 0 ? (
+            outlets.map((outlet) => (
               <div
                 key={outlet.id}
                 className="bg-[#F7F7F7F8] rounded-lg overflow-hidden"
@@ -1363,8 +1312,8 @@ function Home() {
                   {/* Image Section */}
                   <div className="w-full sm:w-1/3 h-48 sm:h-auto px-3 py-4 sm:px-4 sm:py-6">
                     <img
-                      src={outlet.image}
-                      alt={outlet.name}
+                      src={`${API_BASE_URL}${outlet.image}`}
+                      alt={outlet.nama}
                       className="w-full h-full object-cover rounded-md"
                       onError={(e) => {
                         e.currentTarget.src = "/images/outlet.png";
@@ -1376,8 +1325,11 @@ function Home() {
                   <div className="w-full sm:w-2/3 p-3 sm:p-4 flex flex-col justify-between">
                     <div>
                       <h3 className="font-runestars font-bold text-xl sm:text-2xl lg:text-3xl text-gray-800 mb-2">
-                        {outlet.city}
+                        {outlet.nama}
                       </h3>
+                      <p className="text-xs text-gray-500 font-jakarta mb-2">
+                        {outlet.brand.nama}
+                      </p>
 
                       {/* Address */}
                       <div className="flex items-start mb-3">
@@ -1395,7 +1347,7 @@ function Home() {
                           />
                         </svg>
                         <p className="text-xs sm:text-sm text-gray-600 font-jakarta leading-relaxed">
-                          {outlet.address}
+                          {outlet.lokasi}
                         </p>
                       </div>
 
@@ -1415,40 +1367,61 @@ function Home() {
                           />
                         </svg>
                         <p className="text-xs sm:text-sm text-gray-600 font-jakarta">
-                          {outlet.hours}
+                          {outlet.jamOperasional}
                         </p>
                       </div>
                     </div>
 
                     {/* Action Buttons */}
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                      <button className="bg-[#9C0000] text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-jakarta font-medium hover:bg-[#7A0000] transition-colors w-full sm:w-auto">
-                        Reservasi Disini
-                      </button>
-                      <button className="text-[#9C0000] hover:underline px-3 py-2 sm:px-4 sm:py-2 rounded-md font-jakarta font-medium transition-colors flex items-center justify-center sm:justify-start gap-1 text-xs sm:text-sm w-full sm:w-auto">
-                        Lihat di Maps
-                        <svg
-                          className="ml-1 sm:ml-2"
-                          width="16"
-                          height="12"
-                          viewBox="0 0 18 14"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
+                      {outlet.whatsappUrl && (
+                        <a
+                          href={outlet.whatsappUrl.startsWith('http') ? outlet.whatsappUrl : `https://${outlet.whatsappUrl}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-[#9C0000] text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-jakarta font-medium hover:bg-[#7A0000] transition-colors w-full sm:w-auto text-center"
                         >
-                          <path
-                            d="M1 7.02637L17 7.02637M17 7.02637L11 13.0264M17 7.02637L11 1.02637"
-                            stroke="#9C0000"
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </button>
+                          Reservasi Disini
+                        </a>
+                      )}
+                      {outlet.googleMapsLink && (
+                        <a
+                          href={outlet.googleMapsLink.startsWith('http') ? outlet.googleMapsLink : `https://${outlet.googleMapsLink}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#9C0000] hover:underline px-3 py-2 sm:px-4 sm:py-2 rounded-md font-jakarta font-medium transition-colors flex items-center justify-center sm:justify-start gap-1 text-xs sm:text-sm w-full sm:w-auto"
+                        >
+                          Lihat di Maps
+                          <svg
+                            className="ml-1 sm:ml-2"
+                            width="16"
+                            height="12"
+                            viewBox="0 0 18 14"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M1 7.02637L17 7.02637M17 7.02637L11 13.0264M17 7.02637L11 1.02637"
+                              stroke="#9C0000"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
+            ))
+          ) : (
+            <div className="col-span-1 md:col-span-2 py-10 text-center">
+              <p className="text-gray-500 font-medium">
+                Tidak ada outlet tersedia untuk brand ini saat ini.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -1504,9 +1477,9 @@ function Home() {
               <TeamCard
                 key={member.id}
                 id={member.id}
-                name={member.name}
-                position={member.position}
-                image={member.image}
+                name={member.nama}
+                position={member.title}
+                image={`${API_BASE_URL}${member.image}`}
                 linkedinUrl={member.linkedinUrl}
                 instagramUrl={member.instagramUrl}
               />

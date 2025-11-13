@@ -13,8 +13,8 @@ export class TeamService {
         image: dto.image,
         nama: dto.nama,
         title: dto.title,
-        linkedinUrl: dto.linkedinUrl,
-        instagramUrl: dto.instagramUrl,
+        linkedinUrl: dto.linkedinUrl || '',
+        instagramUrl: dto.instagramUrl || '',
       },
     });
   }

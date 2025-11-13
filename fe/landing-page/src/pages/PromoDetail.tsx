@@ -1,6 +1,87 @@
+import { useParams } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient, API_BASE_URL } from "../lib/api-client";
 import PromoCard from "../components/PromoCard";
 
+type Promo = {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  syaratKetentuan: string;
+  berlakuHingga: string;
+  brandId: string;
+  image: string;
+  banner?: string;
+  showBanner: boolean;
+  brand: {
+    id: string;
+    nama: string;
+  };
+};
+
+type PromoListMeta = {
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+};
+
+async function fetchPromoById(id: string) {
+  const response = await apiClient.get<Promo>(`/promo/${id}`);
+  return response.data;
+}
+
+async function fetchRecommendedPromos(currentId: string) {
+  const response = await apiClient.get<Promo[], PromoListMeta>(
+    `/promo?page=1&limit=6`,
+  );
+  const items = response.data ?? [];
+  // Filter out current promo
+  return items.filter((promo) => promo.id !== currentId).slice(0, 6);
+}
+
 function PromoDetail() {
+  const { id } = useParams<{ id: string }>();
+
+  const { data: promo, isLoading: promoLoading, error: promoError } = useQuery({
+    queryKey: ["promo", id],
+    queryFn: () => fetchPromoById(id!),
+    enabled: !!id,
+  });
+
+  const { data: recommendedPromos = [], isLoading: promosLoading } = useQuery({
+    queryKey: ["recommended-promos", id],
+    queryFn: () => fetchRecommendedPromos(id!),
+    enabled: !!id,
+  });
+
+  // Format date helper
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  if (promoLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500 font-medium">Memuat detail promo...</p>
+      </div>
+    );
+  }
+
+  if (promoError || !promo) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500 font-medium">Promo tidak ditemukan</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="lg:flex h-2 w-full mb-6 md:mb-10 hidden">
@@ -53,9 +134,12 @@ function PromoDetail() {
           <div className="flex w-full lg:w-auto flex-col gap-y-4 md:gap-y-6">
             <div className="bg-[#F7F7F7] px-4 py-4 md:py-6 rounded-lg w-full lg:max-w-sm">
               <img
-                src="/images/promo.png"
-                alt="promo"
+                src={`${API_BASE_URL}${promo.image}`}
+                alt={promo.title}
                 className="w-full h-auto rounded-xl"
+                onError={(e) => {
+                  e.currentTarget.src = "https://via.placeholder.com/400x350?text=Promo+Image";
+                }}
               />
             </div>
             <div className="bg-[#FFB835] w-full flex items-center p-4 md:p-6 gap-4 md:gap-6 rounded-md">
@@ -72,50 +156,36 @@ function PromoDetail() {
                 />
               </svg>
               <p className="font-jakarta text-[#9C0000] font-medium text-sm md:text-base">
-                Berlaku Hingga 1 Oktober 2026
+                Berlaku Hingga <strong>{formatDate(promo.berlakuHingga)}</strong>
               </p>
             </div>
           </div>
           <div className="flex flex-col gap-2.5 w-full lg:w-2/3">
             <h2 className="font-runestars">
               <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl md:text-4xl text-white">
-                Promo
+                Promo {promo.brand.nama}
               </span>
             </h2>
             <h1 className="font-jakarta font-bold text-2xl md:text-4xl leading-snug max-w-2xl">
-              Re Opening Bakso Malang
+              {promo.title}
             </h1>
             <p className="text-[#9B9B9B] font-jakarta text-sm md:text-base">
-              Dapatkan Bakso Gratis untuk 50 customer pertama
+              {promo.subtitle}
             </p>
             <div className="font-jakarta mt-6 md:mt-10 flex flex-col gap-y-6 md:gap-y-10">
               <div>
                 <p className="font-bold mb-2 ">Deskripsi Promo</p>
-                <p className="text-[#1E1E1E] font-meidum text-justify tracking-wide leading-[28px] md:leading-[32px] text-sm md:text-base">
-                  Dalam rangka re-opening, Bakso Malang Enggal menghadirkan
-                  promo spesial untuk pelanggan setia. Setiap pengunjung
-                  berkesempatan menikmati semangkuk bakso gratis untuk 100 orang
-                  pertama setiap harinya, serta diskon hingga 50% untuk menu
-                  pilihan selama periode berlangsung. Selain itu, tersedia juga
-                  hadiah menarik dan voucher khusus untuk pembelian berikutnya
-                  agar pengalaman kuliner Anda semakin menyenangkan.
-                </p>
+                <div
+                  className="text-[#1E1E1E] font-meidum text-justify tracking-wide leading-[28px] md:leading-[32px] text-sm md:text-base"
+                  dangerouslySetInnerHTML={{ __html: promo.description }}
+                />
               </div>
               <div>
                 <p className="font-bold mb-2 ">Syarat & Ketentuan</p>
-                <p className="text-[#1E1E1E] font-meidum text-justify tracking-wide leading-[28px] md:leading-[32px] text-sm md:text-base">
-                  Promo ini berlaku hanya pada outlet dan tanggal yang telah
-                  ditentukan. Setiap pengunjung berhak mendapatkan promo
-                  maksimal satu kali per transaksi atau per orang, baik untuk
-                  dine-in maupun take away, namun tidak berlaku untuk layanan
-                  delivery online. Menu gratis dan diskon tersedia selama
-                  persediaan masih ada, serta tidak dapat digabungkan dengan
-                  promo lain, voucher, atau potongan harga lainnya. Untuk menu
-                  diskon, harga sudah termasuk PPN sesuai daftar menu yang
-                  ditentukan. Pihak manajemen Bakso Malang Enggal berhak
-                  melakukan perubahan atau menghentikan promo sewaktu-waktu
-                  tanpa pemberitahuan sebelumnya.
-                </p>
+                <div
+                  className="text-[#1E1E1E] font-meidum text-justify tracking-wide leading-[28px] md:leading-[32px] text-sm md:text-base"
+                  dangerouslySetInnerHTML={{ __html: promo.syaratKetentuan }}
+                />
               </div>
             </div>
           </div>
@@ -163,65 +233,31 @@ function PromoDetail() {
           </div>
           <div className="flex flex-col gap-y-10 md:gap-y-16 my-10 md:my-16">
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 lg:gap-x-20 gap-y-8 md:gap-y-16 relative z-10">
-              <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
-                <PromoCard
-                  id="promo1"
-                  title="Promo Spesial"
-                  description="Diskon 30% untuk pembelian roti kedua"
-                  validUntil="15 November 2026"
-                  image="/images/promo.png"
-                />
-              </div>
-
-              <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
-                <PromoCard
-                  id="promo2"
-                  title="Bakso Malang"
-                  description="Beli 2 porsi bakso, gratis 1 es teh"
-                  validUntil="20 Desember 2026"
-                  image="/images/promo.png"
-                />
-              </div>
-
-              <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
-                <PromoCard
-                  id="promo3"
-                  title="Mie Ayam Spesial"
-                  description="Diskon 25% untuk pembelian paket keluarga"
-                  validUntil="5 Januari 2027"
-                  image="/images/promo.png"
-                />
-              </div>
-
-              <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
-                <PromoCard
-                  id="promo4"
-                  title="Sate Ayam"
-                  description="Beli 10 tusuk, gratis 5 tusuk"
-                  validUntil="10 Februari 2027"
-                  image="/images/promo.png"
-                />
-              </div>
-
-              <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
-                <PromoCard
-                  id="promo5"
-                  title="Nasi Goreng"
-                  description="Diskon 40% untuk pembelian kedua"
-                  validUntil="18 Maret 2027"
-                  image="/images/promo.png"
-                />
-              </div>
-
-              <div className="cursor-pointer" onClick={() => (window.location.href = "/promo/1")}>
-                <PromoCard
-                  id="promo6"
-                  title="Soto Ayam"
-                  description="Gratis kerupuk untuk setiap pembelian"
-                  validUntil="22 April 2027"
-                  image="/images/promo.png"
-                />
-              </div>
+              {promosLoading ? (
+                <div className="col-span-2 lg:col-span-3 py-10 text-center">
+                  <p className="text-gray-500 font-medium">Memuat promo...</p>
+                </div>
+              ) : recommendedPromos.length > 0 ? (
+                recommendedPromos.map((recommendedPromo) => (
+                  <div
+                    key={recommendedPromo.id}
+                    className="cursor-pointer"
+                    onClick={() => (window.location.href = `/promo/${recommendedPromo.id}`)}
+                  >
+                    <PromoCard
+                      id={recommendedPromo.id}
+                      title={recommendedPromo.title}
+                      description={recommendedPromo.subtitle}
+                      validUntil={formatDate(recommendedPromo.berlakuHingga)}
+                      image={`${API_BASE_URL}${recommendedPromo.image}`}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-2 lg:col-span-3 py-10 text-center">
+                  <p className="text-gray-500 font-medium">Tidak ada promo lainnya tersedia saat ini.</p>
+                </div>
+              )}
             </div>
             <div className="mx-auto">
               <a

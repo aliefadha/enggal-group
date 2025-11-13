@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Search, Trash2, Plus, Loader2, Linkedin, Instagram } from "lucide-react";
+import { Search, Trash2, Plus, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -249,9 +249,6 @@ function RouteComponent() {
                     Jabatan
                   </TableHead>
                   <TableHead className="w-32 text-center text-[#9C1A1C]">
-                    Sosial Media
-                  </TableHead>
-                  <TableHead className="w-32 text-center text-[#9C1A1C]">
                     Aksi
                   </TableHead>
                 </TableRow>
@@ -312,26 +309,6 @@ function RouteComponent() {
                       </TableCell>
                       <TableCell className="text-sm text-[#6B7280]">
                         {team.title}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-center gap-2">
-                          <a
-                            href={team.linkedinUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0077B5] transition-opacity hover:opacity-80"
-                          >
-                            <Linkedin className="size-4 text-white" />
-                          </a>
-                          <a
-                            href={team.instagramUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-[#FD5949] via-[#D6249F] to-[#285AEB] transition-opacity hover:opacity-80"
-                          >
-                            <Instagram className="size-4 text-white" />
-                          </a>
-                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center justify-center gap-3">

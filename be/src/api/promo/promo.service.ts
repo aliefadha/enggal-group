@@ -10,7 +10,7 @@ import { RequestPromoUpdateDto } from 'src/api/promo/dto/requests/update.dto';
 
 @Injectable()
 export class PromoService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(dto: RequestPromoCreateDto) {
     if (!dto.brandId) {
@@ -85,8 +85,14 @@ export class PromoService {
         select: {
           id: true,
           title: true,
+          subtitle: true,
+          description: true,
+          syaratKetentuan: true,
           berlakuHingga: true,
           brandId: true,
+          image: true,
+          banner: true,
+          showBanner: true,
           brand: {
             select: { id: true, nama: true },
           },
@@ -94,13 +100,8 @@ export class PromoService {
       }),
     ]);
 
-    const data = rows.map(({ brand, ...rest }) => ({
-      ...rest,
-      namaBrand: brand?.nama ?? null,
-    }));
-
     return {
-      data,
+      data: rows,
       meta: {
         page,
         limit,
@@ -108,6 +109,27 @@ export class PromoService {
         totalPages: Math.max(1, Math.ceil(total / limit)),
       },
     };
+  }
+
+  async findBanners() {
+    const promos = await this.prisma.promo.findMany({
+      where: {
+        showBanner: true,
+        banner: { not: null },
+      },
+      select: {
+        id: true,
+        title: true,
+        banner: true,
+        berlakuHingga: true,
+        brand: {
+          select: { id: true, nama: true },
+        },
+      },
+      orderBy: { berlakuHingga: 'desc' },
+    });
+
+    return { data: promos };
   }
 
   async findOne(id: string) {

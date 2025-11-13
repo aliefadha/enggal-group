@@ -60,7 +60,6 @@ function RouteComponent() {
 
   const imageFileInputRef = React.useRef<HTMLInputElement | null>(null);
 
-  const [selectedImageName, setSelectedImageName] = React.useState("");
   const [selectedImageFile, setSelectedImageFile] =
     React.useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string | null>(null);
@@ -135,7 +134,6 @@ function RouteComponent() {
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0] ?? null;
-    setSelectedImageName(file ? file.name : "");
     setSelectedImageFile(file);
 
     // Clean up old preview URL

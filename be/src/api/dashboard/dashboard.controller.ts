@@ -6,10 +6,9 @@ import { JwtAuthGuard } from '../auth/guard/jwt-guard.auth';
 @ApiTags('dashboard')
 @Controller('dashboard')
 export class DashboardController {
-  constructor(private readonly dashboardService: DashboardService) {}
+  constructor(private readonly dashboardService: DashboardService) { }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   getCounts() {
     return this.dashboardService.getCounts();
   }

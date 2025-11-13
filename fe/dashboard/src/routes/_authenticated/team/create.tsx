@@ -16,8 +16,8 @@ type Team = {
   nama: string;
   title: string;
   image: string;
-  linkedinUrl: string;
-  instagramUrl: string;
+  linkedinUrl?: string;
+  instagramUrl?: string;
 };
 
 const createTeam = async (formData: FormData) => {
@@ -48,11 +48,7 @@ function RouteComponent() {
 
   const [submitError, setSubmitError] = React.useState<string | null>(null);
 
-  const {
-    mutate: mutateTeam,
-    reset: resetCreateTeam,
-    isPending: isCreatePending,
-  } = useMutation({
+  const { mutate: mutateTeam, isPending: isCreatePending } = useMutation({
     mutationFn: createTeam,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teams"] });
@@ -111,8 +107,6 @@ function RouteComponent() {
     if (
       !trimmedNama ||
       !trimmedTitle ||
-      !trimmedLinkedinUrl ||
-      !trimmedInstagramUrl ||
       !selectedImageFile
     ) {
       setSubmitError("Mohon lengkapi semua field yang wajib diisi.");
@@ -124,8 +118,15 @@ function RouteComponent() {
     const formData = new FormData();
     formData.append("nama", trimmedNama);
     formData.append("title", trimmedTitle);
-    formData.append("linkedinUrl", trimmedLinkedinUrl);
-    formData.append("instagramUrl", trimmedInstagramUrl);
+
+    if (trimmedLinkedinUrl) {
+      formData.append("linkedinUrl", trimmedLinkedinUrl);
+    }
+
+    if (trimmedInstagramUrl) {
+      formData.append("instagramUrl", trimmedInstagramUrl);
+    }
+
     formData.append("image", selectedImageFile);
 
     mutateTeam(formData);
@@ -226,7 +227,7 @@ function RouteComponent() {
             {/* LinkedIn Link */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[#2E2E2E]">
-                LinkedIn URL<span className="text-[#C1272D]">*</span>
+                LinkedIn URL
               </Label>
               <Input
                 value={formState.linkedinUrl}
@@ -242,7 +243,7 @@ function RouteComponent() {
             {/* Instagram Link */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[#2E2E2E]">
-                Instagram URL<span className="text-[#C1272D]">*</span>
+                Instagram URL
               </Label>
               <Input
                 value={formState.instagramUrl}

@@ -114,6 +114,11 @@ export class PromoController {
     });
   }
 
+  @Get('banner/list')
+  findBanners() {
+    return this.promoService.findBanners();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.promoService.findOne(id);

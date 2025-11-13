@@ -60,7 +60,6 @@ function RouteComponent() {
 
   const {
     mutate: mutateBrand,
-    reset: resetCreateBrand,
     isPending: isCreatePending,
   } = useMutation({
     mutationFn: createBrand,
@@ -279,18 +278,6 @@ function RouteComponent() {
             />
           </div>
 
-          {/* Title */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-[#2E2E2E]">Title</Label>
-            <Input
-              value={formState.title}
-              onChange={(event) => handleChange("title", event.target.value)}
-              placeholder="Masukan Title Brand"
-              className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
-              disabled={isCreatePending}
-            />
-          </div>
-
           {/* Description */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-[#2E2E2E]">
@@ -306,6 +293,20 @@ function RouteComponent() {
               disabled={isCreatePending}
             />
           </div>
+
+
+          {/* Title */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-[#2E2E2E]">Title</Label>
+            <Input
+              value={formState.title}
+              onChange={(event) => handleChange("title", event.target.value)}
+              placeholder="Masukan Title Brand"
+              className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
+              disabled={isCreatePending}
+            />
+          </div>
+
 
           {/* Content */}
           <div className="space-y-2">

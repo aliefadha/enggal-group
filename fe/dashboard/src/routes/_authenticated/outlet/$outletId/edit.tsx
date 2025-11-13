@@ -177,7 +177,6 @@ function RouteComponent() {
     ...emptyOutlet,
   });
   const [isFormInitialized, setIsFormInitialized] = React.useState(false);
-  const [selectedImageName, setSelectedImageName] = React.useState("");
   const [selectedImageFile, setSelectedImageFile] = React.useState<File | null>(
     null,
   );
@@ -220,7 +219,6 @@ function RouteComponent() {
         jamOperasional: formattedHours,
       });
       setOperationalHours(parsedHours);
-      setSelectedImageName("");
       setSelectedImageFile(null);
       setSubmitError(null);
       toast.success("Perubahan berhasil disimpan.");
@@ -267,7 +265,6 @@ function RouteComponent() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
-    setSelectedImageName(file ? file.name : "");
     setSelectedImageFile(file);
 
     // Clean up old preview URL
@@ -390,7 +387,6 @@ function RouteComponent() {
 
   React.useEffect(() => {
     setFormState({ ...emptyOutlet });
-    setSelectedImageName("");
     setSelectedImageFile(null);
     setImagePreviewUrl(null);
     setSubmitError(null);

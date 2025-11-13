@@ -76,7 +76,6 @@ function RouteComponent() {
   });
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [isFormInitialized, setIsFormInitialized] = React.useState(false);
-  const [selectedImageName, setSelectedImageName] = React.useState("");
   const [selectedImageFile, setSelectedImageFile] = React.useState<File | null>(
     null,
   );
@@ -130,7 +129,6 @@ function RouteComponent() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
-    setSelectedImageName(file ? file.name : "");
     setSelectedImageFile(file);
 
     // Clean up old preview URL
@@ -203,7 +201,6 @@ function RouteComponent() {
     });
     setPublishDate(undefined);
     setIsFormInitialized(false);
-    setSelectedImageName("");
     setSelectedImageFile(null);
     setImagePreviewUrl(null);
     setSubmitError(null);

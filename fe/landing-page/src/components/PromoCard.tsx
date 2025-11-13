@@ -24,7 +24,7 @@ const PromoCard: React.FC<PromoCardProps> = ({ title, description, validUntil, i
 
       <div className="relative my-4 w-full h-56 md:h-72 lg:h-80 px-4">
         <img
-          src={image}
+          src={`${image}`}
           alt={title}
           className="w-full h-full object-cover rounded-xl"
           onError={(e) => {

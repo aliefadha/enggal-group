@@ -1,24 +1,151 @@
+import { useQuery } from "@tanstack/react-query";
+import { apiClient, API_BASE_URL } from "../lib/api-client";
+
+type BeritaItem = {
+  id: string;
+  judul: string;
+  image?: string | null;
+  createdDate: string;
+  penulis: string;
+  content: string;
+};
+
+type BeritaListMeta = {
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+};
+
+async function fetchBeritaList() {
+  const response = await apiClient.get<BeritaItem[], BeritaListMeta>(
+    `/berita?page=1&limit=12`,
+  );
+
+  const items = response.data ?? [];
+  const meta = response.meta ?? {};
+
+  return {
+    data: items,
+    meta: {
+      page: meta.page ?? 1,
+      limit: meta.limit ?? items.length,
+      total: meta.total ?? items.length,
+      totalPages: meta.totalPages ?? (items.length === 0 ? 0 : 1),
+    },
+  };
+}
+
+function formatDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function getImageUrl(path?: string | null) {
+  if (!path) {
+    return "/images/berita_1.png";
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${API_BASE_URL}${normalizedPath}`;
+}
+
+function getExcerpt(text: string, maxLength = 140) {
+  const sanitized = text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+
+  if (!sanitized) {
+    return "";
+  }
+
+  if (sanitized.length <= maxLength) {
+    return sanitized;
+  }
+
+  return `${sanitized.slice(0, maxLength).trimEnd()}...`;
+}
+
 function Berita() {
+  const { data: beritaList, isLoading, isError, error } = useQuery({
+    queryKey: ["berita", "list"],
+    queryFn: fetchBeritaList,
+  });
+
+  const items = beritaList?.data ?? [];
+  const heroBerita = items[0];
+  const sidebarArticles = items.slice(1, 4);
+  const gridArticles = items.slice(4);
+  const heroExcerpt = heroBerita ? getExcerpt(heroBerita.content, 160) : "";
+  const errorMessage =
+    error instanceof Error ? error.message : "Gagal memuat berita.";
+
+  const handleNavigate = (id: string) => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.location.href = `/berita/${id}`;
+  };
+
   return (
     <section className="relative bg-[#F9F9F9]">
       <div className="mb-9">
         <div className="h-[150px] md:h-[300px] relative">
           <div className="absolute inset-0 bg-[url('/images/dots_berita.png')] bg-center bg-cover bg-repeat-x overflow-hidden">
             <div className="absolute top-0 right-0 hidden md:block">
-              <svg width="229" height="269" viewBox="0 0 229 269" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M293 198.032C238.965 176.658 127.999 152.286 116.412 225.797C101.928 317.686 223.368 227.12 149.279 129.942C90.0074 52.2004 28.2108 16.6789 5.00001 5" stroke="#FFB835" stroke-width="10" stroke-linecap="round" />
+              <svg
+                width="229"
+                height="269"
+                viewBox="0 0 229 269"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M293 198.032C238.965 176.658 127.999 152.286 116.412 225.797C101.928 317.686 223.368 227.12 149.279 129.942C90.0074 52.2004 28.2108 16.6789 5.00001 5"
+                  stroke="#FFB835"
+                  strokeWidth="10"
+                  strokeLinecap="round"
+                />
               </svg>
             </div>
             <div className="absolute bottom-1/4 right-4 hidden md:block">
-              <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14.639 1.20521C15.909 -0.339024 18.3912 0.91164 17.9059 2.8513L16.4115 8.82438C16.2358 9.52679 16.4802 10.2676 17.0394 10.7276L21.7948 14.6387C23.339 15.9088 22.0884 18.391 20.1487 17.9057L14.1756 16.4113C13.4732 16.2355 12.7324 16.4799 12.2724 17.0391L8.36128 21.7945C7.0912 23.3388 4.609 22.0881 5.09429 20.1485L6.58874 14.1754C6.76448 13.473 6.52007 12.7321 5.96086 12.2722L1.20545 8.36104C-0.338785 7.09096 0.911879 4.60876 2.85154 5.09406L8.82462 6.5885C9.52703 6.76424 10.2679 6.51984 10.7278 5.96062L14.639 1.20521Z" fill="#9C0000" />
+              <svg
+                width="23"
+                height="23"
+                viewBox="0 0 23 23"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.639 1.20521C15.909 -0.339024 18.3912 0.91164 17.9059 2.8513L16.4115 8.82438C16.2358 9.52679 16.4802 10.2676 17.0394 10.7276L21.7948 14.6387C23.339 15.9088 22.0884 18.391 20.1487 17.9057L14.1756 16.4113C13.4732 16.2355 12.7324 16.4799 12.2724 17.0391L8.36128 21.7945C7.0912 23.3388 4.609 22.0881 5.09429 20.1485L6.58874 14.1754C6.76448 13.473 6.52007 12.7321 5.96086 12.2722L1.20545 8.36104C-0.338785 7.09096 0.911879 4.60876 2.85154 5.09406L8.82462 6.5885C9.52703 6.76424 10.2679 6.51984 10.7278 5.96062L14.639 1.20521Z"
+                  fill="#9C0000"
+                />
               </svg>
             </div>
             <div className="absolute bottom-1/2 right-24 hidden md:block">
-              <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9.25928 3.10019C8.91785 0.164274 12.7951 -1.19565 14.3623 1.31031L19.1887 9.02728C19.7563 9.93477 20.7956 10.4344 21.8588 10.3107L30.8998 9.25928C33.8357 8.91785 35.1956 12.7951 32.6897 14.3623L24.9727 19.1887C24.0652 19.7563 23.5656 20.7956 23.6893 21.8588L24.7407 30.8998C25.0822 33.8357 21.2049 35.1956 19.6377 32.6897L14.8113 24.9727C14.2437 24.0652 13.2044 23.5656 12.1412 23.6893L3.10019 24.7407C0.164274 25.0822 -1.19565 21.2049 1.31031 19.6377L9.02728 14.8113C9.93477 14.2437 10.4344 13.2044 10.3107 12.1412L9.25928 3.10019Z" fill="#9C0000" />
+              <svg
+                width="34"
+                height="34"
+                viewBox="0 0 34 34"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9.25928 3.10019C8.91785 0.164274 12.7951 -1.19565 14.3623 1.31031L19.1887 9.02728C19.7563 9.93477 20.7956 10.4344 21.8588 10.3107L30.8998 9.25928C33.8357 8.91785 35.1956 12.7951 32.6897 14.3623L24.9727 19.1887C24.0652 19.7563 23.5656 20.7956 23.6893 21.8588L24.7407 30.8998C25.0822 33.8357 21.2049 35.1956 19.6377 32.6897L14.8113 24.9727C14.2437 24.0652 13.2044 23.5656 12.1412 23.6893L3.10019 24.7407C0.164274 25.0822 -1.19565 21.2049 1.31031 19.6377L9.02728 14.8113C9.93477 14.2437 10.4344 13.2044 10.3107 12.1412L9.25928 3.10019Z"
+                  fill="#9C0000"
+                />
               </svg>
-
             </div>
             <div className="max-w-4xl mx-auto relative h-full flex justify-between items-center">
               <div className="px-4 md:px-0 ">
@@ -33,8 +160,8 @@ function Berita() {
                     <path
                       d="M2 16.0267C11 9.36005 28.5 -2.17329 26.5 5.02671C24.5 12.2267 21 15.36 19.5 16.0267C27.3333 9.6934 42.7 -1.37323 41.5 5.02671C40.3 11.4267 37.6667 15.0267 36.5 16.0267C45.8333 8.69338 63.6 -3.77329 60 5.02671C56.4 13.8267 61.5 16.0267 64.5 16.0267"
                       stroke="#FFB835"
-                      stroke-width="4"
-                      stroke-linecap="round"
+                      strokeWidth="4"
+                      strokeLinecap="round"
                     />
                   </svg>
                 </div>
@@ -60,7 +187,11 @@ function Berita() {
                   </h2>
                 </div>
               </div>
-              <img src="/images/berita_cover.png" alt="berita" className="w-[300px] hidden md:block" />
+              <img
+                src="/images/berita_cover.png"
+                alt="berita"
+                className="w-[300px] hidden md:block"
+              />
             </div>
           </div>
         </div>
@@ -74,74 +205,104 @@ function Berita() {
 
       <div className="container px-4 md:px-20 mx-auto py-8 font-jakarta">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-          <div
-            className="lg:col-span-2 bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm cursor-pointer"
-            onClick={() => (window.location.href = "/berita/1")}
-          >
-            <div className="relative">
-              <img src="/images/berita_1.png" alt="Bakso Malang" className="w-full h-[250px] md:h-[400px] object-cover" />
-              <div className="absolute bottom-0 left-0 bg-[#9C0000] text-white p-2.5 font-medium text-sm md:text-base">
-                27 September 2025
-              </div>
+          {isLoading ? (
+            <div className="lg:col-span-3 py-10 text-center">
+              <p className="text-gray-500 font-medium">Memuat berita...</p>
             </div>
-            <div className="p-4 md:p-6">
-              <h2 className="text-base md:text-xl text-[#1E1E1E] font-bold mb-6">Bakso Malang Enggal Resmi Hadir di Lippo Cikarang bersama Anwar BAB</h2>
-              <p className="text-[#9B9B9B] mb-4 md:mb-8 truncate">Kabar gembira untuk para pecinta kuliner! Bakso...
-                <span>
-                  <a
-                    href="/berita/1"
-                    className="text-[#9C0000] font-bold hover:underline"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Baca Selengkapnya
-                  </a>
-                </span>
+          ) : isError ? (
+            <div className="lg:col-span-3 py-10 text-center">
+              <p className="text-gray-500 font-medium">{errorMessage}</p>
+            </div>
+          ) : heroBerita ? (
+            <>
+              <div
+                className="lg:col-span-2 bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm cursor-pointer"
+                onClick={() => handleNavigate(heroBerita.id)}
+              >
+                <div className="relative">
+                  <img
+                    src={getImageUrl(heroBerita.image)}
+                    alt={heroBerita.judul}
+                    className="w-full h-[250px] md:h-[400px] object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 bg-[#9C0000] text-white p-2.5 font-medium text-sm md:text-base">
+                    {formatDate(heroBerita.createdDate)}
+                  </div>
+                </div>
+                <div className="p-4 md:p-6">
+                  <h2 className="text-base md:text-xl text-[#1E1E1E] font-bold mb-6">
+                    {heroBerita.judul}
+                  </h2>
+                  <p className="text-[#9B9B9B] mb-4 md:mb-8 truncate">
+                    {heroExcerpt || "Konten akan segera hadir."}{" "}
+                    <span>
+                      <a
+                        href={`/berita/${heroBerita.id}`}
+                        className="text-[#9C0000] font-bold hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Baca Selengkapnya
+                      </a>
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {sidebarArticles.length > 0 ? (
+                  sidebarArticles.map((article) => (
+                    <div
+                      key={article.id}
+                      className="bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm flex p-4 items-center md:items-start gap-2 md:gap-4 cursor-pointer"
+                      onClick={() => handleNavigate(article.id)}
+                    >
+                      <img
+                        src={getImageUrl(article.image)}
+                        alt={article.judul}
+                        className="w-[100px] h-[80px] md:w-[150px] md:h-[120px] object-cover rounded-md"
+                      />
+                      <div className="flex flex-col gap-y-2">
+                        <div className="text-[#9C0000] text-sm font-medium mb-1">
+                          {formatDate(article.createdDate)}
+                        </div>
+                        <h3 className="font-semibold text-sm md:text-base line-clamp-2">
+                          {article.judul}
+                        </h3>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm p-6 text-center text-sm text-gray-500">
+                    Belum ada berita lainnya.
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="lg:col-span-3 py-10 text-center">
+              <p className="text-gray-500 font-medium">
+                Belum ada berita yang dapat ditampilkan.
               </p>
             </div>
-          </div>
-
-          {/* Sidebar News Cards */}
-          <div className="space-y-6">
-            <div
-              className="bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm flex p-4 items-center md:items-start gap-2  md:gap-4 cursor-pointer"
-              onClick={() => (window.location.href = "/berita/1")}
-            >
-              <img src="/images/berita_1.png" alt="Bakso Malang" className="w-[100px] h-[80px] md:w-[150px] md:h-[120px] object-cover rounded-md" />
-              <div className="flex flex-col gap-y-2">
-                <div className="text-[#9C0000] text-sm font-medium mb-1">27 September 2025</div>
-                <h3 className="font-semibold text-sm">Bakso Malang Enggal Resmi Hadir di Lippo Cikarang bersama Anwar BAB</h3>
-              </div>
-            </div>
-
-            <div
-              className="bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm flex p-4 items-center md:items-start gap-2  md:gap-4 cursor-pointer"
-              onClick={() => (window.location.href = "/berita/1")}
-            >
-              <img src="/images/berita_1.png" alt="Bakso Malang" className="w-[100px] h-[80px] md:w-[150px] md:h-[120px] object-cover rounded-md" />
-              <div className="flex flex-col gap-y-2">
-                <div className="text-[#9C0000] text-sm font-medium mb-1">27 September 2025</div>
-                <h3 className="font-semibold text-sm">Bakso Malang Enggal Resmi Hadir di Lippo Cikarang bersama Anwar BAB</h3>
-              </div>
-            </div>
-
-            <div
-              className="bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm flex p-4 items-center md:items-start gap-2  md:gap-4 cursor-pointer"
-              onClick={() => (window.location.href = "/berita/1")}
-            >
-              <img src="/images/berita_1.png" alt="Bakso Malang" className="w-[100px] h-[80px] md:w-[150px] md:h-[120px] object-cover rounded-md" />
-              <div className="flex flex-col gap-y-2">
-                <div className="text-[#9C0000] text-sm font-medium mb-1">27 September 2025</div>
-                <h3 className="font-semibold text-sm">Bakso Malang Enggal Resmi Hadir di Lippo Cikarang bersama Anwar BAB</h3>
-              </div>
-            </div>
-
-          </div>
+          )}
         </div>
+
         <div>
           <div>
             <div className="mb-2">
-              <svg width="67" height="19" viewBox="0 0 67 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 16.0267C11 9.36005 28.5 -2.17329 26.5 5.02671C24.5 12.2267 21 15.36 19.5 16.0267C27.3333 9.6934 42.7 -1.37323 41.5 5.02671C40.3 11.4267 37.6667 15.0267 36.5 16.0267C45.8333 8.69338 63.6 -3.77329 60 5.02671C56.4 13.8267 61.5 16.0267 64.5 16.0267" stroke="#FFB835" stroke-width="4" stroke-linecap="round" />
+              <svg
+                width="67"
+                height="19"
+                viewBox="0 0 67 19"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 16.0267C11 9.36005 28.5 -2.17329 26.5 5.02671C24.5 12.2267 21 15.36 19.5 16.0267C27.3333 9.6934 42.7 -1.37323 41.5 5.02671C40.3 11.4267 37.6667 15.0267 36.5 16.0267C45.8333 8.69338 63.6 -3.77329 60 5.02671C56.4 13.8267 61.5 16.0267 64.5 16.0267"
+                  stroke="#FFB835"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
               </svg>
             </div>
             <h2 className="font-runestars mb-6 relative">
@@ -151,37 +312,63 @@ function Berita() {
             </h2>
           </div>
           <div className="my-16 grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 md:gap-y-16">
-            {Array.from({ length: 6 }, (_, i) => i + 1).map((item: number) => (
-              <div className="bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm cursor-pointer transition-transform" key={item} onClick={() => window.location.href = `/berita/${item}`}>
-                <div className="m-3 md:m-4">
-                  <div className="relative rounded-lg overflow-hidden">
-                    <img src="/images/berita_1.png" alt="Bakso Malang" className="w-full h-[150px] md:h-[300px] object-cover" />
-                    <div className="absolute bottom-0 left-0 bg-[#9C0000] text-white p-2 md:p-2.5 font-medium text-xs md:text-sm">
-                      27 September 2025
+            {isLoading ? (
+              <div className="col-span-2 lg:col-span-3 py-10 text-center">
+                <p className="text-gray-500 font-medium">Memuat berita...</p>
+              </div>
+            ) : isError ? (
+              <div className="col-span-2 lg:col-span-3 py-10 text-center">
+                <p className="text-gray-500 font-medium">{errorMessage}</p>
+              </div>
+            ) : gridArticles.length > 0 ? (
+              gridArticles.map((article) => (
+                <div
+                  key={article.id}
+                  className="bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm cursor-pointer transition-transform"
+                  onClick={() => handleNavigate(article.id)}
+                >
+                  <div className="m-3 md:m-4">
+                    <div className="relative rounded-lg overflow-hidden">
+                      <img
+                        src={getImageUrl(article.image)}
+                        alt={article.judul}
+                        className="w-full h-[150px] md:h-[300px] object-cover"
+                      />
+                      <div className="absolute bottom-0 left-0 bg-[#9C0000] text-white p-2 md:p-2.5 font-medium text-xs md:text-sm">
+                        {formatDate(article.createdDate)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-3 md:p-4">
+                    <h2 className="text-[#1E1E1E] font-bold text-sm md:text-lg mb-3 md:mb-6 md:line-clamp-2">
+                      {article.judul}
+                    </h2>
+                    <div className="text-[#9B9B9B] text-xs md:text-base flex items-center w-full">
+                      <span className="flex-1 min-w-0 truncate">
+                        {getExcerpt(article.content, 80) ||
+                          "Konten akan segera hadir."}
+                      </span>
+                      <a
+                        href={`/berita/${article.id}`}
+                        className="text-[#9C0000] font-bold hover:underline ml-2 flex-shrink-0 whitespace-nowrap"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Baca Selengkapnya
+                      </a>
                     </div>
                   </div>
                 </div>
-                <div className="p-3 md:p-4">
-                  <h2 className="text-[#1E1E1E] font-bold text-sm md:text-lg mb-3 md:mb-6 md:line-clamp-2">Bakso Malang Enggal Resmi Hadir di Lippo Cikarang bersama Anwar BAB</h2>
-                  <div className="text-[#9B9B9B] text-xs md:text-base flex items-center w-full">
-                    <span className="flex-1 min-w-0 truncate">
-                      Kabar gembira untuk para pecinta kuliner! Bakso...
-                    </span>
-                    <a
-                      href={`/berita/${item}`}
-                      className="text-[#9C0000] font-bold hover:underline ml-2 flex-shrink-0 whitespace-nowrap"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      Baca Selengkapnya
-                    </a>
-                  </div>
-                </div>
+              ))
+            ) : (
+              <div className="col-span-2 lg:col-span-3 py-10 text-center">
+                <p className="text-gray-500 font-medium">
+                  Tidak ada berita lainnya.
+                </p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
-
     </section>
   );
 }

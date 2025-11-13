@@ -58,7 +58,7 @@ const fetchBrandById = async (id: string) => {
 };
 
 type UpdateBrandPayload = {
-    id: number;
+    id: string;
     formData: FormData;
 };
 
@@ -135,11 +135,16 @@ function RouteComponent() {
     const [selectedLogoFile, setSelectedLogoFile] = React.useState<File | null>(
         null,
     );
+    const [selectedLogoPreviewUrl, setSelectedLogoPreviewUrl] = React.useState<
+        string | null
+    >(null);
 
     const [selectedCoverImageName, setSelectedCoverImageName] =
         React.useState("");
     const [selectedCoverImageFile, setSelectedCoverImageFile] =
         React.useState<File | null>(null);
+    const [selectedCoverImagePreviewUrl, setSelectedCoverImagePreviewUrl] =
+        React.useState<string | null>(null);
 
     const [submitError, setSubmitError] = React.useState<string | null>(null);
 
@@ -148,8 +153,8 @@ function RouteComponent() {
     const [galleryInstagramUrl, setGalleryInstagramUrl] = React.useState("");
     const [selectedGalleryFile, setSelectedGalleryFile] =
         React.useState<File | null>(null);
-    const [selectedGalleryFileName, setSelectedGalleryFileName] =
-        React.useState("");
+    const [selectedGalleryPreviewUrl, setSelectedGalleryPreviewUrl] =
+        React.useState<string | null>(null);
     const galleryFileInputRef = React.useRef<HTMLInputElement | null>(null);
 
     // Edit gallery state
@@ -161,7 +166,8 @@ function RouteComponent() {
     const [editGalleryFile, setEditGalleryFile] = React.useState<File | null>(
         null,
     );
-    const [editGalleryFileName, setEditGalleryFileName] = React.useState("");
+    const [editGalleryPreviewUrl, setEditGalleryPreviewUrl] =
+        React.useState<string | null>(null);
     const editGalleryFileInputRef = React.useRef<HTMLInputElement | null>(null);
 
     // Delete gallery state
@@ -190,6 +196,29 @@ function RouteComponent() {
             );
         }
     }, [brand]);
+
+    // Cleanup object URLs to prevent memory leaks
+    React.useEffect(() => {
+        return () => {
+            if (selectedLogoPreviewUrl) {
+                URL.revokeObjectURL(selectedLogoPreviewUrl);
+            }
+            if (selectedCoverImagePreviewUrl) {
+                URL.revokeObjectURL(selectedCoverImagePreviewUrl);
+            }
+            if (selectedGalleryPreviewUrl) {
+                URL.revokeObjectURL(selectedGalleryPreviewUrl);
+            }
+            if (editGalleryPreviewUrl) {
+                URL.revokeObjectURL(editGalleryPreviewUrl);
+            }
+        };
+    }, [
+        selectedLogoPreviewUrl,
+        selectedCoverImagePreviewUrl,
+        selectedGalleryPreviewUrl,
+        editGalleryPreviewUrl,
+    ]);
 
     const {
         mutate: mutateUpdateBrand,
@@ -228,7 +257,15 @@ function RouteComponent() {
                 setGalleryCaption("");
                 setGalleryInstagramUrl("");
                 setSelectedGalleryFile(null);
-                setSelectedGalleryFileName("");
+                setSelectedGalleryPreviewUrl((previous) => {
+                    if (previous) {
+                        URL.revokeObjectURL(previous);
+                    }
+                    return null;
+                });
+                if (galleryFileInputRef.current) {
+                    galleryFileInputRef.current.value = "";
+                }
             },
             onError: (mutationError: unknown) => {
                 if (mutationError instanceof ApiError) {
@@ -280,7 +317,15 @@ function RouteComponent() {
                 setEditCaption("");
                 setEditInstagramUrl("");
                 setEditGalleryFile(null);
-                setEditGalleryFileName("");
+                setEditGalleryPreviewUrl((previous) => {
+                    if (previous) {
+                        URL.revokeObjectURL(previous);
+                    }
+                    return null;
+                });
+                if (editGalleryFileInputRef.current) {
+                    editGalleryFileInputRef.current.value = "";
+                }
             },
             onError: (mutationError: unknown) => {
                 if (mutationError instanceof ApiError) {
@@ -312,8 +357,16 @@ function RouteComponent() {
         event: React.ChangeEvent<HTMLInputElement>,
     ) => {
         const file = event.target.files?.[0] ?? null;
+
+        // Revoke previous preview URL
+        if (selectedLogoPreviewUrl) {
+            URL.revokeObjectURL(selectedLogoPreviewUrl);
+        }
+
         setSelectedLogoName(file ? file.name : "");
         setSelectedLogoFile(file);
+        setSelectedLogoPreviewUrl(file ? URL.createObjectURL(file) : null);
+
         if (submitError) {
             setSubmitError(null);
         }
@@ -323,8 +376,16 @@ function RouteComponent() {
         event: React.ChangeEvent<HTMLInputElement>,
     ) => {
         const file = event.target.files?.[0] ?? null;
+
+        // Revoke previous preview URL
+        if (selectedCoverImagePreviewUrl) {
+            URL.revokeObjectURL(selectedCoverImagePreviewUrl);
+        }
+
         setSelectedCoverImageName(file ? file.name : "");
         setSelectedCoverImageFile(file);
+        setSelectedCoverImagePreviewUrl(file ? URL.createObjectURL(file) : null);
+
         if (submitError) {
             setSubmitError(null);
         }
@@ -382,7 +443,7 @@ function RouteComponent() {
         }
 
         mutateUpdateBrand({
-            id: Number(brandId),
+            id: brandId,
             formData,
         });
     };
@@ -395,8 +456,13 @@ function RouteComponent() {
         event: React.ChangeEvent<HTMLInputElement>,
     ) => {
         const file = event.target.files?.[0] ?? null;
-        setSelectedGalleryFileName(file ? file.name : "");
+
+        if (selectedGalleryPreviewUrl) {
+            URL.revokeObjectURL(selectedGalleryPreviewUrl);
+        }
+
         setSelectedGalleryFile(file);
+        setSelectedGalleryPreviewUrl(file ? URL.createObjectURL(file) : null);
     };
 
     const handleAddGallery = () => {
@@ -438,19 +504,31 @@ function RouteComponent() {
     };
 
     const handleEditGallery = (gallery: Gallery) => {
+        if (editGalleryPreviewUrl) {
+            URL.revokeObjectURL(editGalleryPreviewUrl);
+        }
+
         setEditingGallery(gallery);
         setEditCaption(gallery.caption);
         setEditInstagramUrl(gallery.instagramUrl || "");
         setEditGalleryFile(null);
-        setEditGalleryFileName("");
+        setEditGalleryPreviewUrl(null);
+        if (editGalleryFileInputRef.current) {
+            editGalleryFileInputRef.current.value = "";
+        }
     };
 
     const handleEditGalleryFileChange = (
         event: React.ChangeEvent<HTMLInputElement>,
     ) => {
         const file = event.target.files?.[0] ?? null;
-        setEditGalleryFileName(file ? file.name : "");
+
+        if (editGalleryPreviewUrl) {
+            URL.revokeObjectURL(editGalleryPreviewUrl);
+        }
+
         setEditGalleryFile(file);
+        setEditGalleryPreviewUrl(file ? URL.createObjectURL(file) : null);
     };
 
     const handleSaveEditGallery = () => {
@@ -487,7 +565,13 @@ function RouteComponent() {
         setEditCaption("");
         setEditInstagramUrl("");
         setEditGalleryFile(null);
-        setEditGalleryFileName("");
+        if (editGalleryPreviewUrl) {
+            URL.revokeObjectURL(editGalleryPreviewUrl);
+        }
+        setEditGalleryPreviewUrl(null);
+        if (editGalleryFileInputRef.current) {
+            editGalleryFileInputRef.current.value = "";
+        }
     };
 
     if (isLoading) {
@@ -533,15 +617,35 @@ function RouteComponent() {
                         <Label className="text-sm font-semibold text-[#2E2E2E]">
                             Upload Logo
                         </Label>
-                        {brand.logo ? (
+                        {(brand.logo && brand.logo.trim()) || selectedLogoFile ? (
                             <div className="space-y-4">
                                 <div className="relative rounded-3xl border border-[#D6DAE1] bg-[#F9FBFD] p-4">
-                                    <img
-                                        src={`${import.meta.env.VITE_API_BASE_URL}${brand.logo}`}
-                                        alt="Current logo"
-                                        className="mx-auto h-48 w-48 rounded-full object-contain"
-                                    />
+                                    {selectedLogoPreviewUrl || brand.logo ? (
+                                        <img
+                                            src={
+                                                selectedLogoPreviewUrl ||
+                                                `${import.meta.env.VITE_API_BASE_URL}${brand.logo}`
+                                            }
+                                            alt="Current logo"
+                                            className="mx-auto h-48 w-48 rounded-full object-contain"
+                                            onError={(e) => {
+                                                console.error('Failed to load logo:', e);
+                                                (e.target as HTMLImageElement).style.display = 'none';
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className="flex h-48 items-center justify-center text-[#6B7280]">
+                                            No image available
+                                        </div>
+                                    )}
                                 </div>
+                                {selectedLogoFile && (
+                                    <div className="rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] px-4 py-2">
+                                        <p className="text-sm text-[#0369A1]">
+                                            File baru dipilih: <span className="font-medium">{selectedLogoName}</span>
+                                        </p>
+                                    </div>
+                                )}
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -592,15 +696,35 @@ function RouteComponent() {
                         <Label className="text-sm font-semibold text-[#2E2E2E]">
                             Upload Cover Image
                         </Label>
-                        {brand.coverImage ? (
+                        {(brand.coverImage && brand.coverImage.trim()) || selectedCoverImageFile ? (
                             <div className="space-y-4">
                                 <div className="relative rounded-3xl border border-[#D6DAE1] bg-[#F9FBFD] p-4">
-                                    <img
-                                        src={`${import.meta.env.VITE_API_BASE_URL}${brand.coverImage}`}
-                                        alt="Current cover"
-                                        className="mx-auto max-h-96 rounded-2xl object-contain"
-                                    />
+                                    {selectedCoverImagePreviewUrl || brand.coverImage ? (
+                                        <img
+                                            src={
+                                                selectedCoverImagePreviewUrl ||
+                                                `${import.meta.env.VITE_API_BASE_URL}${brand.coverImage}`
+                                            }
+                                            alt="Current cover"
+                                            className="mx-auto max-h-96 rounded-2xl object-contain"
+                                            onError={(e) => {
+                                                console.error('Failed to load cover image:', e);
+                                                (e.target as HTMLImageElement).style.display = 'none';
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className="flex h-96 items-center justify-center text-[#6B7280]">
+                                            No image available
+                                        </div>
+                                    )}
                                 </div>
+                                {selectedCoverImageFile && (
+                                    <div className="rounded-xl bg-[#F0F9FF] border border-[#BAE6FD] px-4 py-2">
+                                        <p className="text-sm text-[#0369A1]">
+                                            File baru dipilih: <span className="font-medium">{selectedCoverImageName}</span>
+                                        </p>
+                                    </div>
+                                )}
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -859,8 +983,29 @@ function RouteComponent() {
                                 <Label className="mb-2 block text-sm font-medium text-[#2E2E2E]">
                                     Upload Gambar
                                 </Label>
-                                <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-4 text-center">
-                                    <Upload className="size-6 text-[#C1272D]" />
+                                <div className="flex w-full flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-4 text-center">
+                                    {selectedGalleryPreviewUrl ? (
+                                        <img
+                                            src={selectedGalleryPreviewUrl}
+                                            alt="Pratinjau gambar gallery"
+                                            className="mx-auto aspect-square w-full max-w-[240px] rounded-2xl object-cover"
+                                        />
+                                    ) : (
+                                        <Upload className="size-6 text-[#C1272D]" />
+                                    )}
+                                    <div className="text-sm text-[#6B7280]">
+                                        {selectedGalleryPreviewUrl
+                                            ? "Pratinjau gambar baru ditampilkan di atas."
+                                            : "Pilih Foto atau Drop Disini"}
+                                    </div>
+                                    {selectedGalleryFile ? (
+                                        <div className="w-full rounded-xl border border-[#BAE6FD] bg-[#F0F9FF] px-3 py-2 text-xs text-[#0369A1]">
+                                            File dipilih:{" "}
+                                            <span className="font-medium">
+                                                {selectedGalleryFile.name}
+                                            </span>
+                                        </div>
+                                    ) : null}
                                     <Button
                                         type="button"
                                         variant="outline"
@@ -869,7 +1014,7 @@ function RouteComponent() {
                                         disabled={isCreatingGallery}
                                         onClick={() => galleryFileInputRef.current?.click()}
                                     >
-                                        Browse File
+                                        {selectedGalleryPreviewUrl ? "Ganti File" : "Browse File"}
                                     </Button>
                                     <input
                                         ref={galleryFileInputRef}
@@ -984,11 +1129,27 @@ function RouteComponent() {
                                 <div className="space-y-4">
                                     <div className="relative rounded-3xl border border-[#D6DAE1] bg-[#F9FBFD] p-4">
                                         <img
-                                            src={`${import.meta.env.VITE_API_BASE_URL}${editingGallery.image}`}
-                                            alt={editingGallery.caption}
+                                            src={
+                                                editGalleryPreviewUrl
+                                                    ? editGalleryPreviewUrl
+                                                    : `${import.meta.env.VITE_API_BASE_URL}${editingGallery.image}`
+                                            }
+                                            alt={
+                                                editGalleryPreviewUrl
+                                                    ? "Pratinjau gambar gallery"
+                                                    : editingGallery.caption
+                                            }
                                             className="mx-auto max-h-64 rounded-2xl object-contain"
                                         />
                                     </div>
+                                    {editGalleryFile ? (
+                                        <div className="rounded-xl border border-[#BAE6FD] bg-[#F0F9FF] px-3 py-2 text-xs text-[#0369A1]">
+                                            File baru dipilih:{" "}
+                                            <span className="font-medium">
+                                                {editGalleryFile.name}
+                                            </span>
+                                        </div>
+                                    ) : null}
                                     <Button
                                         type="button"
                                         variant="outline"

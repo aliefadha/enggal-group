@@ -47,7 +47,7 @@ export class TeamController {
         },
         image: { type: 'string', format: 'binary' },
       },
-      required: ['nama', 'title', 'linkedinUrl', 'instagramUrl', 'image'],
+      required: ['nama', 'title', 'image'],
     },
   })
   create(

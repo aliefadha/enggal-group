@@ -9,10 +9,11 @@ import {
   Put,
   Query,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { BrandService } from 'src/api/brand/brand.service';
 import { RequestBrandCreateDto } from 'src/api/brand/dto/requests/create.dto';
@@ -25,11 +26,16 @@ import { JwtAuthGuard } from '../auth/guard/jwt-guard.auth';
 @ApiTags('brand')
 @Controller('brand')
 export class BrandController {
-  constructor(private readonly brandService: BrandService) {}
+  constructor(private readonly brandService: BrandService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('logo', { storage: uploadDiskStorage }))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'logo', maxCount: 1 },
+      { name: 'coverImage', maxCount: 1 },
+    ], { storage: uploadDiskStorage })
+  )
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -46,7 +52,7 @@ export class BrandController {
           example: 'Bakso Enggal adalah restoran yang menyediakan berbagai macam bakso dengan kualitas terbaik...'
         },
         logo: { type: 'string', format: 'binary' },
-        coverImage: { type: 'string' },
+        coverImage: { type: 'string', format: 'binary' },
         instagramLink: { type: 'string' },
         facebookLink: { type: 'string' },
         twitterLink: { type: 'string' },
@@ -57,8 +63,11 @@ export class BrandController {
   })
   create(
     @Body() dto: RequestBrandCreateDto,
-    @UploadedFile() logo?: StoredFile,
+    @UploadedFiles() files?: { logo?: StoredFile[]; coverImage?: StoredFile[] },
   ) {
+    const logo = files?.logo?.[0];
+    const coverImage = files?.coverImage?.[0];
+
     if (!logo) {
       throw new BadRequestException('Logo file is required');
     }
@@ -66,6 +75,7 @@ export class BrandController {
     const payload: RequestBrandCreateDto = {
       ...dto,
       logo: `/uploads/${logo.filename}`,
+      ...(coverImage ? { coverImage: `/uploads/${coverImage.filename}` } : {}),
     };
 
     return this.brandService.create(payload);
@@ -86,7 +96,12 @@ export class BrandController {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('logo', { storage: uploadDiskStorage }))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'logo', maxCount: 1 },
+      { name: 'coverImage', maxCount: 1 },
+    ], { storage: uploadDiskStorage })
+  )
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -103,7 +118,7 @@ export class BrandController {
           example: 'Bakso Enggal adalah restoran yang menyediakan berbagai macam bakso dengan kualitas terbaik...'
         },
         logo: { type: 'string', format: 'binary' },
-        coverImage: { type: 'string' },
+        coverImage: { type: 'string', format: 'binary' },
         instagramLink: { type: 'string' },
         facebookLink: { type: 'string' },
         twitterLink: { type: 'string' },
@@ -114,11 +129,15 @@ export class BrandController {
   update(
     @Param('id') id: string,
     @Body() dto: RequestBrandUpdateDto,
-    @UploadedFile() logo?: StoredFile,
+    @UploadedFiles() files?: { logo?: StoredFile[]; coverImage?: StoredFile[] },
   ) {
+    const logo = files?.logo?.[0];
+    const coverImage = files?.coverImage?.[0];
+
     const payload: RequestBrandUpdateDto = {
       ...dto,
       ...(logo ? { logo: `/uploads/${logo.filename}` } : {}),
+      ...(coverImage ? { coverImage: `/uploads/${coverImage.filename}` } : {}),
     };
 
     return this.brandService.update(id, payload);

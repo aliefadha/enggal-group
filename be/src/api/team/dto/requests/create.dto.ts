@@ -15,15 +15,15 @@ export class RequestTeamCreateDto {
   @IsNotEmpty()
   title!: string;
 
-  @ApiProperty({ example: 'https://www.linkedin.com/in/john-doe' })
-  @IsNotEmpty()
+  @ApiPropertyOptional({ example: 'https://www.linkedin.com/in/john-doe' })
+  @IsOptional()
   @IsUrl()
-  linkedinUrl!: string;
+  linkedinUrl?: string;
 
-  @ApiProperty({ example: 'https://www.instagram.com/johndoe' })
-  @IsNotEmpty()
+  @ApiPropertyOptional({ example: 'https://www.instagram.com/johndoe' })
+  @IsOptional()
   @IsUrl()
-  instagramUrl!: string;
+  instagramUrl?: string;
 
   constructor(dto: RequestTeamCreateDto) {
     Object.assign(this, dto);
