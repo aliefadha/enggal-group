@@ -67,7 +67,8 @@ model Brand {
 model Berita {
   id          String   @id @default(uuid())
   judul       String
-  image       String
+  slug        String   @unique
+  image       String?
   createdDate DateTime
   penulis     String
   content     String
@@ -81,6 +82,7 @@ model Outlet {
   jamOperasional String
   lokasi         String
   image          String
+  provinsi       String
   googleMapsLink String
   whatsappUrl    String?
   createdAt      DateTime @default(now())

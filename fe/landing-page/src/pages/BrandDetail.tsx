@@ -222,14 +222,8 @@ function BrandDetail() {
                 )}
                 {brand.twitterLink && (
                   <a href={brand.twitterLink.startsWith('http') ? brand.twitterLink : `https://${brand.twitterLink}`} target="_blank" rel="noopener noreferrer" className="text-gray-800 hover:text-[#C00000] transition-colors">
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M9 0h1.98c.144.715.54 1.617 1.235 2.512C12.895 3.389 13.797 4 15 4v2c-1.753 0-3.07-.814-4-1.829V11a5 5 0 1 1-5-5v2a3 3 0 1 0 3 3z" />
                     </svg>
                   </a>
                 )}
@@ -249,7 +243,7 @@ function BrandDetail() {
 
         {/* Brand Story Section */}
         {brand.content && (
-          <div className="mt-16 max-w-6xl container mx-auto px-4 md:px-10">
+          <div className="mt-16 container mx-auto px-4 md:px-10">
             {/* Decorative M */}
             <div className="mb-6">
               <svg
@@ -276,20 +270,17 @@ function BrandDetail() {
             </h2>
 
             {/* Body Text */}
-            <div className="space-y-6 text-[#1E1E1E] font-jakarta text-base md:text-lg leading-relaxed max-w-6xl">
-              {brand.content.split('\n\n').map((paragraph, index) => (
-                <p key={index} className="text-justify">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
+            <div
+              className="space-y-6 text-[#1E1E1E] font-jakarta text-base md:text-lg leading-relaxed prose prose-lg max-w-none"
+              dangerouslySetInnerHTML={{ __html: brand.content }}
+            />
           </div>
         )}
 
         {/* Galeri Section */}
         {galleryImages.length > 0 && (
           <>
-            <div className="mt-16 max-w-6xl container mx-auto px-4 md:px-10">
+            <div className="mt-16  container mx-auto px-4 md:px-10">
               {/* Decorative M */}
               <div className="mb-6">
                 <svg
@@ -324,126 +315,128 @@ function BrandDetail() {
         )}
 
         {/* Outlet Section */}
-        <div className="mt-20 mb-16 container mx-auto px-4 md:px-10">
-          {/* Decorative M */}
-          <div className="mb-6">
-            <svg
-              width="67"
-              height="19"
-              viewBox="0 0 67 19"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M2 16.0267C11 9.36005 28.5 -2.17329 26.5 5.02671C24.5 12.2267 21 15.36 19.5 16.0267C27.3333 9.6934 42.7 -1.37323 41.5 5.02671C40.3 11.4267 37.6667 15.0267 36.5 16.0267C45.8333 8.69338 63.6 -3.77329 60 5.02671C56.4 13.8267 61.5 16.0267 64.5 16.0267"
-                stroke="#FFB835"
-                strokeWidth="4"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
+        {outlets && outlets.length > 0 && (
+          <div className="mt-20 mb-16 container mx-auto px-4 md:px-10">
+            {/* Decorative M */}
+            <div className="mb-6">
+              <svg
+                width="67"
+                height="19"
+                viewBox="0 0 67 19"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 16.0267C11 9.36005 28.5 -2.17329 26.5 5.02671C24.5 12.2267 21 15.36 19.5 16.0267C27.3333 9.6934 42.7 -1.37323 41.5 5.02671C40.3 11.4267 37.6667 15.0267 36.5 16.0267C45.8333 8.69338 63.6 -3.77329 60 5.02671C56.4 13.8267 61.5 16.0267 64.5 16.0267"
+                  stroke="#FFB835"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
 
-          {/* Outlet Heading */}
-          <h2 className="font-runestars mb-12">
-            <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-2xl md:text-4xl text-white">
-              OUTLET {brand.nama?.toUpperCase() || 'BRAND'}
-            </span>
-          </h2>
+            {/* Outlet Heading */}
+            <h2 className="font-runestars mb-12">
+              <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-2xl md:text-4xl text-white">
+                OUTLET {brand.nama?.toUpperCase() || 'BRAND'}
+              </span>
+            </h2>
 
-          {/* Outlet Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {outlets && outlets.map((outlet) => (
-              <div key={outlet.id} className="bg-white rounded-2xl p-6 shadow-sm">
-                <div className="mb-6">
-                  <img
-                    src={`${API_BASE_URL}${outlet.image}`}
-                    alt={outlet.nama}
-                    className="w-1/3 h-48 object-cover rounded-xl"
-                  />
-                </div>
-
-                <h3 className="font-runestars text-2xl md:text-3xl mb-4">
-                  {outlet.nama?.toUpperCase() || 'OUTLET'}
-                </h3>
-
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-start gap-3">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="flex-shrink-0 mt-1"
-                    >
-                      <path
-                        d="M10 0C6.13 0 3 3.13 3 7C3 12.25 10 20 10 20C10 20 17 12.25 17 7C17 3.13 13.87 0 10 0ZM10 9.5C8.62 9.5 7.5 8.38 7.5 7C7.5 5.62 8.62 4.5 10 4.5C11.38 4.5 12.5 5.62 12.5 7C12.5 8.38 11.38 9.5 10 9.5Z"
-                        fill="#FFB835"
-                      />
-                    </svg>
-                    <p className="text-[#303030] text-sm md:text-base">
-                      {outlet.lokasi}
-                    </p>
+            {/* Outlet Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {outlets.map((outlet) => (
+                <div key={outlet.id} className="bg-white rounded-2xl p-6 shadow-sm">
+                  <div className="mb-6">
+                    <img
+                      src={`${API_BASE_URL}${outlet.image}`}
+                      alt={outlet.nama}
+                      className="w-1/3 h-48 object-cover rounded-xl"
+                    />
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="flex-shrink-0"
-                    >
-                      <path
-                        d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM10 18C5.59 18 2 14.41 2 10C2 5.59 5.59 2 10 2C14.41 2 18 5.59 18 10C18 14.41 14.41 18 10 18ZM10.5 5H9V11L14.2 14.2L15 12.9L10.5 10.2V5Z"
-                        fill="#FFB835"
-                      />
-                    </svg>
-                    <p className="text-[#303030] text-sm md:text-base">
-                      {outlet.jamOperasional}
-                    </p>
+                  <h3 className="font-runestars text-2xl md:text-3xl mb-4">
+                    {outlet.nama?.toUpperCase() || 'OUTLET'}
+                  </h3>
+
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-start gap-3">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="flex-shrink-0 mt-1"
+                      >
+                        <path
+                          d="M10 0C6.13 0 3 3.13 3 7C3 12.25 10 20 10 20C10 20 17 12.25 17 7C17 3.13 13.87 0 10 0ZM10 9.5C8.62 9.5 7.5 8.38 7.5 7C7.5 5.62 8.62 4.5 10 4.5C11.38 4.5 12.5 5.62 12.5 7C12.5 8.38 11.38 9.5 10 9.5Z"
+                          fill="#FFB835"
+                        />
+                      </svg>
+                      <p className="text-[#303030] text-sm md:text-base">
+                        {outlet.lokasi}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="flex-shrink-0"
+                      >
+                        <path
+                          d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM10 18C5.59 18 2 14.41 2 10C2 5.59 5.59 2 10 2C14.41 2 18 5.59 18 10C18 14.41 14.41 18 10 18ZM10.5 5H9V11L14.2 14.2L15 12.9L10.5 10.2V5Z"
+                          fill="#FFB835"
+                        />
+                      </svg>
+                      <p className="text-[#303030] text-sm md:text-base">
+                        {outlet.jamOperasional}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3 items-start">
+                    {outlet.whatsappUrl && (
+                      <a
+                        href={outlet.whatsappUrl.startsWith('http') ? outlet.whatsappUrl : `https://${outlet.whatsappUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-[#9C0000] hover:bg-[#7A0000] text-white px-6 py-3 rounded-md font-medium transition-colors"
+                      >
+                        Reservasi Disini
+                      </a>
+                    )}
+                    {outlet.googleMapsLink && (
+                      <a
+                        href={outlet.googleMapsLink.startsWith('http') ? outlet.googleMapsLink : `https://${outlet.googleMapsLink}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-[#9C0000] underline hover:text-[#7A0000] font-medium transition-colors py-3"
+                      >
+                        Lihat di Maps
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      </a>
+                    )}
                   </div>
                 </div>
-
-                <div className="flex flex-col sm:flex-row gap-3 items-start">
-                  {outlet.whatsappUrl && (
-                    <a
-                      href={outlet.whatsappUrl.startsWith('http') ? outlet.whatsappUrl : `https://${outlet.whatsappUrl}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-[#9C0000] hover:bg-[#7A0000] text-white px-6 py-3 rounded-md font-medium transition-colors"
-                    >
-                      Reservasi Disini
-                    </a>
-                  )}
-                  {outlet.googleMapsLink && (
-                    <a
-                      href={outlet.googleMapsLink.startsWith('http') ? outlet.googleMapsLink : `https://${outlet.googleMapsLink}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-[#9C0000] underline hover:text-[#7A0000] font-medium transition-colors py-3"
-                    >
-                      Lihat di Maps
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  </a>
-                  )}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

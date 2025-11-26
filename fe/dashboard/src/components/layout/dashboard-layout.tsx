@@ -210,7 +210,7 @@ export function DashboardLayout() {
               </DropdownMenu>
             </div>
           </header>
-          <div className="flex flex-1 flex-col overflow-auto">
+          <div className="flex flex-1 flex-col">
             <div className="grow p-10 bg-[#F9F9F9]">
               <Outlet />
             </div>

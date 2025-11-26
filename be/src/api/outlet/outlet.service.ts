@@ -9,7 +9,7 @@ import { RequestOutletUpdateDto } from 'src/api/outlet/dto/requests/update.dto';
 
 @Injectable()
 export class OutletService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(dto: RequestOutletCreateDto) {
     if (!dto.brandId) {
@@ -37,6 +37,7 @@ export class OutletService {
         nama: dto.nama,
         jamOperasional: dto.jamOperasional,
         lokasi: dto.lokasi,
+        provinsi: dto.provinsi,
         image: dto.image,
         googleMapsLink: dto.googleMapsLink,
         whatsappUrl: dto.whatsappUrl ?? null,
@@ -112,6 +113,7 @@ export class OutletService {
         brandId: dto.brandId ?? undefined,
         jamOperasional: dto.jamOperasional ?? undefined,
         lokasi: dto.lokasi ?? undefined,
+        provinsi: dto.provinsi ?? undefined,
         image: dto.image ?? undefined,
         googleMapsLink: dto.googleMapsLink ?? undefined,
         whatsappUrl: dto.whatsappUrl ?? undefined,

@@ -58,6 +58,7 @@ export const Route = createFileRoute("/_authenticated/berita/")({
 type BeritaItem = {
   id: string;
   judul: string;
+  slug: string;
   image?: string;
   createdDate?: string;
   penulis: string;
@@ -225,9 +226,9 @@ function RouteComponent() {
                 <CalendarIcon className="mr-2 size-4 text-[#A25C67]" />
                 {dateRange?.from && dateRange?.to
                   ? `${format(dateRange.from, "MMM dd yyyy")} - ${format(
-                      dateRange.to,
-                      "MMM dd yyyy",
-                    )}`
+                    dateRange.to,
+                    "MMM dd yyyy",
+                  )}`
                   : dateRange?.from
                     ? `${format(dateRange.from, "MMM dd yyyy")} - …`
                     : "Pilih Rentang Tanggal"}
@@ -372,7 +373,7 @@ function RouteComponent() {
                           >
                             <Link
                               to="/berita/$beritaId/edit"
-                              params={{ beritaId: item.id }}
+                              params={{ beritaId: item.slug }}
                             >
                               <img
                                 src={Edit}
@@ -392,7 +393,7 @@ function RouteComponent() {
                                 }
                               >
                                 {isDeletePending &&
-                                deleteTargetId === item.id ? (
+                                  deleteTargetId === item.id ? (
                                   <Loader2 className="size-4 animate-spin text-white" />
                                 ) : (
                                   <Trash2 className="size-4 text-white" />
@@ -422,7 +423,7 @@ function RouteComponent() {
                                   onClick={() => handleDelete(item.id)}
                                 >
                                   {isDeletePending &&
-                                  deleteTargetId === item.id ? (
+                                    deleteTargetId === item.id ? (
                                     <Loader2 className="mr-2 size-4 animate-spin" />
                                   ) : null}
                                   Hapus

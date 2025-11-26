@@ -25,7 +25,7 @@ import { JwtAuthGuard } from 'src/api/auth/guard/jwt-guard.auth';
 @ApiTags('berita')
 @Controller('berita')
 export class BeritaController {
-  constructor(private readonly beritaService: BeritaService) {}
+  constructor(private readonly beritaService: BeritaService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -93,12 +93,12 @@ export class BeritaController {
     return this.beritaService.findAll({ page, limit, startDate, endDate });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.beritaService.findOne(id);
+  @Get(':slug')
+  findOne(@Param('slug') slug: string) {
+    return this.beritaService.findOne(slug);
   }
 
-  @Put(':id')
+  @Put(':slug')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image', { storage: uploadDiskStorage }))
   @ApiConsumes('multipart/form-data')
@@ -119,7 +119,7 @@ export class BeritaController {
     },
   })
   update(
-    @Param('id') id: string,
+    @Param('slug') slug: string,
     @Body() dto: RequestBeritaUpdateDto,
     @UploadedFile() image?: StoredFile,
   ) {
@@ -128,7 +128,7 @@ export class BeritaController {
       ...(image ? { image: `/uploads/${image.filename}` } : {}),
     };
 
-    return this.beritaService.update(id, payload);
+    return this.beritaService.update(slug, payload);
   }
 
   @Delete(':id')

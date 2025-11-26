@@ -230,8 +230,8 @@ function RouteComponent() {
             </Button>
           </div>
 
-          <div className="overflow-hidden rounded-3xl border border-[#F0F1F3] bg-white">
-            <Table>
+          <div className="overflow-x-auto rounded-3xl border border-[#F0F1F3] bg-white">
+            <Table className="min-w-[800px]">
               <TableHeader className="bg-[#F6F7F9]">
                 <TableRow className="border-b border-[#F0F1F3]">
                   <TableHead className="w-16 text-center text-[#9C1A1C]">
@@ -302,7 +302,7 @@ function RouteComponent() {
                       <TableCell className="text-sm font-medium text-[#4F4F4F]">
                         {brand.nama}
                       </TableCell>
-                      <TableCell className="text-sm text-[#6B7280]">
+                      <TableCell className="text-sm text-[#6B7280] max-w-[300px] truncate">
                         {brand.description}
                       </TableCell>
                       <TableCell>

@@ -5,6 +5,7 @@ import { apiClient, API_BASE_URL } from "../lib/api-client";
 
 type BeritaItem = {
   id: string;
+  slug: string;
   judul: string;
   image?: string | null;
   createdDate: string;
@@ -38,18 +39,18 @@ type PromoListMeta = {
   totalPages?: number;
 };
 
-async function fetchBeritaById(id: string) {
-  const response = await apiClient.get<BeritaItem>(`/berita/${id}`);
+async function fetchBeritaBySlug(slug: string) {
+  const response = await apiClient.get<BeritaItem>(`/berita/${slug}`);
   return response.data;
 }
 
-async function fetchRelatedBerita(currentId: string) {
+async function fetchRelatedBerita(currentSlug: string) {
   const response = await apiClient.get<BeritaItem[], BeritaListMeta>(
     `/berita?page=1&limit=9`,
   );
 
   const items = response.data ?? [];
-  return items.filter((item) => item.id !== currentId);
+  return items.filter((item) => item.slug !== currentSlug);
 }
 
 async function fetchPromoHighlights() {
@@ -124,16 +125,16 @@ function buildContentHtml(content?: string) {
 }
 
 function BeritaDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
 
   const {
     data: berita,
     isLoading: beritaLoading,
     error: beritaError,
   } = useQuery({
-    queryKey: ["berita", id],
-    queryFn: () => fetchBeritaById(id!),
-    enabled: !!id,
+    queryKey: ["berita", slug],
+    queryFn: () => fetchBeritaBySlug(slug!),
+    enabled: !!slug,
   });
 
   const {
@@ -141,9 +142,9 @@ function BeritaDetail() {
     isLoading: relatedLoading,
     error: relatedError,
   } = useQuery({
-    queryKey: ["berita", "related", id],
-    queryFn: () => fetchRelatedBerita(id!),
-    enabled: !!id,
+    queryKey: ["berita", "related", slug],
+    queryFn: () => fetchRelatedBerita(slug!),
+    enabled: !!slug,
   });
 
   const { data: promoHighlights = [] } = useQuery({
@@ -170,18 +171,18 @@ function BeritaDetail() {
     };
   }, [relatedArticles]);
 
-  const handleNavigate = (targetId: string) => {
+  const handleNavigate = (targetSlug: string) => {
     if (typeof window === "undefined") {
       return;
     }
 
-    window.location.href = `/berita/${targetId}`;
+    window.location.href = `/berita/${targetSlug}`;
   };
 
-  if (!id) {
+  if (!slug) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500 font-medium">ID berita tidak ditemukan.</p>
+        <p className="text-gray-500 font-medium">Berita tidak ditemukan.</p>
       </div>
     );
   }
@@ -409,129 +410,66 @@ function BeritaDetail() {
                   Memuat berita terkait...
                 </div>
               ) : primaryRelated.length > 0 ? (
-                <div className="hidden md:flex flex-col divide-y divide-[#C1C1C1]">
-                  {primaryRelated.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      className="flex gap-4 py-4 text-left first:pt-0 last:pb-0"
-                      onClick={() => handleNavigate(item.id)}
-                    >
-                      <img
-                        src={getImageUrl(item.image)}
-                        alt={item.judul}
-                        className="h-[100px] w-[100px] rounded-lg object-cover"
-                      />
-                      <div>
-                        <p className="text-sm text-[#9C0000]">
-                          {formatDateTime(item.createdDate)}
-                        </p>
-                        <p className="text-sm font-semibold text-[#585858] line-clamp-2">
-                          {item.judul}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                <>
+                  <div className="hidden md:flex flex-col divide-y divide-[#C1C1C1]">
+                    {primaryRelated.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className="flex gap-4 py-4 text-left first:pt-0 last:pb-0"
+                        onClick={() => handleNavigate(item.slug)}
+                      >
+                        <img
+                          src={getImageUrl(item.image)}
+                          alt={item.judul}
+                          className="h-[100px] w-[100px] rounded-lg object-cover"
+                        />
+                        <div>
+                          <p className="text-sm text-[#9C0000]">
+                            {formatDateTime(item.createdDate)}
+                          </p>
+                          <p className="text-sm font-semibold text-[#585858] line-clamp-2">
+                            {item.judul}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="md:hidden flex flex-col gap-y-4">
+                    {primaryRelated.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className="bg-[#F7F7F7] rounded-lg overflow-hidden flex p-4 items-center gap-3 text-left"
+                        onClick={() => handleNavigate(item.slug)}
+                      >
+                        <img
+                          src={getImageUrl(item.image)}
+                          alt={item.judul}
+                          className="w-[100px] h-[80px] md:w-[150px] md:h-[120px] object-cover rounded-md"
+                        />
+                        <div className="flex flex-col gap-y-2">
+                          <div className="text-[#9C0000] text-sm font-medium mb-1">
+                            {formatDateTime(item.createdDate)}
+                          </div>
+                          <h3 className="font-semibold text-sm line-clamp-2">
+                            {item.judul}
+                          </h3>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </>
               ) : (
                 <p className="text-sm text-[#9B9B9B]">{relatedMessage}</p>
               )}
-
-              <div className="md:hidden flex flex-col gap-y-4">
-                {relatedLoading ? (
-                  <div className="py-4 text-center text-sm text-gray-500">
-                    Memuat berita terkait...
-                  </div>
-                ) : primaryRelated.length > 0 ? (
-                  primaryRelated.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      className="bg-[#F7F7F7] rounded-lg overflow-hidden flex p-4 items-center gap-3 text-left"
-                      onClick={() => handleNavigate(item.id)}
-                    >
-                      <img
-                        src={getImageUrl(item.image)}
-                        alt={item.judul}
-                        className="w-[100px] h-[80px] md:w-[150px] md:h-[120px] object-cover rounded-md"
-                      />
-                      <div className="flex flex-col gap-y-2">
-                        <div className="text-[#9C0000] text-sm font-medium mb-1">
-                          {formatDateTime(item.createdDate)}
-                        </div>
-                        <h3 className="font-semibold text-sm line-clamp-2">
-                          {item.judul}
-                        </h3>
-                      </div>
-                    </button>
-                  ))
-                ) : (
-                  <p className="text-sm text-[#9B9B9B]">{relatedMessage}</p>
-                )}
-              </div>
-            </div>
-
-
-            <div className="mt-6 hidden md:block bg-[#F7F7F7] p-4 md:p-6 rounded-lg">
-              <div className="mb-8">
-                <div className="mb-2">
-                  <svg
-                    width="67"
-                    height="19"
-                    viewBox="0 0 67 19"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M2 16.0267C11 9.36005 28.5 -2.17329 26.5 5.02671C24.5 12.2267 21 15.36 19.5 16.0267C27.3333 9.6934 42.7 -1.37323 41.5 5.02671C40.3 11.4267 37.6667 15.0267 36.5 16.0267C45.8333 8.69338 63.6 -3.77329 60 5.02671C56.4 13.8267 61.5 16.0267 64.5 16.0267"
-                      stroke="#FFB835"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </div>
-                <h2 className="font-runestars relative mb-6">
-                  <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] whitespace-nowrap text-3xl font-extrabold text-white md:text-4xl">
-                    Promo
-                  </span>
-                </h2>
-              </div>
-              <div className="flex flex-col divide-y divide-[#C1C1C1]">
-                {promoHighlights.length > 0 ? (
-                  promoHighlights.map((promo) => (
-                    <a
-                      key={promo.id}
-                      href={`/promo/${promo.id}`}
-                      className="flex gap-4 py-4 first:pt-0 last:pb-0"
-                    >
-                      <img
-                        src={`${API_BASE_URL}${promo.image}`}
-                        alt={promo.title}
-                        className="h-[80px] w-[60px] rounded-lg object-cover flex-shrink-0"
-                      />
-                      <div className="flex flex-col gap-y-2">
-                        <p className="text-sm font-bold">{promo.title}</p>
-                        <p className="text-sm text-[#9B9B9B] line-clamp-3">
-                          {promo.subtitle}
-                        </p>
-                        <span className="text-xs text-[#9C0000] font-semibold">
-                          Berlaku hingga {formatDateTime(promo.berlakuHingga)}
-                        </span>
-                      </div>
-                    </a>
-                  ))
-                ) : (
-                  <p className="col-span-3 text-center text-sm text-[#9B9B9B]">
-                    Promo belum tersedia saat ini.
-                  </p>
-                )}
-              </div>
             </div>
           </aside>
         </div>
 
-        <section className="mt-10 mb-16">
-          <div className="mb-8">
+        <section className="mt-10 mb-16 hidden md:block">
+          <div className="mb-8 ">
             <div className="mb-2">
               <svg
                 width="67"
@@ -550,7 +488,7 @@ function BeritaDetail() {
             </div>
             <h2 className="font-runestars relative mb-6">
               <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] whitespace-nowrap text-3xl font-extrabold text-white md:text-4xl">
-                BERITA ENGGAL
+                REKOMENDASI UNTUKMU
               </span>
             </h2>
           </div>
@@ -567,7 +505,7 @@ function BeritaDetail() {
                       key={article.id}
                       type="button"
                       className="overflow-hidden rounded-lg bg-[#F7F7F7] shadow-sm text-left transition-transform hover:-translate-y-1"
-                      onClick={() => handleNavigate(article.id)}
+                      onClick={() => handleNavigate(article.slug)}
                     >
                       <div className="m-4">
                         <div className="relative overflow-hidden rounded-lg">
@@ -627,7 +565,7 @@ function BeritaDetail() {
                 </div>
                 <div className="flex flex-col divide-y divide-[#C1C1C1]">
                   {promoHighlights.length > 0 ? (
-                    promoHighlights.map((promo) => (
+                    promoHighlights.slice(0, 3).map((promo) => (
                       <a
                         key={promo.id}
                         href={`/promo/${promo.id}`}

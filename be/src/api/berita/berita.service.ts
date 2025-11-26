@@ -6,12 +6,25 @@ import { RequestBeritaUpdateDto } from 'src/api/berita/dto/requests/update.dto';
 
 @Injectable()
 export class BeritaService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
+
+  private generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
 
   async create(dto: RequestBeritaCreateDto) {
+    const slug = this.generateSlug(dto.judul);
+
     return this.prisma.berita.create({
       data: {
         judul: dto.judul,
+        slug,
         image: dto.image ?? undefined,
         createdDate: new Date(dto.createdDate),
         penulis: dto.penulis,
@@ -65,22 +78,22 @@ export class BeritaService {
     };
   }
 
-  async findOne(id: string) {
-    const berita = await this.prisma.berita.findUnique({ where: { id } });
+  async findOne(slug: string) {
+    const berita = await this.prisma.berita.findUnique({ where: { slug } });
     if (!berita) {
       throw new NotFoundException('Berita not found');
     }
     return berita;
   }
 
-  async update(id: string, dto: RequestBeritaUpdateDto) {
-    const existing = await this.prisma.berita.findUnique({ where: { id } });
+  async update(slug: string, dto: RequestBeritaUpdateDto) {
+    const existing = await this.prisma.berita.findUnique({ where: { slug: slug } });
     if (!existing) {
       throw new NotFoundException('Berita not found');
     }
 
     return this.prisma.berita.update({
-      where: { id },
+      where: { slug },
       data: {
         judul: dto.judul ?? undefined,
         image: dto.image ?? undefined,

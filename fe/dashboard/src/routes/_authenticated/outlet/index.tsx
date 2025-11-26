@@ -45,7 +45,10 @@ type OutletItem = {
   id: string;
   nama: string;
   kota: string;
-  namaBrand: string;
+  brand: {
+    id: string;
+    nama: string;
+  };
   jamOperasional: string;
   whatsappUrl: string;
   googleMapsLink: string;
@@ -351,7 +354,7 @@ function RouteComponent() {
                         {outlet.nama}
                       </TableCell>
                       <TableCell className="text-sm text-[#6B7280]">
-                        {outlet.namaBrand}
+                        {outlet.brand.nama}
                       </TableCell>
                       <TableCell className="text-sm text-[#6B7280]">
                         {outlet.jamOperasional}
@@ -387,7 +390,7 @@ function RouteComponent() {
                                 }
                               >
                                 {isDeletePending &&
-                                deleteTargetId === outlet.id ? (
+                                  deleteTargetId === outlet.id ? (
                                   <Loader2 className="size-4 animate-spin text-white" />
                                 ) : (
                                   <Trash2 className="size-4 text-white" />
@@ -417,7 +420,7 @@ function RouteComponent() {
                                   onClick={() => handleDelete(outlet.id)}
                                 >
                                   {isDeletePending &&
-                                  deleteTargetId === outlet.id ? (
+                                    deleteTargetId === outlet.id ? (
                                     <Loader2 className="mr-2 size-4 animate-spin" />
                                   ) : null}
                                   Hapus

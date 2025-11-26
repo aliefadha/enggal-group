@@ -140,8 +140,7 @@ function RouteComponent() {
       !trimmedTitle ||
       !trimmedAuthor ||
       !trimmedContent ||
-      !publishDate ||
-      !selectedImageFile
+      !publishDate
     ) {
       setSubmitError("Mohon lengkapi semua field yang wajib diisi.");
       return;
@@ -157,7 +156,9 @@ function RouteComponent() {
     formData.append("penulis", trimmedAuthor);
     formData.append("content", trimmedContent);
     formData.append("createdDate", format(publishDate, "yyyy-MM-dd"));
-    formData.append("image", selectedImageFile);
+    if (selectedImageFile) {
+      formData.append("image", selectedImageFile);
+    }
 
     mutateNews(formData);
   };
@@ -181,7 +182,7 @@ function RouteComponent() {
         <CardContent className="space-y-8 p-6">
           <div className="space-y-2">
             <Label className="text-sm font-semibold text-[#2E2E2E]">
-              Upload Foto<span className="text-[#C1272D]">*</span>
+              Upload Foto
             </Label>
             <p className="text-sm text-[#D74E4E]">
               Disarankan menggunakan foto dengan ukuran rasio 3:4

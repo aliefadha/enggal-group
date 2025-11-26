@@ -25,7 +25,7 @@ import { JwtAuthGuard } from '../auth/guard/jwt-guard.auth';
 @ApiTags('outlet')
 @Controller('outlet')
 export class OutletController {
-  constructor(private readonly outletService: OutletService) {}
+  constructor(private readonly outletService: OutletService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)

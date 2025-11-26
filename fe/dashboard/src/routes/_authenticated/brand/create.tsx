@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Editor } from "@/components/ui/editor";
 import { ApiError, apiClient } from "@/lib/api-client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -50,11 +51,17 @@ function RouteComponent() {
   const [selectedLogoFile, setSelectedLogoFile] = React.useState<File | null>(
     null,
   );
+  const [logoPreviewUrl, setLogoPreviewUrl] = React.useState<string | null>(
+    null,
+  );
 
   const [selectedCoverImageName, setSelectedCoverImageName] =
     React.useState("");
   const [selectedCoverImageFile, setSelectedCoverImageFile] =
     React.useState<File | null>(null);
+  const [coverImagePreviewUrl, setCoverImagePreviewUrl] = React.useState<
+    string | null
+  >(null);
 
   const [submitError, setSubmitError] = React.useState<string | null>(null);
 
@@ -85,6 +92,18 @@ function RouteComponent() {
     },
   });
 
+  // Cleanup preview URLs on unmount
+  React.useEffect(() => {
+    return () => {
+      if (logoPreviewUrl) {
+        URL.revokeObjectURL(logoPreviewUrl);
+      }
+      if (coverImagePreviewUrl) {
+        URL.revokeObjectURL(coverImagePreviewUrl);
+      }
+    };
+  }, [logoPreviewUrl, coverImagePreviewUrl]);
+
   const handleChange = (key: keyof typeof formState, value: string) => {
     setFormState((prev) => ({
       ...prev,
@@ -101,6 +120,20 @@ function RouteComponent() {
     const file = event.target.files?.[0] ?? null;
     setSelectedLogoName(file ? file.name : "");
     setSelectedLogoFile(file);
+
+    // Clean up old preview URL
+    if (logoPreviewUrl) {
+      URL.revokeObjectURL(logoPreviewUrl);
+    }
+
+    // Create new preview URL
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setLogoPreviewUrl(previewUrl);
+    } else {
+      setLogoPreviewUrl(null);
+    }
+
     if (submitError) {
       setSubmitError(null);
     }
@@ -112,6 +145,20 @@ function RouteComponent() {
     const file = event.target.files?.[0] ?? null;
     setSelectedCoverImageName(file ? file.name : "");
     setSelectedCoverImageFile(file);
+
+    // Clean up old preview URL
+    if (coverImagePreviewUrl) {
+      URL.revokeObjectURL(coverImagePreviewUrl);
+    }
+
+    // Create new preview URL
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setCoverImagePreviewUrl(previewUrl);
+    } else {
+      setCoverImagePreviewUrl(null);
+    }
+
     if (submitError) {
       setSubmitError(null);
     }
@@ -200,7 +247,17 @@ function RouteComponent() {
               Upload Logo
             </Label>
             <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-6 text-center">
-              <Upload className="size-8 text-[#C1272D]" />
+              {logoPreviewUrl ? (
+                <div className="w-full max-w-xs">
+                  <img
+                    src={logoPreviewUrl}
+                    alt="Logo Preview"
+                    className="h-auto w-full rounded-xl object-contain"
+                  />
+                </div>
+              ) : (
+                <Upload className="size-8 text-[#C1272D]" />
+              )}
               <div className="text-sm text-[#6B7280]">
                 Pilih Foto atau Drop Disini
               </div>
@@ -211,7 +268,7 @@ function RouteComponent() {
                 disabled={isCreatePending}
                 onClick={() => logoFileInputRef.current?.click()}
               >
-                Browse File
+                {logoPreviewUrl ? "Ganti File" : "Browse File"}
               </Button>
               <input
                 ref={logoFileInputRef}
@@ -235,7 +292,17 @@ function RouteComponent() {
               Upload Cover Image
             </Label>
             <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-[#D6DAE1] bg-[#F9FBFD] p-6 text-center">
-              <Upload className="size-8 text-[#C1272D]" />
+              {coverImagePreviewUrl ? (
+                <div className="w-full max-w-2xl">
+                  <img
+                    src={coverImagePreviewUrl}
+                    alt="Cover Image Preview"
+                    className="h-auto w-full rounded-xl object-contain"
+                  />
+                </div>
+              ) : (
+                <Upload className="size-8 text-[#C1272D]" />
+              )}
               <div className="text-sm text-[#6B7280]">
                 Pilih Foto atau Drop Disini
               </div>
@@ -246,7 +313,7 @@ function RouteComponent() {
                 disabled={isCreatePending}
                 onClick={() => coverImageFileInputRef.current?.click()}
               >
-                Browse File
+                {coverImagePreviewUrl ? "Ganti File" : "Browse File"}
               </Button>
               <input
                 ref={coverImageFileInputRef}
@@ -313,12 +380,12 @@ function RouteComponent() {
             <Label className="text-sm font-medium text-[#2E2E2E]">
               Content
             </Label>
-            <Textarea
+            <Editor
               value={formState.content}
-              onChange={(event) => handleChange("content", event.target.value)}
+              onChange={(value) => handleChange("content", value)}
               placeholder="Masukan Content Brand (optional)"
-              className="min-h-[200px] rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
               disabled={isCreatePending}
+              className="min-h-[200px]"
             />
           </div>
 
@@ -363,14 +430,14 @@ function RouteComponent() {
             {/* Twitter Link */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[#2E2E2E]">
-                Twitter Link
+                Tiktok Link
               </Label>
               <Input
                 value={formState.twitterLink}
                 onChange={(event) =>
                   handleChange("twitterLink", event.target.value)
                 }
-                placeholder="https://twitter.com/yourbrand"
+                placeholder="https://tiktok.com/@yourbrand"
                 className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
                 disabled={isCreatePending}
               />

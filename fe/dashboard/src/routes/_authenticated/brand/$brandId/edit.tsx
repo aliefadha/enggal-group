@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Editor } from "@/components/ui/editor";
 import {
     Dialog,
     DialogContent,
@@ -818,12 +819,12 @@ function RouteComponent() {
                         <Label className="text-sm font-medium text-[#2E2E2E]">
                             Content
                         </Label>
-                        <Textarea
+                        <Editor
                             value={formState.content}
-                            onChange={(event) => handleChange("content", event.target.value)}
+                            onChange={(value) => handleChange("content", value)}
                             placeholder="Masukan Content Brand (optional)"
-                            className="min-h-[200px] rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
                             disabled={isUpdatePending}
+                            className="min-h-[200px]"
                         />
                     </div>
 
@@ -868,14 +869,14 @@ function RouteComponent() {
                         {/* Twitter Link */}
                         <div className="space-y-2">
                             <Label className="text-sm font-medium text-[#2E2E2E]">
-                                Twitter Link
+                                Tiktok Link
                             </Label>
                             <Input
                                 value={formState.twitterLink}
                                 onChange={(event) =>
                                     handleChange("twitterLink", event.target.value)
                                 }
-                                placeholder="https://twitter.com/yourbrand"
+                                placeholder="https://tiktok.com/yourbrand"
                                 className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
                                 disabled={isUpdatePending}
                             />

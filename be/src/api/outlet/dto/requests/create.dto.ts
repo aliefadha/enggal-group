@@ -14,6 +14,10 @@ export class RequestOutletCreateDto {
   @IsNotEmpty()
   lokasi!: string;
 
+  @ApiProperty({ example: 'Jakarta' })
+  @IsNotEmpty()
+  provinsi!: string;
+
   @ApiPropertyOptional({ example: '/uploads/outlet-jakarta.png' })
   @IsOptional()
   image?: string;

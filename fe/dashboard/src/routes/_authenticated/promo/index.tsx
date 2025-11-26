@@ -59,8 +59,10 @@ type PromoItem = {
   id: string;
   title: string;
   berlakuHingga: string;
-  brandId: string;
-  namaBrand: string;
+  brand: {
+    id: string,
+    nama: string
+  }
 };
 
 type PromoListMeta = {
@@ -161,7 +163,7 @@ function RouteComponent() {
   const promos = React.useMemo(() => {
     const items = data?.data ?? [];
     return items.filter((item) =>
-      (item.namaBrand ?? "").toLowerCase().includes(searchTerm.toLowerCase()),
+      (item.brand.nama ?? "").toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [data?.data, searchTerm]);
 
@@ -224,9 +226,9 @@ function RouteComponent() {
                 <CalendarIcon className="mr-2 size-4 text-[#A25C67]" />
                 {dateRange?.from && dateRange?.to
                   ? `${format(dateRange.from, "MMM dd yyyy")} - ${format(
-                      dateRange.to,
-                      "MMM dd yyyy",
-                    )}`
+                    dateRange.to,
+                    "MMM dd yyyy",
+                  )}`
                   : dateRange?.from
                     ? `${format(dateRange.from, "MMM dd yyyy")} - …`
                     : "Pilih Rentang Tanggal"}
@@ -354,7 +356,7 @@ function RouteComponent() {
                         {promo.title}
                       </TableCell>
                       <TableCell className="text-sm text-[#6B7280]">
-                        {promo.namaBrand}
+                        {promo.brand.nama}
                       </TableCell>
                       <TableCell className="text-sm text-[#6B7280]">
                         {formatDisplayDate(promo.berlakuHingga)}
@@ -389,7 +391,7 @@ function RouteComponent() {
                                 }
                               >
                                 {isDeletePending &&
-                                deleteTargetId === promo.id ? (
+                                  deleteTargetId === promo.id ? (
                                   <Loader2 className="size-4 animate-spin text-white" />
                                 ) : (
                                   <Trash2 className="size-4 text-white" />
@@ -419,7 +421,7 @@ function RouteComponent() {
                                   onClick={() => handleDelete(promo.id)}
                                 >
                                   {isDeletePending &&
-                                  deleteTargetId === promo.id ? (
+                                    deleteTargetId === promo.id ? (
                                     <Loader2 className="mr-2 size-4 animate-spin" />
                                   ) : null}
                                   Hapus

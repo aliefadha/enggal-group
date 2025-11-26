@@ -15,7 +15,7 @@ export function AppRoutes() {
       <Route path="/brand" element={<Brand />} />,
       <Route path="/brand/:id" element={<BrandDetail />} />,
       <Route path="/berita" element={<Berita />} />,
-      <Route path="/berita/:id" element={<BeritaDetail />} />,
+      <Route path="/berita/:slug" element={<BeritaDetail />} />,
       <Route path="/promo" element={<Promo />} />,
       <Route path="/promo/:id" element={<PromoDetail />} />,
       <Route path="/career" element={<Career />} />,

@@ -166,9 +166,7 @@ function RouteComponent() {
 
     if (
       !trimmedNama ||
-      !trimmedTitle ||
-      !trimmedLinkedinUrl ||
-      !trimmedInstagramUrl
+      !trimmedTitle
     ) {
       setSubmitError("Mohon lengkapi semua field yang wajib diisi.");
       return;
@@ -179,8 +177,14 @@ function RouteComponent() {
     const formData = new FormData();
     formData.append("nama", trimmedNama);
     formData.append("title", trimmedTitle);
-    formData.append("linkedinUrl", trimmedLinkedinUrl);
-    formData.append("instagramUrl", trimmedInstagramUrl);
+
+    if (trimmedLinkedinUrl) {
+      formData.append("linkedinUrl", trimmedLinkedinUrl);
+    }
+
+    if (trimmedInstagramUrl) {
+      formData.append("instagramUrl", trimmedInstagramUrl);
+    }
 
     if (selectedImageFile) {
       formData.append("image", selectedImageFile);
@@ -332,7 +336,7 @@ function RouteComponent() {
             {/* LinkedIn Link */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[#2E2E2E]">
-                LinkedIn URL<span className="text-[#C1272D]">*</span>
+                LinkedIn URL
               </Label>
               <Input
                 value={formState.linkedinUrl}
@@ -348,7 +352,7 @@ function RouteComponent() {
             {/* Instagram Link */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[#2E2E2E]">
-                Instagram URL<span className="text-[#C1272D]">*</span>
+                Instagram URL
               </Label>
               <Input
                 value={formState.instagramUrl}

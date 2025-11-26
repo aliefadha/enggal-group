@@ -27,6 +27,125 @@ type BrandOption = {
   nama: string;
 };
 
+type ProvinsiOption = {
+  id: string;
+  nama: string;
+  value: string;
+}
+
+const provinsiOptions: ProvinsiOption[] = [
+  {
+    id: "1",
+    nama: "Jawa Barat",
+    value: "jawa-barat",
+  },
+  {
+    id: "2",
+    nama: "Jawa Tengah",
+    value: "jawa-tengah",
+  },
+  {
+    id: "3",
+    nama: "Jawa Timur",
+    value: "jawa-timur",
+  },
+  {
+    id: "4",
+    nama: "Jawa Tengah",
+    value: "jawa-tengah",
+  },
+  {
+    id: "5",
+    nama: "Madura",
+    value: "madura",
+  },
+  {
+    id: "6",
+    nama: "Aceh",
+    value: "aceh",
+  },
+  {
+    id: "7",
+    nama: "Sumatra Utara",
+    value: "sumatra-utara",
+  },
+  {
+    id: "8",
+    nama: "Sumatra Barat",
+    value: "sumatra-barat",
+  },
+  {
+    id: "9",
+    nama: "Riau",
+    value: "riau",
+  },
+  {
+    id: "10",
+    nama: "Jambi",
+    value: "jambi",
+  },
+  {
+    id: "11",
+    nama: "Sumatra Selatan",
+    value: "sumatra-selatan",
+  },
+  {
+    id: "12",
+    nama: "Lampung",
+    value: "lampung",
+  },
+  {
+    id: "13",
+    nama: "Banten",
+    value: "banten",
+  },
+  {
+    id: "14",
+    nama: "Jakarta",
+    value: "jakarta",
+  },
+  {
+    id: "15",
+    nama: "Kalimantan Barat",
+    value: "kalimantan-barat",
+  },
+  {
+    id: "16",
+    nama: "Kalimantan Tengah",
+    value: "kalimantan-tengah",
+  },
+  {
+    id: "17",
+    nama: "Kalimantan Timur",
+    value: "kalimantan-timur",
+  },
+  {
+    id: "18",
+    nama: "Kalimantan Selatan",
+    value: "kalimantan-selatan",
+  },
+  {
+    id: "19",
+    nama: "Nusa Tenggara Timur",
+    value: "nusa-tenggara-timur",
+  },
+  {
+    id: "20",
+    nama: "Nusa Tenggara Barat",
+    value: "nusa-tenggara-barat",
+  },
+  {
+    id: "21",
+    nama: "Bali",
+    value: "bali",
+  },
+  {
+    id: "22",
+    nama: "Makassar",
+    value: "makassar",
+  },
+];
+
 type BrandListMeta = {
   page?: number;
   limit?: number;
@@ -66,27 +185,6 @@ const normalizeTimeValue = (value: string) => {
   const hour = rawHour.padStart(2, "0").slice(-2);
 
   return `${hour}:${minute}`;
-};
-
-const timeToMinutes = (value: string) => {
-  if (!value) {
-    return null;
-  }
-
-  const [hour, minute] = value.split(":").map(Number);
-
-  if (
-    Number.isNaN(hour) ||
-    Number.isNaN(minute) ||
-    hour < 0 ||
-    hour > 23 ||
-    minute < 0 ||
-    minute > 59
-  ) {
-    return null;
-  }
-
-  return hour * 60 + minute;
 };
 
 const formatOperationalHours = (start: string, end: string) => {
@@ -129,6 +227,9 @@ function RouteComponent() {
   const [selectedBrand, setSelectedBrand] = React.useState<string | undefined>(
     undefined,
   );
+  const [selectedProvinsi, setSelectedProvinsi] = React.useState<string | undefined>(
+    undefined
+  )
   const [formState, setFormState] = React.useState({
     name: "",
     address: "",
@@ -221,6 +322,14 @@ function RouteComponent() {
     }
   };
 
+  const handleProvinsiChange = (value: string) => {
+    setSelectedProvinsi(value);
+    setSubmitError(null);
+    if (isCreateSuccess || isCreateError) {
+      resetOutletMutation();
+    }
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
     setSelectedImageFile(file);
@@ -284,22 +393,6 @@ function RouteComponent() {
     const trimmedOperationalHours = formattedOperationalHours.trim();
     const trimmedMapsUrl = formState.mapsUrl.trim();
     const trimmedWhatsappUrl = formState.whatsappUrl.trim();
-    const startMinutes = timeToMinutes(operationalHours.start);
-    const endMinutes = timeToMinutes(operationalHours.end);
-
-    if (
-      startMinutes !== null &&
-      endMinutes !== null &&
-      endMinutes < startMinutes
-    ) {
-      const errorMessage = "Jam selesai tidak boleh lebih awal dari jam mulai.";
-      toast.error(errorMessage);
-      if (isCreateSuccess || isCreateError) {
-        resetOutletMutation();
-      }
-      return;
-    }
-
     if (
       !selectedBrand ||
       !trimmedName ||
@@ -307,7 +400,8 @@ function RouteComponent() {
       !trimmedOperationalHours ||
       !trimmedMapsUrl ||
       !trimmedWhatsappUrl ||
-      !selectedImageFile
+      !selectedImageFile ||
+      !selectedProvinsi
     ) {
       setSubmitError("Mohon lengkapi semua field yang wajib diisi.");
       return;
@@ -325,6 +419,7 @@ function RouteComponent() {
     formData.append("googleMapsLink", trimmedMapsUrl);
     formData.append("whatsappUrl", trimmedWhatsappUrl);
     formData.append("brandId", selectedBrand);
+    formData.append("provinsi", selectedProvinsi);
     formData.append("image", selectedImageFile);
 
     mutateOutlet(formData);
@@ -460,17 +555,46 @@ function RouteComponent() {
               ) : null}
             </div>
           </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-[#2E2E2E]">
-              Alamat Outlet<span className="text-[#C1272D]">*</span>
-            </Label>
-            <Input
-              value={formState.address}
-              onChange={(event) => handleChange("address", event.target.value)}
-              placeholder="Jln. A Yani, Bandung"
-              disabled={isCreatePending}
-              className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
-            />
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[#2E2E2E]">
+                Alamat Outlet<span className="text-[#C1272D]">*</span>
+              </Label>
+              <Input
+                value={formState.address}
+                onChange={(event) => handleChange("address", event.target.value)}
+                placeholder="Jln. A Yani, Bandung"
+                disabled={isCreatePending}
+                className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[#2E2E2E]">
+                Provinsi<span className="text-[#C1272D]">*</span>
+              </Label>
+              <Select
+                value={selectedProvinsi}
+                onValueChange={handleProvinsiChange}
+              >
+                <SelectTrigger className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-left text-sm text-[#4F4F4F]">
+                  <SelectValue
+                    placeholder="Pilih Provinsi"
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {provinsiOptions.map((provinsi) => (
+                    <SelectItem key={provinsi.id} value={provinsi.value}>
+                      {provinsi.nama}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {isBrandError ? (
+                <p className="text-xs text-[#C1272D]">
+                  {(brandError as Error)?.message ?? "Gagal memuat data brand."}
+                </p>
+              ) : null}
+            </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -521,7 +645,7 @@ function RouteComponent() {
                 onChange={(event) =>
                   handleChange("mapsUrl", event.target.value)
                 }
-                placeholder="https://share.google/olg0GDvQ6t759Lbej"
+                placeholder="https://maps.app.goo.gl/xxxxxx"
                 disabled={isCreatePending}
                 className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
               />

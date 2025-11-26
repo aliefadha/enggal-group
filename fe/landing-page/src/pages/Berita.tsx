@@ -3,6 +3,7 @@ import { apiClient, API_BASE_URL } from "../lib/api-client";
 
 type BeritaItem = {
   id: string;
+  slug: string;
   judul: string;
   image?: string | null;
   createdDate: string;
@@ -90,12 +91,12 @@ function Berita() {
   const errorMessage =
     error instanceof Error ? error.message : "Gagal memuat berita.";
 
-  const handleNavigate = (id: string) => {
+  const handleNavigate = (slug: string) => {
     if (typeof window === "undefined") {
       return;
     }
 
-    window.location.href = `/berita/${id}`;
+    window.location.href = `/berita/${slug}`;
   };
 
   return (
@@ -147,7 +148,7 @@ function Berita() {
                 />
               </svg>
             </div>
-            <div className="max-w-4xl mx-auto relative h-full flex justify-between items-center">
+            <div className="max-w-6xl mx-auto relative h-full flex justify-between items-center">
               <div className="px-4 md:px-0 ">
                 <div className="mb-4">
                   <svg
@@ -217,7 +218,7 @@ function Berita() {
             <>
               <div
                 className="lg:col-span-2 bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm cursor-pointer"
-                onClick={() => handleNavigate(heroBerita.id)}
+                onClick={() => handleNavigate(heroBerita.slug)}
               >
                 <div className="relative">
                   <img
@@ -237,7 +238,7 @@ function Berita() {
                     {heroExcerpt || "Konten akan segera hadir."}{" "}
                     <span>
                       <a
-                        href={`/berita/${heroBerita.id}`}
+                        href={`/berita/${heroBerita.slug}`}
                         className="text-[#9C0000] font-bold hover:underline"
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -254,7 +255,7 @@ function Berita() {
                     <div
                       key={article.id}
                       className="bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm flex p-4 items-center md:items-start gap-2 md:gap-4 cursor-pointer"
-                      onClick={() => handleNavigate(article.id)}
+                      onClick={() => handleNavigate(article.slug)}
                     >
                       <img
                         src={getImageUrl(article.image)}
@@ -325,7 +326,7 @@ function Berita() {
                 <div
                   key={article.id}
                   className="bg-[#F7F7F7] rounded-lg overflow-hidden shadow-sm cursor-pointer transition-transform"
-                  onClick={() => handleNavigate(article.id)}
+                  onClick={() => handleNavigate(article.slug)}
                 >
                   <div className="m-3 md:m-4">
                     <div className="relative rounded-lg overflow-hidden">
@@ -349,7 +350,7 @@ function Berita() {
                           "Konten akan segera hadir."}
                       </span>
                       <a
-                        href={`/berita/${article.id}`}
+                        href={`/berita/${article.slug}`}
                         className="text-[#9C0000] font-bold hover:underline ml-2 flex-shrink-0 whitespace-nowrap"
                         onClick={(e) => e.stopPropagation()}
                       >

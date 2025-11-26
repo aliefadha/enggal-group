@@ -27,7 +27,7 @@ type OutletItem = {
   id: string;
   nama: string;
   brandId: string;
-  kota: string;
+  provinsi: string;
   jamOperasional: string;
   lokasi: string;
   googleMapsLink: string;
@@ -46,6 +46,125 @@ type BrandListMeta = {
   total?: number;
   totalPages?: number;
 };
+
+type ProvinsiOption = {
+  id: string;
+  nama: string;
+  value: string;
+}
+
+const provinsiOptions: ProvinsiOption[] = [
+  {
+    id: "1",
+    nama: "Jawa Barat",
+    value: "jawa-barat",
+  },
+  {
+    id: "2",
+    nama: "Jawa Tengah",
+    value: "jawa-tengah",
+  },
+  {
+    id: "3",
+    nama: "Jawa Timur",
+    value: "jawa-timur",
+  },
+  {
+    id: "4",
+    nama: "Jawa Tengah",
+    value: "jawa-tengah",
+  },
+  {
+    id: "5",
+    nama: "Madura",
+    value: "madura",
+  },
+  {
+    id: "6",
+    nama: "Aceh",
+    value: "aceh",
+  },
+  {
+    id: "7",
+    nama: "Sumatra Utara",
+    value: "sumatra-utara",
+  },
+  {
+    id: "8",
+    nama: "Sumatra Barat",
+    value: "sumatra-barat",
+  },
+  {
+    id: "9",
+    nama: "Riau",
+    value: "riau",
+  },
+  {
+    id: "10",
+    nama: "Jambi",
+    value: "jambi",
+  },
+  {
+    id: "11",
+    nama: "Sumatra Selatan",
+    value: "sumatra-selatan",
+  },
+  {
+    id: "12",
+    nama: "Lampung",
+    value: "lampung",
+  },
+  {
+    id: "13",
+    nama: "Banten",
+    value: "banten",
+  },
+  {
+    id: "14",
+    nama: "Jakarta",
+    value: "jakarta",
+  },
+  {
+    id: "15",
+    nama: "Kalimantan Barat",
+    value: "kalimantan-barat",
+  },
+  {
+    id: "16",
+    nama: "Kalimantan Tengah",
+    value: "kalimantan-tengah",
+  },
+  {
+    id: "17",
+    nama: "Kalimantan Timur",
+    value: "kalimantan-timur",
+  },
+  {
+    id: "18",
+    nama: "Kalimantan Selatan",
+    value: "kalimantan-selatan",
+  },
+  {
+    id: "19",
+    nama: "Nusa Tenggara Timur",
+    value: "nusa-tenggara-timur",
+  },
+  {
+    id: "20",
+    nama: "Nusa Tenggara Barat",
+    value: "nusa-tenggara-barat",
+  },
+  {
+    id: "21",
+    nama: "Bali",
+    value: "bali",
+  },
+  {
+    id: "22",
+    nama: "Makassar",
+    value: "makassar",
+  },
+];
 
 const fetchOutletById = async (id: string) => {
   const response = await apiClient.get<OutletItem>(`/outlet/${id}`);
@@ -80,7 +199,7 @@ const emptyOutlet: OutletItem = {
   id: "",
   nama: "",
   brandId: "",
-  kota: "",
+  provinsi: "",
   jamOperasional: "",
   lokasi: "",
   googleMapsLink: "",
@@ -109,27 +228,6 @@ const normalizeTimeValue = (value: string) => {
   const hour = rawHour.padStart(2, "0").slice(-2);
 
   return `${hour}:${minute}`;
-};
-
-const timeToMinutes = (value: string) => {
-  if (!value) {
-    return null;
-  }
-
-  const [hour, minute] = value.split(":").map(Number);
-
-  if (
-    Number.isNaN(hour) ||
-    Number.isNaN(minute) ||
-    hour < 0 ||
-    hour > 23 ||
-    minute < 0 ||
-    minute > 59
-  ) {
-    return null;
-  }
-
-  return hour * 60 + minute;
 };
 
 const parseOperationalHours = (value: string): OperationalHours => {
@@ -321,24 +419,8 @@ function RouteComponent() {
       return;
     }
 
-    const startMinutes = timeToMinutes(operationalHours.start);
-    const endMinutes = timeToMinutes(operationalHours.end);
-
-    if (
-      startMinutes !== null &&
-      endMinutes !== null &&
-      endMinutes < startMinutes
-    ) {
-      const errorMessage = "Jam selesai tidak boleh lebih awal dari jam mulai.";
-      toast.error(errorMessage);
-      if (isUpdateSuccess || isUpdateError) {
-        resetOutletMutation();
-      }
-      return;
-    }
-
     const trimmedNama = formState.nama.trim();
-    const trimmedKota = formState.kota.trim();
+    const trimmedProvinsi = formState.provinsi.trim();
     const trimmedLokasi = formState.lokasi.trim();
     const trimmedJamOperasional = formatOperationalHours(
       operationalHours.start,
@@ -351,7 +433,7 @@ function RouteComponent() {
     if (
       !trimmedBrandId ||
       !trimmedNama ||
-      !trimmedKota ||
+      !trimmedProvinsi ||
       !trimmedLokasi ||
       !trimmedJamOperasional ||
       !trimmedMapsUrl ||
@@ -368,7 +450,7 @@ function RouteComponent() {
 
     const formData = new FormData();
     formData.append("nama", trimmedNama);
-    formData.append("kota", trimmedKota);
+    formData.append("provinsi", trimmedProvinsi);
     formData.append("lokasi", trimmedLokasi);
     formData.append("jamOperasional", trimmedJamOperasional);
     formData.append("googleMapsLink", trimmedMapsUrl);
@@ -549,18 +631,6 @@ function RouteComponent() {
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label className="text-sm font-medium text-[#2E2E2E]">
-              Kota<span className="text-[#C1272D]">*</span>
-            </Label>
-            <Input
-              value={formState.kota}
-              onChange={(event) => handleChange("kota", event.target.value)}
-              placeholder="Bandung"
-              disabled={isSubmitDisabled}
-              className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-[#2E2E2E]">
               Alamat Outlet<span className="text-[#C1272D]">*</span>
             </Label>
             <Input
@@ -570,6 +640,27 @@ function RouteComponent() {
               disabled={isSubmitDisabled}
               className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
             />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-[#2E2E2E]">
+              Provinsi<span className="text-[#C1272D]">*</span>
+            </Label>
+            <Select
+              value={formState.provinsi}
+              onValueChange={(value) => handleChange("provinsi", value)}
+              disabled={isSubmitDisabled}
+            >
+              <SelectTrigger className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-left text-sm text-[#4F4F4F]">
+                <SelectValue placeholder="Pilih Provinsi" />
+              </SelectTrigger>
+              <SelectContent>
+                {provinsiOptions.map((provinsi) => (
+                  <SelectItem key={provinsi.id} value={provinsi.value}>
+                    {provinsi.nama}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -616,7 +707,7 @@ function RouteComponent() {
               onChange={(event) =>
                 handleChange("googleMapsLink", event.target.value)
               }
-              placeholder="https://share.google/olg0GDvQ6t759Lbej"
+              placeholder="https://maps.app.goo.gl/xxxxxx"
               disabled={isSubmitDisabled}
               className="h-12 rounded-2xl border border-[#D6DAE1] bg-white text-sm text-[#4F4F4F] ring-offset-0 focus-visible:ring-2 focus-visible:ring-[#C1272D]/30 focus-visible:ring-offset-0"
             />

@@ -1,6 +1,20 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
+
+type DashboardCounts = {
+  totalUserCareer: number;
+  totalBrand: number;
+  totalBerita: number;
+  totalOutlet: number;
+};
+
+async function fetchDashboardCounts() {
+  const response = await apiClient.get<DashboardCounts>(`/dashboard`);
+  return response.data;
+}
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search) => ({
@@ -24,6 +38,11 @@ function LoginComponent() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const { data: dashboardCounts } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: () => fetchDashboardCounts(),
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -269,7 +288,7 @@ function LoginComponent() {
             </div>
             <div className="flex flex-col items-start justify-center bg-[#A71D28] p-4 text-[#FFB835]">
               <span className="flex gap-x-1 text-4xl font-bold leading-none">
-                <span>8</span>
+                <span>{dashboardCounts?.totalBrand ?? 8}</span>
                 <svg
                   width="18"
                   height="18"
