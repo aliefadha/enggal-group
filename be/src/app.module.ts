@@ -16,6 +16,7 @@ import { BeritaModule } from './api/berita/berita.module';
 import { DashboardModule } from './api/dashboard/dashboard.module';
 import { AuthModule } from './api/auth/auth.module';
 import { GalleryModule } from './api/gallery/gallery.module';
+import { GoogleAuthModule } from './api/google-auth/google-auth.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { GalleryModule } from './api/gallery/gallery.module';
     DashboardModule,
     AuthModule,
     GalleryModule,
+    GoogleAuthModule,
   ],
   controllers: [AppController],
   providers: [

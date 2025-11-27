@@ -1,15 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { GoogleSheetsService } from 'src/common/google-sheets/google-sheets.service';
 import { RequestUserCareerCreateDto } from 'src/api/user-career/dto/requests/create.dto';
 import { RequestUserCareerUpdateDto } from 'src/api/user-career/dto/requests/update.dto';
 
 @Injectable()
 export class UserCareerService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(UserCareerService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private googleSheets: GoogleSheetsService,
+    private configService: ConfigService,
+  ) {}
 
   async create(dto: RequestUserCareerCreateDto) {
-    return this.prisma.userCareer.create({
+    const createdCareer = await this.prisma.userCareer.create({
       data: {
         tanggal: new Date(dto.tanggal),
         nama: dto.nama,
@@ -19,6 +27,37 @@ export class UserCareerService {
         cv_link: dto.cv_link,
       },
     });
+
+    // Append to Google Sheets in the background
+    this.appendToGoogleSheets(createdCareer).catch((error) => {
+      this.logger.error('Failed to append to Google Sheets', error);
+    });
+
+    return createdCareer;
+  }
+
+  private async appendToGoogleSheets(career: any) {
+    const spreadsheetId = this.configService.get<string>('GOOGLE_SHEETS_CAREER_SPREADSHEET_ID');
+    const range = this.configService.get<string>('GOOGLE_SHEETS_CAREER_RANGE') || 'Sheet1!A:F';
+
+    if (!spreadsheetId) {
+      this.logger.warn('Google Sheets spreadsheet ID not configured, skipping append');
+      return;
+    }
+
+    const row = [
+      [
+        `${String(career.tanggal.getMonth() + 1).padStart(2, '0')}-${String(career.tanggal.getDate()).padStart(2, '0')}-${career.tanggal.getFullYear()}`,
+        career.nama,
+        `0${career.no_hp}`,
+        career.email,
+        career.alamat,
+        career.cv_link,
+      ],
+    ];
+
+    await this.googleSheets.appendRow(spreadsheetId, range, row);
+    this.logger.log(`Career application appended to Google Sheets: ${career.id}`);
   }
 
   async findAll({

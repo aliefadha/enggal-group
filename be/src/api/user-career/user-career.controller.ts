@@ -17,16 +17,18 @@ import { UserCareerService } from './user-career.service';
 import { RequestUserCareerCreateDto } from 'src/api/user-career/dto/requests/create.dto';
 import { RequestUserCareerUpdateDto } from 'src/api/user-career/dto/requests/update.dto';
 import { UserCareerListQueryDto } from 'src/api/user-career/dto/requests/list.query.dto';
-import { uploadDiskStorage } from '../upload/upload.storage';
-import type { StoredFile } from '../upload/upload.types';
+import { GoogleDriveService } from 'src/common/google-drive/google-drive.service';
 
 @ApiTags('user-career')
 @Controller('user-career')
 export class UserCareerController {
-  constructor(private readonly service: UserCareerService) {}
+  constructor(
+    private readonly service: UserCareerService,
+    private readonly googleDrive: GoogleDriveService,
+  ) { }
 
   @Post()
-  @UseInterceptors(FileInterceptor('cv', { storage: uploadDiskStorage }))
+  @UseInterceptors(FileInterceptor('cv'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -42,7 +44,7 @@ export class UserCareerController {
       required: ['tanggal', 'nama', 'no_hp', 'email', 'alamat', 'cv'],
     },
   })
-  create(@Body() dto: RequestUserCareerCreateDto, @UploadedFile() cv?: StoredFile) {
+  async create(@Body() dto: RequestUserCareerCreateDto, @UploadedFile() cv?: Express.Multer.File) {
     if (!cv) {
       throw new BadRequestException('CV file is required');
     }
@@ -52,9 +54,21 @@ export class UserCareerController {
       throw new BadRequestException('CV file must be a PDF');
     }
 
+    // Generate unique filename
+    const timestamp = Date.now();
+    const sanitizedName = dto.nama.replace(/[^a-zA-Z0-9]/g, '_');
+    const filename = `CV_${sanitizedName}_${timestamp}.pdf`;
+
+    // Upload to Google Drive
+    const driveFile = await this.googleDrive.uploadFile(
+      cv.buffer,
+      filename,
+      cv.mimetype,
+    );
+
     const payload: RequestUserCareerCreateDto = {
       ...dto,
-      cv_link: `/uploads/${cv.filename}`,
+      cv_link: driveFile.webViewLink,
     };
 
     return this.service.create(payload);
@@ -99,7 +113,7 @@ export class UserCareerController {
   }
 
   @Put(':id')
-  @UseInterceptors(FileInterceptor('cv', { storage: uploadDiskStorage }))
+  @UseInterceptors(FileInterceptor('cv'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -114,19 +128,37 @@ export class UserCareerController {
       },
     },
   })
-  update(
+  async update(
     @Param('id') id: string,
     @Body() dto: RequestUserCareerUpdateDto,
-    @UploadedFile() cv?: StoredFile,
+    @UploadedFile() cv?: Express.Multer.File,
   ) {
     // Validate file is PDF if uploaded
     if (cv && cv.mimetype !== 'application/pdf') {
       throw new BadRequestException('CV file must be a PDF');
     }
 
+    let cvLink: string | undefined;
+
+    if (cv) {
+      // Generate unique filename
+      const timestamp = Date.now();
+      const sanitizedName = dto.nama || 'Unknown';
+      const filename = `CV_${sanitizedName.replace(/[^a-zA-Z0-9]/g, '_')}_${timestamp}.pdf`;
+
+      // Upload to Google Drive
+      const driveFile = await this.googleDrive.uploadFile(
+        cv.buffer,
+        filename,
+        cv.mimetype,
+      );
+
+      cvLink = driveFile.webViewLink;
+    }
+
     const payload: RequestUserCareerUpdateDto = {
       ...dto,
-      ...(cv ? { cv_link: `/uploads/${cv.filename}` } : {}),
+      ...(cvLink ? { cv_link: cvLink } : {}),
     };
 
     return this.service.update(id, payload);
