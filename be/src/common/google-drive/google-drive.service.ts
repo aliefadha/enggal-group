@@ -53,7 +53,6 @@ export class GoogleDriveService {
         fields: 'id, webViewLink, webContentLink',
       });
 
-      // Make file publicly accessible (optional - remove if you want private files)
       await this.drive.permissions.create({
         fileId: response.data.id,
         requestBody: {
