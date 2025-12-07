@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, type Editor as TiptapEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { cn } from "../../lib/utils";
+import { sanitizeHtml } from "../../lib/xss-filter";
 import { Button } from "./button";
 import {
   Bold,
@@ -28,7 +29,7 @@ interface EditorProps {
   className?: string;
 }
 
-const MenuBar = ({ editor }: { editor: any }) => {
+const MenuBar = ({ editor }: { editor: TiptapEditor | null }) => {
   if (!editor) {
     return null;
   }
@@ -192,7 +193,9 @@ export function Editor({
     },
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
-      onChange(html);
+      // Sanitize the HTML content to prevent XSS attacks
+      const sanitizedHtml = sanitizeHtml(html);
+      onChange(sanitizedHtml);
     },
   });
 

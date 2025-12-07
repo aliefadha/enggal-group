@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsNumberString, IsOptional } from 'class-validator';
+import { IsDateString, IsEnum, IsNumberString, IsOptional } from 'class-validator';
+import { CareerStatus } from '@prisma/client';
 
 export class UserCareerListQueryDto {
   @ApiPropertyOptional({ description: 'Page number (1-based)', default: 1 })
@@ -27,6 +28,15 @@ export class UserCareerListQueryDto {
   @IsOptional()
   @IsDateString()
   endDate?: string;
+
+  @ApiPropertyOptional({
+    enum: CareerStatus,
+    description: 'Filter by career status',
+    example: CareerStatus.PENDING,
+  })
+  @IsOptional()
+  @IsEnum(CareerStatus)
+  status?: CareerStatus;
 
   constructor(dto: UserCareerListQueryDto) {
     Object.assign(this, dto);

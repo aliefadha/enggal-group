@@ -14,7 +14,7 @@ export class UserCareerService {
     private prisma: PrismaService,
     private googleSheets: GoogleSheetsService,
     private configService: ConfigService,
-  ) {}
+  ) { }
 
   async create(dto: RequestUserCareerCreateDto) {
     const createdCareer = await this.prisma.userCareer.create({
@@ -25,6 +25,7 @@ export class UserCareerService {
         email: dto.email,
         alamat: dto.alamat,
         cv_link: dto.cv_link,
+        status: dto.status,
       },
     });
 
@@ -38,7 +39,7 @@ export class UserCareerService {
 
   private async appendToGoogleSheets(career: any) {
     const spreadsheetId = this.configService.get<string>('GOOGLE_SHEETS_CAREER_SPREADSHEET_ID');
-    const range = this.configService.get<string>('GOOGLE_SHEETS_CAREER_RANGE') || 'Sheet1!A:F';
+    const range = this.configService.get<string>('GOOGLE_SHEETS_CAREER_RANGE') || 'Sheet1!A:H';
 
     if (!spreadsheetId) {
       this.logger.warn('Google Sheets spreadsheet ID not configured, skipping append');
@@ -47,12 +48,14 @@ export class UserCareerService {
 
     const row = [
       [
+        career.id, // HIDDEN: Database ID in Column A
         `${String(career.tanggal.getMonth() + 1).padStart(2, '0')}-${String(career.tanggal.getDate()).padStart(2, '0')}-${career.tanggal.getFullYear()}`,
         career.nama,
         `0${career.no_hp}`,
         career.email,
         career.alamat,
         career.cv_link,
+        career.status,
       ],
     ];
 
@@ -60,16 +63,57 @@ export class UserCareerService {
     this.logger.log(`Career application appended to Google Sheets: ${career.id}`);
   }
 
+  private async updateGoogleSheets(career: any): Promise<void> {
+    const spreadsheetId = this.configService.get<string>('GOOGLE_SHEETS_CAREER_SPREADSHEET_ID');
+    const range = this.configService.get<string>('GOOGLE_SHEETS_CAREER_RANGE') || 'Sheet1!A:H';
+
+    if (!spreadsheetId) {
+      this.logger.warn('Google Sheets spreadsheet ID not configured, skipping update');
+      return;
+    }
+
+    try {
+      // Find the row by database ID (hidden in Column A)
+      const rowIndex = await this.googleSheets.findRowById(spreadsheetId, range, career.id);
+
+      if (rowIndex === -1) {
+        this.logger.warn(`Row not found for career ID: ${career.id}, will append as new row`);
+        await this.appendToGoogleSheets(career);
+        return;
+      }
+
+      // Prepare updated row data (visible columns B-H)
+      const updatedRow = [
+        `${String(career.tanggal.getMonth() + 1).padStart(2, '0')}-${String(career.tanggal.getDate()).padStart(2, '0')}-${career.tanggal.getFullYear()}`,
+        career.nama,
+        `0${career.no_hp}`,
+        career.email,
+        career.alamat,
+        career.cv_link,
+        career.status,
+      ];
+
+      // Update the row (columns B-H, maintaining hidden ID in A)
+      await this.googleSheets.updateRow(spreadsheetId, range, rowIndex, updatedRow);
+      this.logger.log(`Career application updated in Google Sheets: ${career.id}`);
+
+    } catch (error) {
+      this.logger.error('Failed to update Google Sheets', error);
+    }
+  }
+
   async findAll({
     page = 1,
     limit = 10,
     startDate,
     endDate,
+    status,
   }: {
     page?: number;
     limit?: number;
     startDate?: Date;
     endDate?: Date;
+    status?: any;
   }) {
     const skip = (page - 1) * limit;
     const where: Prisma.UserCareerWhereInput = {};
@@ -82,6 +126,10 @@ export class UserCareerService {
       if (endDate) {
         where.tanggal.lte = endDate;
       }
+    }
+
+    if (status) {
+      where.status = status;
     }
 
     const [total, data] = await this.prisma.$transaction([
@@ -119,7 +167,7 @@ export class UserCareerService {
       throw new NotFoundException('UserCareer not found');
     }
 
-    return this.prisma.userCareer.update({
+    const updatedCareer = await this.prisma.userCareer.update({
       where: { id },
       data: {
         tanggal: dto.tanggal ? new Date(dto.tanggal) : undefined,
@@ -128,8 +176,16 @@ export class UserCareerService {
         email: dto.email ?? undefined,
         alamat: dto.alamat ?? undefined,
         cv_link: dto.cv_link ?? undefined,
+        status: dto.status ?? undefined,
       },
     });
+
+    // Update Google Sheets in background
+    this.updateGoogleSheets(updatedCareer).catch((error) => {
+      this.logger.error('Failed to update Google Sheets', error);
+    });
+
+    return updatedCareer;
   }
 
   async remove(id: string) {

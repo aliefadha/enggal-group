@@ -284,7 +284,7 @@ function Home() {
 
   // Find CEO from team data
   const ceoData = teamMembers.find(
-    (member) => member.title.toLowerCase() === "ceo"
+    (member) => member.title.toLowerCase() === "chief executive officer"
   );
 
   const handleBrandSelect = (brandId: string) => {
@@ -362,7 +362,7 @@ function Home() {
                     fill="#FFB835"
                   />
                 </svg>
-                12 kota besar Indonesia
+                12 Kota Besar Indonesia
               </div>
             </div>
             <div className="flex flex-col lg:flex-row mt-2 gap-2">
@@ -470,13 +470,6 @@ function Home() {
             {/* Row 3 - Brand Logos */}
             <div className="border border-gray-100 flex items-center justify-center p-4">
               <img
-                src="/images/rang_kapau.png"
-                className="max-w-[80%] max-h-[80%] object-contain"
-                alt="Rang Kapau"
-              />
-            </div>
-            <div className="border border-gray-100 flex items-center justify-center p-4">
-              <img
                 src="/images/warung_kondang.svg"
                 className="max-w-[80%] max-h-[80%] object-contain"
                 alt="Warung Kondang"
@@ -484,16 +477,23 @@ function Home() {
             </div>
             <div className="border border-gray-100 flex items-center justify-center p-4">
               <img
-                src="/images/ambun_suri.png"
+                src="/images/warkop_agam.png"
                 className="max-w-[80%] max-h-[80%] object-contain"
-                alt="Sarapan Pagi"
+                alt="Warkop Agam"
               />
             </div>
             <div className="border border-gray-100 flex items-center justify-center p-4">
               <img
-                src="/images/warkop_agam.png"
+                src="/images/bebek_sawahan.png"
                 className="max-w-[80%] max-h-[80%] object-contain"
-                alt="Kedai Pical Agam"
+                alt="bebek sawahan"
+              />
+            </div>
+            <div className="border border-gray-100 flex items-center justify-center p-4">
+              <img
+                src="/images/kebab_zabab.png"
+                className="max-w-[80%] max-h-[80%] object-contain"
+                alt="Kebab zabab"
               />
             </div>
 
@@ -529,16 +529,16 @@ function Home() {
 
             <div className="col-span-1 flex items-center justify-center p-4">
               <img
-                src="/images/bebek_sawahan.png"
+                src={placeholderImage}
                 className="max-w-[80%] max-h-[80%] object-contain"
-                alt="Bebek Sawahan"
+                alt="placeholder"
               />
             </div>
             <div className="border border-gray-100 flex items-center justify-center p-4">
               <img
-                src="/images/kebab_zabab.png"
+                src={placeholderImage}
                 className="max-w-[80%] max-h-[80%] object-contain"
-                alt="Kebab Zababa"
+                alt="placeholder"
               />
             </div>
             <div className=" p-4 flex flex-col items-start justify-center bg-[#FFB835]">
@@ -626,7 +626,7 @@ function Home() {
               <img
                 src={ceoData?.image ? `${API_BASE_URL}${ceoData.image}` : "/images/ceo.png"}
                 alt={ceoData?.nama ? `${ceoData.nama} - ${ceoData.title}` : "Enggal Group CEO"}
-                className="relative z-10 h-5/6 w-auto object-cover"
+                className="relative z-10 h-full w-auto object-cover"
               />
             </motion.div>
 
@@ -816,17 +816,13 @@ function Home() {
               <div className="block lg:flex justify-between">
                 <h1 className="font-runestars text-2xl">LAHIRNYA PERJALANAN</h1>
                 <p className="font-jakarta text-sm lg:max-w-[250px]">
-                  Awal mula Enggal Group dimulai dari Bakso Malang Enggal tahun
+                  Awal mula Enggal Group dimulai dari Bakso Malang Enggal
                   di Palembang.
                 </p>
               </div>
               <div className="flex justify-between gap-4">
                 <img
-                  src="/images/2008.jpg"
-                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[200px] rounded-md object-cover"
-                />
-                <img
-                  src="/images/2008.jpg"
+                  src="/images/2008.webp"
                   className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[200px] rounded-md object-cover"
                 />
               </div>
@@ -855,7 +851,7 @@ function Home() {
               </div>
               <div className="flex justify-between gap-4">
                 <img
-                  src="/images/2023.jpg"
+                  src="/images/2023.webp"
                   className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[200px] rounded-md object-cover"
                 />
                 <img
@@ -878,7 +874,7 @@ function Home() {
               className="flex flex-col gap-y-4 xl:gap-y-10 w-full pb-10 mb-10 md:pb-16 md:mb-16 border-b-2 border-dashed border-[#CDCDCD]"
             >
               <p className="text-[#9C0000] font-jakarta font-bold text-xl">
-                2023
+                2024
               </p>
               <div className="block lg:flex justify-between">
                 <h1 className="font-runestars text-2xl">MENYEBAR KE BANYAK KOTA</h1>
@@ -888,12 +884,12 @@ function Home() {
               </div>
               <div className="flex justify-between gap-4">
                 <img
-                  src="/images/20232.png"
-                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[450px] rounded-md object-contain"
+                  src="/images/20241.webp"
+                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[200px] rounded-md object-cover"
                 />
                 <img
-                  src="/images/20233.png"
-                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[450px] rounded-md object-contain"
+                  src="/images/20242.webp"
+                  className="flex-1 w-full max-w-[calc(50%-0.5rem)] h-[100px] md:h-[200px] rounded-md object-cover"
                 />
               </div>
             </motion.div>
@@ -948,7 +944,8 @@ function Home() {
                     </h1>
                   </div>
                   <div>
-                    <p className="font-jakarta font-medium text-[#3F2900] mt-4 md:mt-24 md:text-xs max-w-md text-justify">Memulai ekspansi ke Pulau Jawa, Yong Bengkalis, kedai kopi berkonsep Melayu dengan 14 outlet di Riau dan Kepri, kini hadir di Kota Wisata.</p>
+                    <p className="font-jakarta font-medium text-[#3F2900] mt-4 md:mt-24 md:text-xs max-w-md text-justify">Launch beberapa brand lainnya: Kebab Zabbab di Jakarta Timur, Warung Kondang di Kota Wisata, Soerabi Bandung Enhaii di Kota Wisata</p>
+                    <p className="font-jakarta font-medium text-[#3F2900] mt-4 md:text-xs max-w-md text-justify">Memulai ekspansi ke Pulau Jawa, Yong Bengkalis, kedai kopi berkonsep Melayu dengan 14 outlet di Riau dan Kepri, kini hadir di Kota Wisata.</p>
                   </div>
                 </div>
               </div>
@@ -1235,11 +1232,11 @@ function Home() {
             />
             <h2 className="font-runestars">
               <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-2xl sm:text-3xl md:text-4xl text-white">
-                Our Outlet
+                Outlet Kami
               </span>
             </h2>
             <p className="font-jakarta font-medium text-sm md:text-base leading-relaxed">
-              25 Outlet di 12 Kota Besar di Indonesia, Satu Cita Rasa Nusantara
+              {outlets.length} Outlet di 12 Kota Besar di Indonesia, Satu Cita Rasa Nusantara
             </p>
           </div>
           <div className="flex gap-3 sm:gap-4 w-full lg:w-auto">
@@ -1392,7 +1389,7 @@ function Home() {
                           rel="noopener noreferrer"
                           className="bg-[#9C0000] text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-jakarta font-medium hover:bg-[#7A0000] transition-colors w-full sm:w-auto text-center"
                         >
-                          Reservasi Disini
+                          Reservasi Di sini
                         </a>
                       )}
                       {outlet.googleMapsLink && (
@@ -1473,7 +1470,7 @@ function Home() {
           <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
           <h2 className="font-runestars">
             <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-4xl md:text-5xl text-white whitespace-nowrap">
-              OUR TEAM
+              TIM KAMI
             </span>
           </h2>
           <p className="font-jakarta font-medium ">

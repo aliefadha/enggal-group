@@ -21,14 +21,22 @@ model User {
   nama     String
 }
 
+enum CareerStatus {
+  PENDING
+  INTERVIEW
+  HIRED
+  REJECT
+}
+
 model UserCareer {
-  id      String   @id @default(uuid())
+  id      String       @id @default(uuid())
   tanggal DateTime
   nama    String
   no_hp   String
   email   String
   alamat  String
   cv_link String
+  status  CareerStatus @default(PENDING)
 }
 
 model Promo {

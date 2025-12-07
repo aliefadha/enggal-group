@@ -104,7 +104,28 @@ async function submitCareerApplication(formData: UserCareerFormData) {
   return response.data;
 }
 
+type DashboardCounts = {
+  totalUserCareer: number;
+  totalBrand: number;
+  totalBerita: number;
+  totalOutlet: number;
+};
+
+async function fetchDashboardCounts() {
+  const response = await apiClient.get<DashboardCounts>(
+    `/dashboard`,
+  );
+
+  return response.data;
+}
+
 function Career() {
+
+  const { data: dashboardCounts } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: () => fetchDashboardCounts()
+  });
+
   const {
     register,
     handleSubmit: handleFormSubmit,
@@ -132,7 +153,6 @@ function Career() {
   });
 
   const brands = brandsData?.data ?? [];
-  const totalBrands = brandsData?.meta?.total ?? 0;
 
   const brandLogos = brands.map(brand => ({
     src: `${API_BASE_URL}${brand.logo}`,
@@ -150,6 +170,7 @@ function Career() {
       });
       reset();
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       const errorMessage = error?.message || 'Terjadi kesalahan saat mengirim lamaran';
       setDialogState({
@@ -192,12 +213,12 @@ function Career() {
                 <div className="bg-white rounded-lg py-2 px-3 sm:px-4 shadow-sm flex items-center space-x-3">
                   <img src={brandIcon} alt="Brand" className="w-5 h-5" />
                   <span className="font-semibold text-xs sm:text-sm text-[#6E0112] font-jakarta">
-                    {brandsLoading ? '...' : totalBrands} Brand Besar
+                    {dashboardCounts?.totalBrand} Brand Besar
                   </span>
                 </div>
                 <div className="bg-white rounded-lg py-2 px-3 sm:px-4 shadow-sm flex items-center space-x-3">
                   <img src={outletIcon} alt="Outlet" className="w-5 h-5" />
-                  <span className="font-semibold text-xs sm:text-sm text-[#6E0112] font-jakarta">25 Outlet</span>
+                  <span className="font-semibold text-xs sm:text-sm text-[#6E0112] font-jakarta">{dashboardCounts?.totalOutlet} Outlet</span>
                 </div>
                 <div className="bg-white rounded-lg py-2 px-3 sm:px-4 shadow-sm flex items-center space-x-3">
                   <img src={cityIcon} alt="City" className="w-4 h-5" />
@@ -324,7 +345,7 @@ function Career() {
                   <input
                     type="text"
                     {...register('name')}
-                    placeholder="Masukan nama kamu disini"
+                    placeholder="Masukan nama kamu di sini"
                     className={`w-full px-4 py-3 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 ${errors.name ? 'border-red-500' : 'border-gray-200'
                       }`}
                     disabled={careerMutation.isPending || isSubmitting}
@@ -340,7 +361,7 @@ function Career() {
                   <input
                     type="tel"
                     {...register('whatsapp')}
-                    placeholder="Masukan nomor WA Kamu disini"
+                    placeholder="Masukan nomor WA Kamu di sini"
                     className={`w-full px-4 py-3 bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50 ${errors.whatsapp ? 'border-red-500' : 'border-gray-200'
                       }`}
                     disabled={careerMutation.isPending || isSubmitting}
@@ -402,7 +423,7 @@ function Career() {
                             <span className="text-orange-500 font-medium">{cvFile.name}</span>
                           ) : (
                             <>
-                              <span> Pilih file atau drop CV kamu disini!</span>
+                              <span> Pilih file atau drop CV kamu di sini!</span>
                             </>
                           )}
                         </div>

@@ -3,7 +3,7 @@ import { NavLink } from "react-router";
 import { motion } from "motion/react";
 
 const PRIMARY_LINKS = [
-  { label: "Home", to: "/", isAnchor: false },
+  { label: "Beranda", to: "/", isAnchor: false },
   { label: "Tentang", to: "/#tentang", isAnchor: true },
   { label: "Brand", to: "/#brand", isAnchor: true },
   { label: "Berita", to: "/berita", isAnchor: false },
@@ -104,7 +104,7 @@ const Navbar: React.FC = () => {
             }
             onClick={closeMobileMenu}
           >
-            Career
+            Karir
           </NavLink>
         </div>
       </div>

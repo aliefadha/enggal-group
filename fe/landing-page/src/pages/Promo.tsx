@@ -41,17 +41,6 @@ type PromoListMeta = {
   totalPages?: number;
 };
 
-type PromoBanner = {
-  id: string;
-  title: string;
-  banner: string;
-  berlakuHingga: string;
-  brand: {
-    id: string;
-    nama: string;
-  };
-};
-
 async function fetchBrands() {
   const response = await apiClient.get<Brand[], BrandListMeta>(
     `/brand?page=1&limit=100`,
@@ -90,10 +79,7 @@ async function fetchPromos(brandId?: string) {
   };
 }
 
-async function fetchPromoBanners() {
-  const response = await apiClient.get<PromoBanner[]>(`/promo/banner/list`);
-  return response.data ?? [];
-}
+
 
 function Promo() {
   const [selectedBrand, setSelectedBrand] = useState<string>("all");
@@ -110,14 +96,10 @@ function Promo() {
     queryFn: () => fetchPromos(selectedBrand)
   });
 
-  const { data: bannersData = [] } = useQuery({
-    queryKey: ["promo-banners"],
-    queryFn: () => fetchPromoBanners()
-  });
-
-  const banners = bannersData.length > 0
-    ? bannersData.map(banner => `${API_BASE_URL}${banner.banner}`)
-    : ["/images/banner-1.png"];
+  // Static banner images
+  const banners = [
+    "/images/banner.webp",
+  ];
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -175,40 +157,6 @@ function Promo() {
               </div>
             ))}
           </div>
-
-          {/* Controls */}
-          <button
-            aria-label="Previous slide"
-            className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-9 h-9 flex items-center justify-center"
-            onClick={() => setCurrentSlide((s) => (s - 1 + banners.length) % banners.length)}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-          </button>
-          <button
-            aria-label="Next slide"
-            className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full w-9 h-9 flex items-center justify-center"
-            onClick={() => setCurrentSlide((s) => (s + 1) % banners.length)}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-          </button>
-
-          {/* Dots moved below bars */}
-        </div>
-        <div className="flex h-2 w-full">
-          <div className="w-1/3 bg-[#9C0000]"></div>
-          <div className="w-1/3 bg-[#FFB835]"></div>
-          <div className="w-1/3 bg-[#6E0112]"></div>
-        </div>
-        {/* Dots under the colored bars */}
-        <div className="w-full flex items-center justify-center gap-2 mt-3">
-          {banners.map((_, idx) => (
-            <button
-              key={idx}
-              aria-label={`Go to slide ${idx + 1}`}
-              className={`w-2.5 h-2.5 rounded-full transition-all ${currentSlide === idx ? "bg-[#6E0112]" : "bg-[#6E0112]/40 hover:bg-[#6E0112]/60"}`}
-              onClick={() => setCurrentSlide(idx)}
-            />
-          ))}
         </div>
       </div>
       <div className=" py-12 relative px-4">

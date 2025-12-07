@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsDateString, IsEmail, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { CareerStatus } from '@prisma/client';
 
 export class RequestUserCareerCreateDto {
   @ApiProperty({ example: '2024-05-20' })
@@ -26,6 +27,15 @@ export class RequestUserCareerCreateDto {
   @IsOptional()
   @IsNotEmpty()
   cv_link?: string
+
+  @ApiPropertyOptional({
+    enum: CareerStatus,
+    example: CareerStatus.PENDING,
+    description: 'Career application status'
+  })
+  @IsOptional()
+  @IsEnum(CareerStatus)
+  status?: CareerStatus
 
   constructor(dto: RequestUserCareerCreateDto) {
     Object.assign(this, dto);

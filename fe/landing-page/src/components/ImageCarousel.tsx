@@ -17,8 +17,8 @@ interface ImageCarouselProps {
 const ImageCarousel = ({ direction = "left", images = [] }: ImageCarouselProps) => {
     const [isHovered, setIsHovered] = useState(false);
     const [dimensions, setDimensions] = useState({
-        width: 300,
-        height: 300
+        width: 400,
+        height: 500
     });
 
     // Default fallback images if no images provided
@@ -90,7 +90,7 @@ const ImageCarousel = ({ direction = "left", images = [] }: ImageCarouselProps) 
                                         src={image.src}
                                         alt={image.alt}
                                         className="w-full h-full object-cover"
-                                        style={{ display: "block" }}
+                                        style={{ display: "block", aspectRatio: 4 / 5 }}
                                     />
                                     {/* Hover overlay with caption */}
                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
@@ -113,7 +113,7 @@ const ImageCarousel = ({ direction = "left", images = [] }: ImageCarouselProps) 
                                         src={image.src}
                                         alt={image.alt}
                                         className="w-full h-full object-cover"
-                                        style={{ display: "block" }}
+                                        style={{ display: "block", aspectRatio: 4 / 5 }}
                                     />
                                     {/* Hover overlay with caption */}
                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">

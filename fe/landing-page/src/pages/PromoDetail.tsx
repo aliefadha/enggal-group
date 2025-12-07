@@ -175,17 +175,74 @@ function PromoDetail() {
             <div className="font-jakarta mt-6 md:mt-10 flex flex-col gap-y-6 md:gap-y-10">
               <div>
                 <p className="font-bold mb-2 ">Deskripsi Promo</p>
-                <div
-                  className="text-[#1E1E1E] font-meidum text-justify tracking-wide leading-[28px] md:leading-[32px] text-sm md:text-base"
-                  dangerouslySetInnerHTML={{ __html: promo.description }}
-                />
+                <div className="promo-content">
+                  <style>{`
+                    .promo-content ul {
+                      list-style-type: disc;
+                      padding-left: 1.25rem;
+                      margin-bottom: 1rem;
+                    }
+                    .promo-content ol {
+                      list-style-type: decimal;
+                      padding-left: 1.25rem;
+                      margin-bottom: 1rem;
+                    }
+                    .promo-content li {
+                      margin-bottom: 0.25rem;
+                    }
+                    .promo-content strong {
+                      font-weight: bold;
+                    }
+                    .promo-content a {
+                      color: #9C0000;
+                      text-decoration: underline;
+                    }
+                    .promo-content h1 {
+                      font-size: 1.875rem;
+                      font-weight: bold;
+                      margin-bottom: 1rem;
+                      margin-top: 1.5rem;
+                      color: #1E1E1E;
+                    }
+                    .promo-content h2 {
+                      font-size: 1.5rem;
+                      font-weight: bold;
+                      margin-bottom: 0.875rem;
+                      margin-top: 1.25rem;
+                      color: #1E1E1E;
+                    }
+                    .promo-content h3 {
+                      font-size: 1.25rem;
+                      font-weight: bold;
+                      margin-bottom: 0.75rem;
+                      margin-top: 1rem;
+                      color: #1E1E1E;
+                    }
+                    .promo-content h4, .promo-content h5, .promo-content h6 {
+                      font-weight: bold;
+                      margin-bottom: 0.625rem;
+                      margin-top: 0.875rem;
+                      color: #1E1E1E;
+                    }
+                    .promo-content p {
+                      margin-bottom: 1rem;
+                      line-height: 1.6;
+                    }
+                  `}</style>
+                  <div
+                    className="text-[#1E1E1E] font-meidum text-justify tracking-wide leading-[28px] md:leading-[32px] text-sm md:text-base"
+                    dangerouslySetInnerHTML={{ __html: promo.description }}
+                  />
+                </div>
               </div>
               <div>
                 <p className="font-bold mb-2 ">Syarat & Ketentuan</p>
-                <div
-                  className="text-[#1E1E1E] font-meidum text-justify tracking-wide leading-[28px] md:leading-[32px] text-sm md:text-base"
-                  dangerouslySetInnerHTML={{ __html: promo.syaratKetentuan }}
-                />
+                <div className="promo-content">
+                  <div
+                    className="text-[#1E1E1E] font-meidum text-justify tracking-wide leading-[28px] md:leading-[32px] text-sm md:text-base"
+                    dangerouslySetInnerHTML={{ __html: promo.syaratKetentuan }}
+                  />
+                </div>
               </div>
             </div>
           </div>

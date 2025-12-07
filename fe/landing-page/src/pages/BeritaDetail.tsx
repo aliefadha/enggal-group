@@ -373,10 +373,65 @@ function BeritaDetail() {
                 <h1 className="mb-4 lg:mb-10 text-2xl md:text-3xl font-bold text-[#1E1E1E]">
                   {berita.judul}
                 </h1>
-                <div
-                  className="text-justify font-medium text-sm md:text-base tracking-[0.5%] leading-relaxed md:leading-[30px] text-[#4F4F4F]"
-                  dangerouslySetInnerHTML={{ __html: contentHtml }}
-                />
+                <div className="berita-content">
+                  <style>{`
+                    .berita-content ul {
+                      list-style-type: disc;
+                      padding-left: 1.25rem;
+                      margin-bottom: 1rem;
+                    }
+                    .berita-content ol {
+                      list-style-type: decimal;
+                      padding-left: 1.25rem;
+                      margin-bottom: 1rem;
+                    }
+                    .berita-content li {
+                      margin-bottom: 0.25rem;
+                    }
+                    .berita-content strong {
+                      font-weight: bold;
+                    }
+                    .berita-content a {
+                      color: #9C0000;
+                      text-decoration: underline;
+                    }
+                    .berita-content h1 {
+                      font-size: 1.875rem;
+                      font-weight: bold;
+                      margin-bottom: 1rem;
+                      margin-top: 1.5rem;
+                      color: #1E1E1E;
+                    }
+                    .berita-content h2 {
+                      font-size: 1.5rem;
+                      font-weight: bold;
+                      margin-bottom: 0.875rem;
+                      margin-top: 1.25rem;
+                      color: #1E1E1E;
+                    }
+                    .berita-content h3 {
+                      font-size: 1.25rem;
+                      font-weight: bold;
+                      margin-bottom: 0.75rem;
+                      margin-top: 1rem;
+                      color: #1E1E1E;
+                    }
+                    .berita-content h4, .berita-content h5, .berita-content h6 {
+                      font-weight: bold;
+                      margin-bottom: 0.625rem;
+                      margin-top: 0.875rem;
+                      color: #1E1E1E;
+                    }
+                    .berita-content p {
+                      margin-bottom: 1rem;
+                      line-height: 1.6;
+                    }
+                  `}</style>
+                  <div
+                    className="text-justify font-medium text-sm md:text-base tracking-[0.5%] leading-relaxed md:leading-[30px] text-[#4F4F4F]"
+                    dangerouslySetInnerHTML={{ __html: contentHtml }}
+                  />
+                </div>
               </div>
             </div>
           </div>

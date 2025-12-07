@@ -39,6 +39,7 @@ export class UserCareerController {
         no_hp: { type: 'string', example: '081234567890' },
         email: { type: 'string', example: 'budi@example.com' },
         alamat: { type: 'string', example: 'Jl. Merdeka No. 123, Jakarta' },
+        status: { type: 'string', enum: ['PENDING', 'INTERVIEW', 'HIRED', 'REJECT'], example: 'PENDING' },
         cv: { type: 'string', format: 'binary' },
       },
       required: ['tanggal', 'nama', 'no_hp', 'email', 'alamat', 'cv'],
@@ -104,7 +105,13 @@ export class UserCareerController {
       );
     }
 
-    return this.service.findAll({ page, limit, startDate, endDate });
+    return this.service.findAll({
+      page,
+      limit,
+      startDate,
+      endDate,
+      status: query.status
+    });
   }
 
   @Get(':id')
@@ -124,6 +131,7 @@ export class UserCareerController {
         no_hp: { type: 'string', example: '081234567890' },
         email: { type: 'string', example: 'budi@example.com' },
         alamat: { type: 'string', example: 'Jl. Merdeka No. 123, Jakarta' },
+        status: { type: 'string', enum: ['PENDING', 'INTERVIEW', 'HIRED', 'REJECT'], example: 'PENDING' },
         cv: { type: 'string', format: 'binary' },
       },
     },
