@@ -120,6 +120,28 @@ export class GoogleSheetsService {
     }
   }
 
+  async deleteRow(spreadsheetId: string, range: string, rowIndex: number): Promise<void> {
+    try {
+      // Clear the entire row (columns A to H, which is 8 columns)
+      const actualRange = `${range.split('!')[0]}!${this.getColumnLetter(0)}${rowIndex}:${this.getColumnLetter(7)}${rowIndex}`;
+
+      // Clear the row by updating it with 8 empty values (for columns A-H)
+      await this.sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: actualRange,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [['', '', '', '', '', '', '', '']], // 8 empty values for columns A-H
+        },
+      });
+
+      this.logger.log(`Row ${rowIndex} cleared successfully from spreadsheet`);
+    } catch (error) {
+      this.logger.error(`Error deleting row ${rowIndex} from spreadsheet`, error);
+      throw error;
+    }
+  }
+
   async getRowData(spreadsheetId: string, range: string, rowIndex: number): Promise<any[]> {
     try {
       // Convert 1-based row index to 0-based for API

@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { createFileRoute } from "@tanstack/react-router";
-import { Calendar as CalendarIcon, Loader2, Search, MoreHorizontal } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2, Search, MoreHorizontal, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 
@@ -29,6 +29,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { apiClient } from "@/lib/api-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -200,6 +209,82 @@ function StatusActions({
   );
 }
 
+function DeleteButton({
+  applicant,
+  onDelete
+}: {
+  applicant: CareerApplicant;
+  onDelete: (id: string) => Promise<void>;
+}) {
+  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [showDialog, setShowDialog] = React.useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await onDelete(applicant.id);
+      setShowDialog(false);
+      toast.success("Data career berhasil dihapus");
+    } catch (error) {
+      console.error('Failed to delete:', error);
+      toast.error("Gagal menghapus data career");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <Dialog open={showDialog} onOpenChange={setShowDialog}>
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px] rounded-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-[#9C1A1C]">Konfirmasi Hapus</DialogTitle>
+          <DialogDescription className="text-[#6B7280]">
+            Apakah Anda yakin ingin menghapus data career dari <span className="font-semibold text-[#4F4F4F]">{applicant.nama}</span>?
+            <br />
+            <span className="text-xs text-red-500">Tindakan ini tidak dapat dibatalkan.</span>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowDialog(false)}
+            disabled={isDeleting}
+            className="rounded-xl border-[#F0F1F3] bg-[#F9FBFD] text-[#4F4F4F] hover:bg-[#f1f3f7]"
+          >
+            Batal
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="rounded-xl bg-[#C1272D] hover:bg-[#C1272D]/90"
+          >
+            {isDeleting ? (
+              <>
+                <Loader2 className="mr-2 size-4 animate-spin" />
+                Menghapus...
+              </>
+            ) : (
+              "Hapus"
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function RouteComponent() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [pagination, setPagination] = React.useState({ page: 1, limit: 15 });
@@ -237,6 +322,16 @@ function RouteComponent() {
   const updateCareerStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: CareerStatus }) => {
       return apiClient.put(`/user-career/${id}`, { status });
+    },
+    onSuccess: () => {
+      // Invalidate all user-careers queries to refetch the latest data
+      queryClient.invalidateQueries({ queryKey: ["user-careers"] });
+    },
+  });
+
+  const deleteCareerMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiClient.delete(`/user-career/${id}`);
     },
     onSuccess: () => {
       // Invalidate all user-careers queries to refetch the latest data
@@ -380,7 +475,7 @@ function RouteComponent() {
                   <TableHead className="w-28 text-center text-[#9C1A1C]">
                     CV
                   </TableHead>
-                  <TableHead className="w-16 text-center text-[#9C1A1C]">
+                  <TableHead className="w-32 text-center text-[#9C1A1C]">
                     Aksi
                   </TableHead>
                 </TableRow>
@@ -450,20 +545,28 @@ function RouteComponent() {
                         </a>
                       </TableCell>
                       <TableCell className="text-center">
-                        <StatusActions
-                          status={applicant.status}
-                          onStatusChange={async (newStatus: CareerStatus) => {
-                            try {
-                              await updateCareerStatusMutation.mutateAsync({
-                                id: applicant.id,
-                                status: newStatus
-                              });
-                            } catch (error) {
-                              console.error('Failed to update status:', error);
-                              throw error; // Re-throw to be caught by StatusActions
-                            }
-                          }}
-                        />
+                        <div className="flex items-center justify-center gap-2">
+                          <StatusActions
+                            status={applicant.status}
+                            onStatusChange={async (newStatus: CareerStatus) => {
+                              try {
+                                await updateCareerStatusMutation.mutateAsync({
+                                  id: applicant.id,
+                                  status: newStatus
+                                });
+                              } catch (error) {
+                                console.error('Failed to update status:', error);
+                                throw error; // Re-throw to be caught by StatusActions
+                              }
+                            }}
+                          />
+                          <DeleteButton
+                            applicant={applicant}
+                            onDelete={async (id: string) => {
+                              await deleteCareerMutation.mutateAsync(id);
+                            }}
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))

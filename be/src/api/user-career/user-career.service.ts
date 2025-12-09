@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import type { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GoogleSheetsService } from 'src/common/google-sheets/google-sheets.service';
+import { GoogleDriveService } from 'src/common/google-drive/google-drive.service';
 import { RequestUserCareerCreateDto } from 'src/api/user-career/dto/requests/create.dto';
 import { RequestUserCareerUpdateDto } from 'src/api/user-career/dto/requests/update.dto';
 
@@ -13,6 +14,7 @@ export class UserCareerService {
   constructor(
     private prisma: PrismaService,
     private googleSheets: GoogleSheetsService,
+    private googleDrive: GoogleDriveService,
     private configService: ConfigService,
   ) { }
 
@@ -193,7 +195,70 @@ export class UserCareerService {
     if (!existing) {
       throw new NotFoundException('UserCareer not found');
     }
-    await this.prisma.userCareer.delete({ where: { id } });
-    return { success: true };
+
+    try {
+      // Delete from Google Sheets
+      await this.deleteFromGoogleSheets(existing.id);
+
+      // Delete CV file from Google Drive
+      if (existing.cv_link) {
+        await this.deleteFromGoogleDrive(existing.cv_link);
+      }
+
+      // Finally delete from database
+      await this.prisma.userCareer.delete({ where: { id } });
+
+      this.logger.log(`UserCareer ${id} deleted successfully from all sources`);
+      return { success: true };
+    } catch (error) {
+      this.logger.error(`Failed to delete UserCareer ${id} completely`, error);
+      throw error;
+    }
+  }
+
+  private async deleteFromGoogleSheets(dbId: string): Promise<void> {
+    try {
+      const spreadsheetId = this.configService.get<string>('GOOGLE_SHEETS_CAREER_SPREADSHEET_ID');
+      const range = this.configService.get<string>('GOOGLE_SHEETS_CAREER_RANGE') || 'Sheet1!A:H';
+
+      if (!spreadsheetId) {
+        this.logger.warn('Google Sheets spreadsheet ID not configured, skipping sheet deletion');
+        return;
+      }
+
+      // Find the row by database ID
+      const rowIndex = await this.googleSheets.findRowById(spreadsheetId, range, dbId);
+
+      if (rowIndex === -1) {
+        this.logger.warn(`Row not found for career ID: ${dbId} in Google Sheets`);
+        return;
+      }
+
+      // Delete the row
+      await this.googleSheets.deleteRow(spreadsheetId, range, rowIndex);
+      this.logger.log(`Career application deleted from Google Sheets: ${dbId}`);
+    } catch (error) {
+      this.logger.error('Failed to delete from Google Sheets', error);
+      // Don't throw here as this is not critical for the overall deletion
+    }
+  }
+
+  private async deleteFromGoogleDrive(cvLink: string): Promise<void> {
+    try {
+      // Extract file ID from the Google Drive URL
+      const fileId = this.googleDrive.extractFileIdFromUrl(cvLink);
+
+      if (!fileId) {
+        this.logger.warn(`Could not extract file ID from CV link: ${cvLink}`);
+        return;
+      }
+
+      // Delete the file from Google Drive
+      await this.googleDrive.deleteFile(fileId);
+      this.logger.log(`CV file deleted from Google Drive: ${fileId}`);
+    } catch (error) {
+      this.logger.error('Failed to delete CV file from Google Drive', error);
+      // Don't throw here as this is not critical for the overall deletion
+    }
   }
 }
