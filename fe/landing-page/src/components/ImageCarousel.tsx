@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
-const GAP = -10;
+const GAP = 0;
 
 type CarouselImage = {
     src: string;
@@ -34,13 +34,13 @@ const ImageCarousel = ({ direction = "left", images = [] }: ImageCarouselProps) 
         const updateDimensions = () => {
             if (window.innerWidth < 640) {
                 // Mobile
-                setDimensions({ width: 200, height: 200 });
+                setDimensions({ width: 200, height: 250 });
             } else if (window.innerWidth < 1024) {
                 // Tablet
-                setDimensions({ width: 250, height: 250 });
+                setDimensions({ width: 250, height: 312.5 });
             } else {
                 // Desktop
-                setDimensions({ width: 300, height: 300 });
+                setDimensions({ width: 300, height: 375 });
             }
         };
 

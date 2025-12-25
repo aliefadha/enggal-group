@@ -7,14 +7,14 @@ import { apiClient, API_BASE_URL } from '../lib/api-client';
 import brandIcon from '../assets/images/brand_icon.svg';
 import outletIcon from '../assets/images/outlet_icon.svg';
 import cityIcon from '../assets/images/city_icon.svg';
-import heroIllustration from '../assets/images/hero_illustration.png';
+import heroIllustration from '../assets/images/hero_illustration.webp';
 import vectorLine from '../assets/images/vector_line.svg';
 import comfortIcon from '../assets/images/comfort_icon.svg';
 import trainingIcon from '../assets/images/training_icon.svg';
 import careerIcon from '../assets/images/career_icon.svg';
 import multibrandIcon from '../assets/images/multibrand_icon.svg';
 import uploadIcon from '../assets/images/upload_icon.svg';
-import careerGroup from '../assets/images/career_group.png';
+import careerGroup from '../assets/images/career_group.webp';
 import LogoCarousel from '../components/LogoCarousel';
 import {
   Dialog,
@@ -202,6 +202,20 @@ function Career() {
     });
   };
 
+  const scrollToForm = () => {
+    const formElement = document.getElementById('form');
+    if (formElement) {
+      const offset = 80; // Offset in pixels to prevent form from being hidden behind headers
+      const elementPosition = formElement.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <section className="relative bg-[#F9F9F9] py-16 md:py-24 m-2 md:m-0 rounded-md md:rounded-none">
@@ -234,7 +248,7 @@ function Career() {
                 </div>
                 <div className="flex flex-wrap gap-x-2 gap-y-1">
                   <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-3xl sm:text-4xl lg:text-5xl font-runestars text-white whitespace-normal md:whitespace-nowrap">
-                    Besar,
+                    Besar
                   </span>
                   <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-bold text-3xl sm:text-4xl lg:text-5xl text-[#FFB835] font-runestars whitespace-normal md:whitespace-nowrap">
                     Enggal Group Indonesia
@@ -245,12 +259,15 @@ function Career() {
                 </p>
               </div>
 
-              <button className="bg-black hover:bg-[#333] text-white font-semibold px-8 py-3 rounded-xl transition-colors w-3/4 sm:w-auto">
+              <button
+                onClick={scrollToForm}
+                className="bg-black hover:bg-[#333] text-white font-semibold px-8 py-3 rounded-xl transition-colors w-3/4 sm:w-auto"
+              >
                 Lamar Di sini!
               </button>
             </div>
 
-            <div className="hidden md:flex justify-center mt-8 lg:mt-0">
+            <div className="flex justify-center mt-8 lg:mt-0">
               <img src={heroIllustration} alt="Career Illustration" className="max-w-full h-auto" />
             </div>
           </div>
@@ -308,14 +325,14 @@ function Career() {
       </section>
 
       {/* Application Form Section */}
-      <section className="py-8 lg:py-16">
+      <section className="py-8 lg:py-16" id="form">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:items-stretch">
             <div className="bg-[#FFB835] rounded-lg p-6 text-white relative overflow-hidden h-full flex flex-col">
               <div className="absolute inset-0 z-0 pointer-events-none bg-[url('/images/dots.png')] bg-center bg-cover bg-no-repeat opacity-20"></div>
               <div className="relative z-10 space-y-6 max-w-[450px] w-full mx-auto flex-1 flex flex-col justify-between">
                 <div className='bg-white h-48 sm:h-64 md:h-80 lg:h-[380px] mx-auto rounded-md flex items-center justify-center overflow-hidden w-full'>
-                  <img src={careerGroup} alt="Career Group" className="w-full h-auto object-cover" />
+                  <img src={careerGroup} alt="Career Group" className="w-full h-full object-cover" />
                 </div>
                 <div className="space-y-2">
                   <h3 className="font-runestars">

@@ -49,24 +49,26 @@ const Footer: React.FC = () => {
             <div className="md:flex flex-col gap-4 hidden">
               <h1 className="font-jakarta text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white">Lokasi Head Office</h1>
               <div className="flex items-start gap-3">
-                <svg width="16" height="16" viewBox="0 0 16 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6.32444 19.5713C6.86311 20.0215 7.42489 20.4329 8 20.8345C8.57635 20.4382 9.1354 20.0168 9.67556 19.5713C10.576 18.8224 11.4234 18.0104 12.2116 17.1413C14.0284 15.1291 16 12.212 16 8.93747C16 7.87337 15.7931 6.81969 15.391 5.83659C14.989 4.85349 14.3997 3.96022 13.6569 3.20779C12.914 2.45535 12.0321 1.85849 11.0615 1.45128C10.0909 1.04406 9.05058 0.834473 8 0.834473C6.94943 0.834473 5.90914 1.04406 4.93853 1.45128C3.96793 1.85849 3.08601 2.45535 2.34315 3.20779C1.60028 3.96022 1.011 4.85349 0.608964 5.83659C0.206926 6.81969 -1.56548e-08 7.87337 0 8.93747C0 12.212 1.97156 15.1282 3.78844 17.1413C4.57655 18.0107 5.42397 18.8221 6.32444 19.5713ZM8 11.8636C7.23382 11.8636 6.49902 11.5553 5.95725 11.0065C5.41548 10.4578 5.11111 9.71352 5.11111 8.93747C5.11111 8.16143 5.41548 7.41716 5.95725 6.86842C6.49902 6.31967 7.23382 6.01139 8 6.01139C8.76618 6.01139 9.50098 6.31967 10.0428 6.86842C10.5845 7.41716 10.8889 8.16143 10.8889 8.93747C10.8889 9.71352 10.5845 10.4578 10.0428 11.0065C9.50098 11.5553 8.76618 11.8636 8 11.8636Z" fill="white" />
-                </svg>
-                <p className="font-jakarta text-sm sm:text-base md:text-base leading-relaxed text-[#CECECE]">
-                  Jl. Boulevard Kota Wisata No.26 Blok C1, <br /> Kel. Ciangsana, Kec. Gn. Putri, <br /> Kabupaten Bogor, Jawa Barat 16968
-                </p>
+                <a href="https://maps.app.goo.gl/TyYZHSyybnLpMLCt6" className='flex items-start gap-3'>
+                  <svg width="16" height="16" viewBox="0 0 16 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.32444 19.5713C6.86311 20.0215 7.42489 20.4329 8 20.8345C8.57635 20.4382 9.1354 20.0168 9.67556 19.5713C10.576 18.8224 11.4234 18.0104 12.2116 17.1413C14.0284 15.1291 16 12.212 16 8.93747C16 7.87337 15.7931 6.81969 15.391 5.83659C14.989 4.85349 14.3997 3.96022 13.6569 3.20779C12.914 2.45535 12.0321 1.85849 11.0615 1.45128C10.0909 1.04406 9.05058 0.834473 8 0.834473C6.94943 0.834473 5.90914 1.04406 4.93853 1.45128C3.96793 1.85849 3.08601 2.45535 2.34315 3.20779C1.60028 3.96022 1.011 4.85349 0.608964 5.83659C0.206926 6.81969 -1.56548e-08 7.87337 0 8.93747C0 12.212 1.97156 15.1282 3.78844 17.1413C4.57655 18.0107 5.42397 18.8221 6.32444 19.5713ZM8 11.8636C7.23382 11.8636 6.49902 11.5553 5.95725 11.0065C5.41548 10.4578 5.11111 9.71352 5.11111 8.93747C5.11111 8.16143 5.41548 7.41716 5.95725 6.86842C6.49902 6.31967 7.23382 6.01139 8 6.01139C8.76618 6.01139 9.50098 6.31967 10.0428 6.86842C10.5845 7.41716 10.8889 8.16143 10.8889 8.93747C10.8889 9.71352 10.5845 10.4578 10.0428 11.0065C9.50098 11.5553 8.76618 11.8636 8 11.8636Z" fill="white" />
+                  </svg>
+                  <p className="font-jakarta text-sm sm:text-base md:text-base leading-relaxed text-[#CECECE]">
+                    Jl. Boulevard Kota Wisata No.26 Blok C1, <br /> Kel. Ciangsana, Kec. Gn. Putri, <br /> Kabupaten Bogor, Jawa Barat 16968
+                  </p>
+                </a>
               </div>
             </div>
           </div>
           <div className='flex justify-between gap-x-4 col-start-1 lg:col-start-4 col-span-3'>
             <div className="text-left">
-              <h3 className="mb-4 font-jakarta text-base sm:text-lg md:text-xl font-bold text-white">Navigation</h3>
+              <h3 className="mb-4 font-jakarta text-base sm:text-lg md:text-xl font-bold text-white">Navigasi</h3>
               <ul className="space-y-4 font-jakarta text-sm md:text-base font-light text-[#CECECE] md:space-y-6">
                 <li>
-                  <Link to="/">Home</Link>
+                  <Link to="/">Beranda</Link>
                 </li>
                 <li>
-                  <Link to="/">Our Story</Link>
+                  <Link to="/">Cerita Kami</Link>
                 </li>
                 <li>
                   <Link to="/brand">Brand</Link>
@@ -94,19 +96,19 @@ const Footer: React.FC = () => {
                     <svg width="20" height="20" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M18 0H2C0.9 0 0.00999999 0.9 0.00999999 2L0 14C0 15.1 0.9 16 2 16H18C19.1 16 20 15.1 20 14V2C20 0.9 19.1 0 18 0ZM17.6 4.25L10.53 8.67C10.21 8.87 9.79 8.87 9.47 8.67L2.4 4.25C2.15 4.09 2 3.82 2 3.53C2 2.96 2.61 2.6 3.09 2.87L10 7L16.91 2.87C17.39 2.6 18 2.96 18 3.53C18 3.82 17.85 4.09 17.6 4.25Z" fill="#CECECE" />
                     </svg>
-                    <p className="font-jakarta text-sm text-[#CECECE]">contact@enggal.id</p>
+                    <a href="mailto:contact@enggal.id" className="font-jakarta text-sm text-[#CECECE] hover:text-white transition-colors">contact@enggal.id</a>
                   </li>
                   <li className="flex items-center gap-4 justify-start">
                     <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M4.35239 0C4.52703 2.47136e-06 4.69849 0.0467401 4.84898 0.135363C4.99947 0.223986 5.1235 0.351265 5.2082 0.503992L6.40506 2.65991C6.48223 2.79898 6.52434 2.95476 6.52775 3.11377C6.53117 3.27278 6.49577 3.43023 6.42463 3.57248L5.27181 5.8791C5.27181 5.8791 5.60601 7.59708 7.00447 8.99602C8.40341 10.3945 10.1155 10.7233 10.1155 10.7233L12.4217 9.56999C12.564 9.49876 12.7215 9.46332 12.8806 9.46673C13.0397 9.47014 13.1956 9.51231 13.3347 9.58956L15.4975 10.7923C15.6499 10.8771 15.7768 11.0012 15.8651 11.1516C15.9535 11.3019 16.0001 11.4732 16 11.6476V14.1299C16 15.3943 14.8256 16.3073 13.6278 15.9032C11.1675 15.0728 7.34845 13.4923 4.92782 11.0717C2.50768 8.65106 0.926706 4.83246 0.0968311 2.3717C-0.307342 1.17435 0.605717 0 1.8701 0H4.35239Z" fill="#CECECE" />
                     </svg>
-                    <p className="font-jakarta text-sm text-[#CECECE]">+62-813-1389-4340 (Partnership)</p>
+                    <a href="https://wa.me/6281313894340" className="font-jakarta text-sm text-[#CECECE] hover:text-white transition-colors">+62-813-1389-4340 (Partnership)</a>
                   </li>
                   <li className="flex items-center gap-4 justify-start">
                     <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M4.35239 0C4.52703 2.47136e-06 4.69849 0.0467401 4.84898 0.135363C4.99947 0.223986 5.1235 0.351265 5.2082 0.503992L6.40506 2.65991C6.48223 2.79898 6.52434 2.95476 6.52775 3.11377C6.53117 3.27278 6.49577 3.43023 6.42463 3.57248L5.27181 5.8791C5.27181 5.8791 5.60601 7.59708 7.00447 8.99602C8.40341 10.3945 10.1155 10.7233 10.1155 10.7233L12.4217 9.56999C12.564 9.49876 12.7215 9.46332 12.8806 9.46673C13.0397 9.47014 13.1956 9.51231 13.3347 9.58956L15.4975 10.7923C15.6499 10.8771 15.7768 11.0012 15.8651 11.1516C15.9535 11.3019 16.0001 11.4732 16 11.6476V14.1299C16 15.3943 14.8256 16.3073 13.6278 15.9032C11.1675 15.0728 7.34845 13.4923 4.92782 11.0717C2.50768 8.65106 0.926706 4.83246 0.0968311 2.3717C-0.307342 1.17435 0.605717 0 1.8701 0H4.35239Z" fill="#CECECE" />
                     </svg>
-                    <p className="font-jakarta text-sm text-[#CECECE]">+62-813-1389-4410 (Customer Care)</p>
+                    <a href="https://wa.me/6281313894410" className="font-jakarta text-sm text-[#CECECE] hover:text-white transition-colors">+62-813-1389-4410 (Customer Care)</a>
                   </li>
                 </ul>
               </div>

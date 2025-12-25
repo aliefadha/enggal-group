@@ -540,7 +540,12 @@ function RouteComponent() {
                         <StatusBadge status={applicant.status} />
                       </TableCell>
                       <TableCell className="text-center text-sm font-semibold text-[#FF9F0D]">
-                        <a href={applicant.cv_link} className="hover:underline">
+                        <a
+                          href={applicant.cv_link}
+                          className="hover:underline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           Buka
                         </a>
                       </TableCell>

@@ -400,6 +400,8 @@ function Index() {
                           <a
                             href={applicant.cv_link}
                             className="hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
                           >
                             Buka
                           </a>
