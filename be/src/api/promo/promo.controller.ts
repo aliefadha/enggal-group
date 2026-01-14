@@ -105,12 +105,18 @@ export class PromoController {
     const limit = Math.min(Math.max(1, limitRaw), 100);
     const startDate = query.startDate ? new Date(query.startDate) : undefined;
     const endDate = query.endDate ? new Date(query.endDate) : undefined;
+
+    // Validate sortOrder
+    const sortOrder = query.sortOrder === 'asc' ? 'asc' : 'desc';
+
     return this.promoService.findAll({
       page,
       limit,
       brandId: query.brandId,
       startDate,
       endDate,
+      sortBy: query.sortBy,
+      sortOrder,
     });
   }
 

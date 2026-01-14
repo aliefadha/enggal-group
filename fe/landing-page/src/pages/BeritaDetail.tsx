@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient, API_BASE_URL } from "../lib/api-client";
+import { useSeoMeta } from "../hooks/useSeoMeta";
 
 type BeritaItem = {
   id: string;
@@ -73,15 +74,10 @@ function formatDateTime(value: string) {
     year: "numeric",
   });
 
-  const timePart = date.toLocaleTimeString("id-ID", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
   const hasExplicitTime =
     date.getHours() !== 0 || date.getMinutes() !== 0 || date.getSeconds() !== 0;
 
-  return hasExplicitTime ? `${datePart}, ${timePart}` : datePart;
+  return hasExplicitTime ? `${datePart}` : datePart;
 }
 
 function getImageUrl(path?: string | null) {
@@ -150,6 +146,17 @@ function BeritaDetail() {
   const { data: promoHighlights = [] } = useQuery({
     queryKey: ["berita", "promo-highlights"],
     queryFn: fetchPromoHighlights,
+  });
+
+  // SEO Meta Tags
+  useSeoMeta({
+    title: berita?.judul,
+    description: berita ? getExcerpt(berita.content, 160) : undefined,
+    image: berita ? getImageUrl(berita.image) : undefined,
+    url: slug ? `/berita/${slug}` : undefined,
+    publishedTime: berita?.createdDate,
+    author: berita?.penulis || "Enggal Group",
+    keywords: "berita, enggal group, berita terbaru, berita terkini",
   });
 
   const errorMessage =
@@ -296,7 +303,7 @@ function BeritaDetail() {
                 </div>
               </div>
               <img
-                src="/images/berita_cover.png"
+                src="/images/berita_cover.webp"
                 alt="berita"
                 className="w-[300px] hidden md:block"
               />
@@ -357,7 +364,7 @@ function BeritaDetail() {
             <img
               src={getImageUrl(berita.image)}
               alt={berita.judul}
-              className="mx-auto w-full object-cover rounded-md max-h-[450px]"
+              className="mx-auto w-full object-cover rounded-md max-h-[450px] aspect-[4/3]"
             />
             <div className="my-9 flex flex-col gap-y-8">
               <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-7">

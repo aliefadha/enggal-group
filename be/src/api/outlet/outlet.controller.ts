@@ -85,11 +85,21 @@ export class OutletController {
     const limitRaw = parseInt(query.limit ?? '10', 10) || 10;
     const limit = Math.min(Math.max(1, limitRaw), 100);
 
+    // Validate sortOrder
+    const sortOrder = query.sortOrder === 'asc' ? 'asc' : 'desc';
+
     return this.outletService.findAll({
       page,
       limit,
       brandId: query.brandId,
+      sortBy: query.sortBy,
+      sortOrder,
     });
+  }
+
+  @Get('count-by-brand/:brandName')
+  async countByBrandName(@Param('brandName') brandName: string) {
+    return this.outletService.countByBrandName(brandName);
   }
 
   @Get(':id')
@@ -142,4 +152,5 @@ export class OutletController {
   remove(@Param('id') id: string) {
     return this.outletService.remove(id);
   }
+
 }

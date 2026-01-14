@@ -189,9 +189,9 @@ function Berita() {
                 </div>
               </div>
               <img
-                src="/images/berita_cover.png"
+                src="/images/berita_cover.webp"
                 alt="berita"
-                className="w-[300px] hidden md:block"
+                className="w-[200px] md:w-[300px]"
               />
             </div>
           </div>

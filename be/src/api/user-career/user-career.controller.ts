@@ -40,9 +40,12 @@ export class UserCareerController {
         email: { type: 'string', example: 'budi@example.com' },
         alamat: { type: 'string', example: 'Jl. Merdeka No. 123, Jakarta' },
         status: { type: 'string', enum: ['PENDING', 'INTERVIEW', 'HIRED', 'REJECT'], example: 'PENDING' },
+        jenis_kelamin: { type: 'string', enum: ['LAKI_LAKI', 'PEREMPUAN'], example: 'LAKI_LAKI' },
+        kota: { type: 'string', example: 'Jakarta' },
+        tanggal_lahir: { type: 'string', example: '1995-05-20' },
         cv: { type: 'string', format: 'binary' },
       },
-      required: ['tanggal', 'nama', 'no_hp', 'email', 'alamat', 'cv'],
+      required: ['tanggal', 'nama', 'no_hp', 'email', 'alamat', 'jenis_kelamin', 'kota', 'cv'],
     },
   })
   async create(@Body() dto: RequestUserCareerCreateDto, @UploadedFile() cv?: Express.Multer.File) {
@@ -105,12 +108,17 @@ export class UserCareerController {
       );
     }
 
+    // Validate sortOrder
+    const sortOrder = query.sortOrder === 'asc' ? 'asc' : 'desc';
+
     return this.service.findAll({
       page,
       limit,
       startDate,
       endDate,
-      status: query.status
+      status: query.status,
+      sortBy: query.sortBy,
+      sortOrder,
     });
   }
 
@@ -132,6 +140,9 @@ export class UserCareerController {
         email: { type: 'string', example: 'budi@example.com' },
         alamat: { type: 'string', example: 'Jl. Merdeka No. 123, Jakarta' },
         status: { type: 'string', enum: ['PENDING', 'INTERVIEW', 'HIRED', 'REJECT'], example: 'PENDING' },
+        jenis_kelamin: { type: 'string', enum: ['LAKI_LAKI', 'PEREMPUAN'], example: 'LAKI_LAKI' },
+        kota: { type: 'string', example: 'Jakarta' },
+        tanggal_lahir: { type: 'string', example: '1995-05-20' },
         cv: { type: 'string', format: 'binary' },
       },
     },

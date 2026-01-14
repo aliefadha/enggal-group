@@ -50,12 +50,16 @@ export class PromoService {
     brandId,
     startDate,
     endDate,
+    sortBy,
+    sortOrder = 'desc',
   }: {
     page?: number;
     limit?: number;
     brandId?: string;
     startDate?: Date;
     endDate?: Date;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
   }) {
     const skip = (page - 1) * limit;
     const where: Prisma.PromoWhereInput = {};
@@ -75,12 +79,31 @@ export class PromoService {
       where.berlakuHingga = berlakuHinggaFilter;
     }
 
+    // Build orderBy clause dynamically
+    const orderBy: any = {};
+    if (sortBy) {
+      // Handle nested brand sorting
+      if (sortBy === 'brand.nama') {
+        orderBy.brand = { nama: sortOrder };
+      } else {
+        // Direct field sorting
+        const validSortFields = ['title', 'subtitle', 'berlakuHingga', 'description', 'syaratKetentuan', 'image', 'banner', 'showBanner'];
+        if (validSortFields.includes(sortBy)) {
+          orderBy[sortBy] = sortOrder;
+        } else {
+          orderBy.berlakuHingga = 'desc'; // Fallback to default
+        }
+      }
+    } else {
+      orderBy.berlakuHingga = 'desc'; // Default sorting
+    }
+
     const [total, rows] = await this.prisma.$transaction([
       this.prisma.promo.count({ where }),
       this.prisma.promo.findMany({
         skip,
         take: limit,
-        orderBy: { berlakuHingga: 'desc' },
+        orderBy,
         where,
         select: {
           id: true,

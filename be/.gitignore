@@ -401,3 +401,5 @@ dist
 
 /generated/prisma
 uploads/
+
+/secrets

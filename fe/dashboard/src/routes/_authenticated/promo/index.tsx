@@ -8,6 +8,7 @@ import {
   Plus,
   Search,
   Trash2,
+  ArrowUpDown,
 } from "lucide-react";
 import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
@@ -77,11 +78,15 @@ async function fetchPromo({
   limit,
   startDate,
   endDate,
+  sortBy,
+  sortOrder,
 }: {
   page: number;
   limit: number;
   startDate?: string;
   endDate?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }) {
   const params = new URLSearchParams({
     page: String(page),
@@ -94,6 +99,14 @@ async function fetchPromo({
 
   if (endDate) {
     params.set("endDate", endDate);
+  }
+
+  if (sortBy) {
+    params.set("sortBy", sortBy);
+  }
+
+  if (sortOrder) {
+    params.set("sortOrder", sortOrder);
   }
 
   const response = await apiClient.get<PromoItem[], PromoListMeta>(
@@ -126,12 +139,46 @@ function formatDisplayDate(date?: string) {
   return format(parsed, "dd-MM-yyyy");
 }
 
+function SortableHeader({
+  column,
+  label,
+  sortConfig,
+  onSort,
+}: {
+  column: string;
+  label: string;
+  sortConfig: { sortBy: string; sortOrder: 'asc' | 'desc' };
+  onSort: (column: string) => void;
+}) {
+  const isActive = sortConfig.sortBy === column;
+  
+  return (
+    <button
+      onClick={() => onSort(column)}
+      className="flex items-center gap-1 hover:text-[#6E0112] transition-colors"
+    >
+      {label}
+      {!isActive && (
+        <ArrowUpDown className="h-3 w-3 text-[#9C1A1C]/50" />
+      )}
+      {isActive && (
+        sortConfig.sortOrder === 'asc' ? (
+          <span className="text-[#6E0112]">↑</span>
+        ) : (
+          <span className="text-[#6E0112]">↓</span>
+        )
+      )}
+    </button>
+  );
+}
+
 function RouteComponent() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [pagination, setPagination] = React.useState({ page: 1, limit: 15 });
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>(
     undefined,
   );
+  const [sortConfig, setSortConfig] = React.useState<{ sortBy: string; sortOrder: 'asc' | 'desc' }>({ sortBy: 'berlakuHingga', sortOrder: 'desc' });
   const queryClient = useQueryClient();
   const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(
     null,
@@ -151,12 +198,16 @@ function RouteComponent() {
       pagination.limit,
       startDateParam ?? null,
       endDateParam ?? null,
+      sortConfig.sortBy,
+      sortConfig.sortOrder,
     ],
     queryFn: () =>
       fetchPromo({
         ...pagination,
         startDate: startDateParam,
         endDate: endDateParam,
+        sortBy: sortConfig.sortBy,
+        sortOrder: sortConfig.sortOrder,
       }),
   });
 
@@ -177,6 +228,18 @@ function RouteComponent() {
 
   const handleDateRangeChange = (value: DateRange | undefined) => {
     setDateRange(value);
+    setPagination((prev) => ({ ...prev, page: 1 }));
+  };
+
+  const handleSort = (column: string) => {
+    setSortConfig((prev) => {
+      if (prev.sortBy === column) {
+        // Toggle sort order if same column
+        return { sortBy: column, sortOrder: prev.sortOrder === 'asc' ? 'desc' : 'asc' };
+      }
+      // New column, default to ascending
+      return { sortBy: column, sortOrder: 'asc' };
+    });
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
@@ -300,10 +363,29 @@ function RouteComponent() {
                   <TableHead className="w-16 text-center text-[#9C1A1C]">
                     No
                   </TableHead>
-                  <TableHead className="text-[#9C1A1C]">Nama Promo</TableHead>
-                  <TableHead className="text-[#9C1A1C]">Brand</TableHead>
+                  <TableHead className="text-[#9C1A1C]">
+                    <SortableHeader 
+                      column="title" 
+                      label="Nama Promo" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
+                  </TableHead>
+                  <TableHead className="text-[#9C1A1C]">
+                    <SortableHeader 
+                      column="brand.nama" 
+                      label="Brand" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
+                  </TableHead>
                   <TableHead className="w-40 text-[#9C1A1C]">
-                    Berlaku Hingga
+                    <SortableHeader 
+                      column="berlakuHingga" 
+                      label="Berlaku Hingga" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
                   </TableHead>
                   <TableHead className="w-32 text-center text-[#9C1A1C]">
                     Aksi

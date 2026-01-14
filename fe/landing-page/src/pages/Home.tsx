@@ -206,6 +206,8 @@ function Home() {
   const [selectedBrand, setSelectedBrand] = useState<string>("all");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [activeBrand, setActiveBrand] = useState<BrandHighlight | null>(null);
+  const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
+  const [preloadedImages, setPreloadedImages] = useState<Set<string>>(new Set());
 
   const { data: brandsData } = useQuery({
     queryKey: ["brands"],
@@ -238,11 +240,47 @@ function Home() {
     })).slice(0, 12)) || []
     , [brandsData]);
 
+  // Preload all brand cover images when brands data is loaded
+  useEffect(() => {
+    if (brandHighlights.length > 0) {
+      brandHighlights.forEach((brand) => {
+        if (brand.coverImage && !preloadedImages.has(brand.coverImage)) {
+          const img = new Image();
+          img.onload = () => {
+            setPreloadedImages((prev) => new Set([...prev, brand.coverImage!]));
+          };
+          img.src = brand.coverImage;
+        }
+      });
+    }
+  }, [brandHighlights, preloadedImages]);
+
   useEffect(() => {
     if (brandHighlights.length > 0 && !activeBrand) {
       setActiveBrand(brandHighlights[0]);
     }
   }, [brandHighlights, activeBrand]);
+
+  const handleSelectBrand = (brand: BrandHighlight) => {
+    if (brand.id === activeBrand?.id) return;
+
+    const imageUrl = brand.coverImage || "/images/brand_image.jpg";
+
+    setActiveBrand(brand);
+
+    if (!preloadedImages.has(imageUrl)) {
+      setIsImageLoading(true);
+      const img = new Image();
+      img.onload = () => {
+        setPreloadedImages((prev) => new Set([...prev, imageUrl]));
+        setIsImageLoading(false);
+      };
+      img.onerror = () => {
+        setIsImageLoading(false);
+      };
+      img.src = imageUrl;
+    }
+  };
 
   const navigateBrand = (direction: "next" | "prev") => {
     if (!activeBrand) return;
@@ -258,7 +296,7 @@ function Home() {
     const nextIndex =
       (currentIndex + offset + brandHighlights.length) %
       brandHighlights.length;
-    setActiveBrand(brandHighlights[nextIndex]);
+    handleSelectBrand(brandHighlights[nextIndex]);
   };
 
   const handlePrevBrand = () => navigateBrand("prev");
@@ -397,12 +435,20 @@ function Home() {
               Dari bakso prasmanan hingga kuliner Nusantara, kami hadirkan
               pengalaman makan otentik dan hangat untuk semua.
             </div>
-            <a
-              href="#brand"
-              className="mt-6 inline-flex w-fit items-center justify-center gap-2 rounded-md bg-white px-6 py-3 font-jakarta text-sm font-semibold  text-[#303030] transition hover:bg-[#FFB835] hover:text-[#6E0112]"
-            >
-              Jelajahi Brand
-            </a>
+            <div className="flex flex-col md:flex-row gap-2 mt-6">
+              <a
+                href="#brand"
+                className="inline-flex w-fit items-center justify-center gap-2 rounded-md bg-white px-6 py-3 font-jakarta text-sm font-semibold  text-[#303030] transition hover:bg-[#FFB835] hover:text-[#6E0112]"
+              >
+                Jelajahi Brand
+              </a>
+              <a
+                href="/membership"
+                className=" inline-flex w-fit items-center justify-center gap-2 rounded-md bg-transparent border border-white px-6 py-3 font-jakarta text-sm font-semibold  text-white transition hover:bg-[#6E0112] hover:border-[#6E0112] hover:text-white"
+              >
+                Join Membership
+              </a>
+            </div>
           </div>
         </div>
         <div className="bg-white border border-[#D9D9D9] rounded-md w-1/2 overflow-hidden h-[650px] hidden md:block">
@@ -440,28 +486,28 @@ function Home() {
             {/* Row 2 - Food Images */}
             <div className="col-span-1">
               <img
-                src="/images/image1.jpg"
+                src="/images/hero_1.webp"
                 className="w-full h-full object-cover"
                 alt="Food 1"
               />
             </div>
             <div className="col-span-1">
               <img
-                src="/images/image2.jpg"
+                src="/images/hero_2.webp"
                 className="w-full h-full object-cover"
                 alt="Food 2"
               />
             </div>
             <div className="col-span-1">
               <img
-                src="/images/image3.jpg"
+                src="/images/hero_3.webp"
                 className="w-full h-full object-cover"
                 alt="Food 3"
               />
             </div>
             <div className="col-span-1">
               <img
-                src="/images/image3.jpg"
+                src="/images/hero_4.webp"
                 className="w-full h-full object-cover"
                 alt="Food 4"
               />
@@ -500,28 +546,28 @@ function Home() {
             {/* Row 4 - Food Images */}
             <div className="col-span-1">
               <img
-                src="/images/image4.jpg"
+                src="/images/hero_5.webp"
                 className="w-full h-full object-cover"
                 alt="Food 5"
               />
             </div>
             <div className="col-span-1">
               <img
-                src="/images/image5.jpg"
+                src="/images/hero_6.webp"
                 className="w-full h-full object-cover"
                 alt="Food 6"
               />
             </div>
             <div className="col-span-1">
               <img
-                src="/images/image4.jpg"
+                src="/images/hero_7.webp"
                 className="w-full h-full object-cover"
                 alt="Food 7"
               />
             </div>
             <div className="col-span-1">
               <img
-                src="/images/image3.jpg"
+                src="/images/hero_8.webp"
                 className="w-full h-full object-cover"
                 alt="Food 8"
               />
@@ -529,7 +575,7 @@ function Home() {
 
             <div className="col-span-1 flex items-center justify-center p-4">
               <img
-                src={placeholderImage}
+                src="images/yongbengkalis.png"
                 className="max-w-[80%] max-h-[80%] object-contain"
                 alt="placeholder"
               />
@@ -879,7 +925,7 @@ function Home() {
               <div className="block lg:flex justify-between">
                 <h1 className="font-runestars text-2xl">MENYEBAR KE BANYAK KOTA</h1>
                 <p className="font-jakarta text-sm lg:max-w-[250px]">
-                  Bakso Raja di Pekanbaru, Bebek Sawahan di Palembang, Warkop Putra Agam di Jakarta Timur dan Sarapan Pagi Ambun Suri di Kota Wisata
+                  Bakso Raja di Pekanbaru, Bebek Sawahan di Palembang, Warkop Putra Agam di Jakarta Timur
                 </p>
               </div>
               <div className="flex justify-between gap-4">
@@ -1096,8 +1142,8 @@ function Home() {
                 <button
                   key={brand.id}
                   type="button"
-                  onClick={() => setActiveBrand(brand)}
-                  className={`border border-gray-100 flex items-center justify-center w-full h-full cursor-pointer transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFB835] ${brand.rounded ? "rounded" : ""
+                  onClick={() => handleSelectBrand(brand)}
+                  className={`border border-gray-100 flex items-center justify-center w-full h-full cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFB835] ${brand.rounded ? "rounded" : ""
                     } ${activeBrand?.id === brand.id
                       ? "bg-[#FFF4D6] shadow-sm"
                       : "bg-white hover:bg-gray-50"
@@ -1130,9 +1176,14 @@ function Home() {
               className="relative flex-1 overflow-hidden rounded-t-xl cursor-pointer"
               onClick={() => activeBrand && (window.location.href = `/brand/${activeBrand.id}`)}
             >
+              {/* Loading skeleton */}
+              {isImageLoading && (
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse z-10" />
+              )}
               <img
                 src={activeBrand?.coverImage || "/images/brand_image.jpg"}
-                className="h-full object-cover w-full"
+                className={`h-full object-cover w-full transition-opacity duration-300 ${isImageLoading ? 'opacity-0' : 'opacity-100'}`}
+                alt={activeBrand?.name || "Brand cover image"}
               />
               {brandHighlights.length > 1 && (
                 <div className="absolute bottom-4 right-4 z-10 flex items-center gap-3 lg:hidden">
@@ -1466,7 +1517,7 @@ function Home() {
           </svg>
         </div>
 
-        <div className="flex flex-col gap-y-4 items-center justify-center w-full mx-auto max-w-md text-center mb-16">
+        <div className="flex flex-col gap-y-4 items-center justify-center w-full mx-auto max-w-xl text-center mb-16">
           <img src={vectorLine} alt="Decorative line" className="w-16 h-5" />
           <h2 className="font-runestars">
             <span className="text-shadow-[0_0_6px_#6E0112,1px_0_0_#6E0112,2px_0_0_#6E0112,-1px_0_0_#6E0112,-2px_0_0_#6E0112,0_1px_0_#6E0112,0_2px_0_#6E0112,0_-1px_0_#6E0112,0_-2px_0_#6E0112,1px_1px_0_#6E0112,2px_2px_0_#6E0112,-1px_-1px_0_#6E0112,-2px_-2px_0_#6E0112,1px_-1px_0_#6E0112,2px_-2px_0_#6E0112,-1px_1px_0_#6E0112,-2px_2px_0_#6E0112] font-extrabold text-4xl md:text-5xl text-white whitespace-nowrap">

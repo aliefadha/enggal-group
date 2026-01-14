@@ -1,9 +1,13 @@
-import { Controller, Get, Post, Query, Res } from '@nestjs/common';
+import { Controller, Get, Query, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google } from 'googleapis';
 import { Response } from 'express';
-import { GoogleSheetsService } from 'src/common/google-sheets/google-sheets.service';
 
+/**
+ * @deprecated Service Account authentication is now used instead of OAuth2.
+ * This controller is kept for reference but is no longer needed for production.
+ * Remove this module if you don't need OAuth2 flow for other purposes.
+ */
 @Controller('google-auth')
 export class GoogleAuthController {
   private oauth2Client;
@@ -13,9 +17,17 @@ export class GoogleAuthController {
     const clientSecret = this.configService.get<string>('GOOGLE_CLIENT_SECRET');
     const redirectUri = this.configService.get<string>('GOOGLE_REDIRECT_URI');
 
-    this.oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+    this.oauth2Client = new google.auth.OAuth2(
+      clientId,
+      clientSecret,
+      redirectUri,
+    );
   }
 
+  /**
+   * @deprecated No longer needed with Service Account authentication.
+   * This endpoint would redirect to Google OAuth consent screen.
+   */
   @Get('authorize')
   authorize(@Res() res: Response) {
     const scopes = [
@@ -26,12 +38,16 @@ export class GoogleAuthController {
     const authUrl = this.oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: scopes,
-      prompt: 'consent', // Force consent screen to get refresh token
+      prompt: 'consent',
     });
 
     res.redirect(authUrl);
   }
 
+  /**
+   * @deprecated No longer needed with Service Account authentication.
+   * This endpoint was the OAuth2 callback for exchanging auth code for tokens.
+   */
   @Get('callback')
   async callback(@Query('code') code: string, @Res() res: Response) {
     try {
@@ -100,10 +116,14 @@ export class GoogleAuthController {
               </ol>
             </div>
 
-            ${tokens.access_token ? `
+            ${
+              tokens.access_token
+                ? `
               <h3>Access Token (temporary):</h3>
               <pre><code class="token">${tokens.access_token}</code></pre>
-            ` : ''}
+            `
+                : ''
+            }
 
             <h3>All Tokens:</h3>
             <pre><code>${JSON.stringify(tokens, null, 2)}</code></pre>

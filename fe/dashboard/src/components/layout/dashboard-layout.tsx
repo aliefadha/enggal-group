@@ -39,6 +39,7 @@ import outletIcon from "@/assets/icons/outlet.svg";
 import promoIcon from "@/assets/icons/promo.svg";
 import teamIcon from "@/assets/icons/team.svg";
 import userCareerIcon from "@/assets/icons/usercareer.svg";
+import membershipIcon from "@/assets/icons/membership.svg";
 import { useAuth } from "@/auth";
 
 type NavItem = {
@@ -84,6 +85,11 @@ const primaryNav: NavItem[] = [
     title: "Team",
     href: "/team",
     icon: teamIcon,
+  },
+  {
+    title: "Membership",
+    href: "/membership",
+    icon: membershipIcon,
   },
 ];
 
@@ -180,43 +186,55 @@ export function DashboardLayout() {
       <div className="bg-background flex min-h-svh w-full">
         <AppSidebar />
         <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mx-2 h-6" />
-            <div className="ml-auto flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="h-11 w-11 rounded-full border border-white/20 bg-white/10 p-0 transition hover:bg-white/20"
-                  >
-                    <span className="sr-only">Open profile menu</span>
-                    <div className="flex h-full w-full items-center justify-center rounded-full bg-white">
-                      <UserRound className="size-5 text-[#6E0112]" />
-                    </div>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-40 rounded-2xl border border-[#F0F1F3]"
-                >
-                  <DropdownMenuItem
-                    className="text-[#C1272D]"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </header>
-          <div className="flex flex-1 flex-col">
-            <div className="grow p-10 bg-[#F9F9F9]">
-              <Outlet />
-            </div>
-          </div>
+          <DashboardContent
+            handleLogout={handleLogout}
+          />
         </SidebarInset>
       </div>
     </SidebarProvider>
+  );
+}
+
+function DashboardContent({ handleLogout }: { handleLogout: () => void }) {
+  return (
+    <>
+      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <SidebarTrigger className="-ml-1" />
+        <Separator orientation="vertical" className="mx-2 h-6" />
+        <div className="ml-auto flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="h-11 w-11 rounded-full border border-white/20 bg-white/10 p-0 transition hover:bg-white/20"
+              >
+                <span className="sr-only">Open profile menu</span>
+                <div className="flex h-full w-full items-center justify-center rounded-full bg-white">
+                  <UserRound className="size-5 text-[#6E0112]" />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-40 rounded-2xl border border-[#F0F1F3]"
+            >
+              <DropdownMenuItem
+                className="text-[#C1272D]"
+                onClick={handleLogout}
+              >
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
+      <div
+        className="flex flex-1 flex-col overflow-hidden w-full"
+      >
+        <div className="grow p-10 bg-[#F9F9F9] overflow-x-auto w-full">
+          <Outlet />
+        </div>
+      </div>
+    </>
   );
 }

@@ -28,15 +28,23 @@ enum CareerStatus {
   REJECT
 }
 
+enum Gender {
+  LAKI_LAKI
+  PEREMPUAN
+}
+
 model UserCareer {
-  id      String       @id @default(uuid())
-  tanggal DateTime
-  nama    String
-  no_hp   String
-  email   String
-  alamat  String
-  cv_link String
-  status  CareerStatus @default(PENDING)
+  id            String       @id @default(uuid())
+  tanggal       DateTime
+  nama          String
+  no_hp         String
+  email         String
+  alamat        String
+  cv_link       String
+  status        CareerStatus @default(PENDING)
+  jenis_kelamin Gender
+  kota          String
+  tanggal_lahir DateTime     @default(now())
 }
 
 model Promo {
@@ -117,4 +125,17 @@ model Gallery {
   instagramUrl String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model Membership {
+  id             String   @id @default(uuid())
+  membershipId   String   @unique
+  nama           String
+  email          String
+  no_hp          String
+  jenis_kelamin  Gender
+  kota           String
+  tanggal_lahir  DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

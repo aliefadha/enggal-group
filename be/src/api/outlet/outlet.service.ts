@@ -50,20 +50,43 @@ export class OutletService {
     page = 1,
     limit = 10,
     brandId,
+    sortBy,
+    sortOrder = 'asc',
   }: {
     page?: number;
     limit?: number;
     brandId?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
   }) {
     const skip = (page - 1) * limit;
     const where = brandId ? { brandId } : undefined;
+
+    // Build orderBy clause dynamically
+    const orderBy: any = {};
+    if (sortBy) {
+      // Handle nested brand sorting
+      if (sortBy === 'brand.nama') {
+        orderBy.brand = { nama: sortOrder };
+      } else {
+        // Direct field sorting
+        const validSortFields = ['nama', 'kota', 'jamOperasional', 'lokasi', 'googleMapsLink', 'whatsappUrl'];
+        if (validSortFields.includes(sortBy)) {
+          orderBy[sortBy] = sortOrder;
+        } else {
+          orderBy.nama = 'asc'; // Fallback to default
+        }
+      }
+    } else {
+      orderBy.nama = 'asc'; // Default sorting
+    }
 
     const [total, rows] = await this.prisma.$transaction([
       this.prisma.outlet.count({ where }),
       this.prisma.outlet.findMany({
         skip,
         take: limit,
-        orderBy: { nama: 'asc' },
+        orderBy,
         where,
         include: { brand: { select: { id: true, nama: true } } },
       }),
@@ -130,5 +153,21 @@ export class OutletService {
 
     await this.prisma.outlet.delete({ where: { id } });
     return { success: true };
+  }
+
+  async countByBrandName(brandName: string) {
+    const brand = await this.prisma.brand.findFirst({
+      where: { nama: { equals: brandName, mode: 'insensitive' } },
+    });
+
+    if (!brand) {
+      throw new NotFoundException(`Brand "${brandName}" not found`);
+    }
+
+    const count = await this.prisma.outlet.count({
+      where: { brandId: brand.id },
+    });
+
+    return { count, brandName: brand.nama };
   }
 }
