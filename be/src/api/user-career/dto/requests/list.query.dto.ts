@@ -1,6 +1,16 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsNumberString, IsOptional } from 'class-validator';
+import { IsDateString, IsEnum, IsNumberString, IsOptional, IsString } from 'class-validator';
 import { CareerStatus } from '@prisma/client';
+
+export class SortOrder {
+  @IsOptional()
+  @IsString()
+  sortBy?: string;
+
+  @IsOptional()
+  @IsEnum(['asc', 'desc'])
+  sortOrder?: 'asc' | 'desc';
+}
 
 export class UserCareerListQueryDto {
   @ApiPropertyOptional({ description: 'Page number (1-based)', default: 1 })
@@ -37,6 +47,23 @@ export class UserCareerListQueryDto {
   @IsOptional()
   @IsEnum(CareerStatus)
   status?: CareerStatus;
+
+  @ApiPropertyOptional({
+    description: 'Sort by field (tanggal, nama, status, etc.)',
+    example: 'tanggal',
+  })
+  @IsOptional()
+  @IsString()
+  sortBy?: string;
+
+  @ApiPropertyOptional({
+    enum: ['asc', 'desc'],
+    description: 'Sort order',
+    example: 'desc',
+  })
+  @IsOptional()
+  @IsEnum(['asc', 'desc'])
+  sortOrder?: 'asc' | 'desc';
 
   constructor(dto: UserCareerListQueryDto) {
     Object.assign(this, dto);

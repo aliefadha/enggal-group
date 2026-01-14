@@ -95,6 +95,19 @@ const Navbar: React.FC = () => {
           </button>
 
           <NavLink
+            to="/membership"
+            className={({ isActive }) =>
+              [
+                "rounded-xl px-4 py-2 uppercase font-runestars text-sm text-[#6E0112] transition hover:underline hidden md:block",
+                isActive ? "underline text-[#FFB835] bg-[#6E0112]" : "bg-transparent border border-[#FFB835]",
+              ].join(" ")
+            }
+            onClick={closeMobileMenu}
+          >
+            Membership
+          </NavLink>
+
+          <NavLink
             to="/career"
             className={({ isActive }) =>
               [
@@ -111,11 +124,11 @@ const Navbar: React.FC = () => {
 
       <div
         className={[
-          "border-t border-[#E5E5E5] bg-white px-6 pb-6 pt-4 uppercase font-runestars transition-[max-height,opacity] duration-200 ease-in-out lg:hidden",
+          "border-t border-[#E5E5E5] bg-white px-6 uppercase font-runestars transition-[max-height,opacity] duration-200 ease-in-out lg:hidden",
           isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 overflow-hidden opacity-0",
         ].join(" ")}
       >
-        <div className="mx-auto flex max-w-6xl flex-col gap-4">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 py-2">
           {PRIMARY_LINKS.map(({ label, to, isAnchor }) => renderLink(label, to, isAnchor))}
         </div>
       </div>

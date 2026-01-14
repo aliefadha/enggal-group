@@ -24,6 +24,22 @@ import {
   DialogTitle,
   DialogFooter,
 } from '../components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { Calendar } from '../components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '../components/ui/popover';
+import { Button } from '../components/ui/button';
 
 type Brand = {
   id: string;
@@ -38,6 +54,29 @@ type BrandListMeta = {
   limit?: number;
   total?: number;
   totalPages?: number;
+};
+
+type ProvinceData = {
+  id: string;
+  name: string;
+};
+
+type CityData = {
+  id: string;
+  id_provinsi: string;
+  name: string;
+};
+
+type ProvincesApiResponse = {
+  code: string;
+  messages: string;
+  value: ProvinceData[];
+};
+
+type CitiesApiResponse = {
+  code: string;
+  messages: string;
+  value: CityData[];
 };
 
 // Zod validation schema
@@ -59,7 +98,12 @@ const careerFormSchema = z.object({
     .max(500, 'Alamat maksimal 500 karakter'),
   cv: z.instanceof(File, { message: 'CV harus diupload' })
     .refine((file) => file.size <= 5 * 1024 * 1024, 'Ukuran file CV maksimal 5MB')
-    .refine((file) => file.type === 'application/pdf', 'File CV harus berformat PDF')
+    .refine((file) => file.type === 'application/pdf', 'File CV harus berformat PDF'),
+  jenis_kelamin: z.enum(['LAKI_LAKI', 'PEREMPUAN'], {
+    error: () => ({ message: 'Jenis kelamin harus dipilih' })
+  }),
+  kota: z.string().min(3, 'Kota minimal 3 karakter').max(100, 'Kota maksimal 100 karakter'),
+  tanggal_lahir: z.string().min(1, 'Tanggal lahir harus dipilih'),
 });
 
 type CareerFormData = z.infer<typeof careerFormSchema>;
@@ -82,6 +126,18 @@ async function fetchBrands() {
   };
 }
 
+async function fetchProvinces(): Promise<ProvinceData[]> {
+  const response = await fetch(`https://api.binderbyte.com/wilayah/provinsi?api_key=${import.meta.env.VITE_WILAYAH_API_KEY}`);
+  const data: ProvincesApiResponse = await response.json();
+  return data.value;
+}
+
+async function fetchCitiesByProvince(provinceId: string): Promise<CityData[]> {
+  const response = await fetch(`https://api.binderbyte.com/wilayah/kabupaten?api_key=${import.meta.env.VITE_WILAYAH_API_KEY}&id_provinsi=${provinceId}`);
+  const data: CitiesApiResponse = await response.json();
+  return data.value;
+}
+
 type UserCareerFormData = {
   tanggal: string;
   nama: string;
@@ -89,6 +145,9 @@ type UserCareerFormData = {
   email: string;
   alamat: string;
   cv: File;
+  jenis_kelamin: string;
+  kota: string;
+  tanggal_lahir: string;
 };
 
 async function submitCareerApplication(formData: UserCareerFormData) {
@@ -99,6 +158,9 @@ async function submitCareerApplication(formData: UserCareerFormData) {
   data.append('email', formData.email);
   data.append('alamat', formData.alamat);
   data.append('cv', formData.cv);
+  data.append('jenis_kelamin', formData.jenis_kelamin);
+  data.append('kota', formData.kota);
+  data.append('tanggal_lahir', formData.tanggal_lahir);
 
   const response = await apiClient.post('/user-career', data);
   return response.data;
@@ -126,16 +188,44 @@ function Career() {
     queryFn: () => fetchDashboardCounts()
   });
 
+  const { data: provinces = [] } = useQuery({
+    queryKey: ["provinces"],
+    queryFn: fetchProvinces,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
+  });
+
+  const [selectedProvince, setSelectedProvince] = useState('');
+  const [provinceSearchQuery, setProvinceSearchQuery] = useState('');
+
+  const { data: cities = [] } = useQuery({
+    queryKey: ["cities", selectedProvince],
+    queryFn: () => fetchCitiesByProvince(selectedProvince),
+    enabled: !!selectedProvince,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
+  });
+
+  const [citySearchQuery, setCitySearchQuery] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+
   const {
     register,
     handleSubmit: handleFormSubmit,
     formState: { errors, isSubmitting },
     reset,
     setValue,
-    watch
+    watch,
   } = useForm<CareerFormData>({
     resolver: zodResolver(careerFormSchema),
-    mode: 'onBlur'
+    mode: 'onBlur',
+    defaultValues: {
+      kota: ''
+    }
   });
 
   const cvFile = watch('cv');
@@ -169,6 +259,10 @@ function Career() {
         message: 'Terima kasih telah melamar. Kami akan menghubungi Anda segera jika profil Anda sesuai dengan kebutuhan kami.'
       });
       reset();
+      setSelectedDate(undefined);
+      setSelectedProvince('');
+      setProvinceSearchQuery('');
+      setCitySearchQuery('');
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -198,7 +292,10 @@ function Career() {
       no_hp: data.whatsapp,
       email: data.email,
       alamat: data.address,
-      cv: data.cv
+      cv: data.cv,
+      jenis_kelamin: data.jenis_kelamin,
+      kota: data.kota,
+      tanggal_lahir: data.tanggal_lahir
     });
   };
 
@@ -327,10 +424,10 @@ function Career() {
       {/* Application Form Section */}
       <section className="py-8 lg:py-16" id="form">
         <div className="container mx-auto max-w-6xl px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:items-stretch">
-            <div className="bg-[#FFB835] rounded-lg p-6 text-white relative overflow-hidden h-full flex flex-col">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="bg-[#FFB835] rounded-lg p-6 text-white relative overflow-hidden h-fit flex flex-col">
               <div className="absolute inset-0 z-0 pointer-events-none bg-[url('/images/dots.png')] bg-center bg-cover bg-no-repeat opacity-20"></div>
-              <div className="relative z-10 space-y-6 max-w-[450px] w-full mx-auto flex-1 flex flex-col justify-between">
+              <div className="relative z-10 space-y-6 max-w-[450px] w-full mx-auto flex-1 flex flex-col justify-start">
                 <div className='bg-white h-48 sm:h-64 md:h-80 lg:h-[380px] mx-auto rounded-md flex items-center justify-center overflow-hidden w-full'>
                   <img src={careerGroup} alt="Career Group" className="w-full h-full object-cover" />
                 </div>
@@ -417,6 +514,168 @@ function Career() {
                   />
                   {errors.address && (
                     <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>
+                  )}
+                </div>
+
+                {/* Gender Field */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Jenis Kelamin*</label>
+                  <div className="flex gap-6">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        {...register('jenis_kelamin')}
+                        value="LAKI_LAKI"
+                        className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500"
+                        disabled={careerMutation.isPending || isSubmitting}
+                      />
+                      <span className="text-sm text-gray-700">Laki-laki</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        {...register('jenis_kelamin')}
+                        value="PEREMPUAN"
+                        className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500"
+                        disabled={careerMutation.isPending || isSubmitting}
+                      />
+                      <span className="text-sm text-gray-700">Perempuan</span>
+                    </label>
+                  </div>
+                  {errors.jenis_kelamin && (
+                    <p className="text-red-500 text-xs mt-1">{errors.jenis_kelamin.message}</p>
+                  )}
+                </div>
+
+                {/* Province Field */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Provinsi*</label>
+                  <Select
+                    value={selectedProvince}
+                    onValueChange={(value) => {
+                      setSelectedProvince(value);
+                      setValue('kota', '');
+                      setCitySearchQuery('');
+                      setProvinceSearchQuery('');
+                    }}
+                    disabled={careerMutation.isPending || isSubmitting}
+                    onOpenChange={(open) => {
+                      if (!open) {
+                        setProvinceSearchQuery('');
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-full border-gray-200">
+                      <SelectValue placeholder="Pilih provinsi" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <div className="p-2">
+                        <input
+                          type="text"
+                          placeholder="Cari provinsi..."
+                          value={provinceSearchQuery}
+                          onChange={(e) => setProvinceSearchQuery(e.target.value)}
+                          onKeyDown={(e) => e.stopPropagation()}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                      </div>
+                      {provinces
+                        .filter(province =>
+                          province.name.toLowerCase().includes(provinceSearchQuery.toLowerCase())
+                        )
+                        .map((province) => (
+                          <SelectItem key={province.id} value={province.id}>
+                            {province.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* City Field */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Kota/Kabupaten*</label>
+                  <Select
+                    value={watch('kota')}
+                    onValueChange={(value) => {
+                      setValue('kota', value);
+                      setCitySearchQuery('');
+                    }}
+                    disabled={careerMutation.isPending || isSubmitting || !selectedProvince}
+                    onOpenChange={(open) => {
+                      if (!open) {
+                        setCitySearchQuery('');
+                      }
+                    }}
+                  >
+                    <SelectTrigger
+                      className={`w-full ${errors.kota ? 'border-red-500' : 'border-gray-200'
+                        }`}
+                    >
+                      <SelectValue placeholder={!selectedProvince ? "Pilih provinsi terlebih dahulu" : "Pilih kota/kabupaten"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <div className="p-2">
+                        <input
+                          type="text"
+                          placeholder="Cari kota/kabupaten..."
+                          value={citySearchQuery}
+                          onChange={(e) => setCitySearchQuery(e.target.value)}
+                          onKeyDown={(e) => e.stopPropagation()}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                      </div>
+                      {cities
+                        .filter(city =>
+                          city.name.toLowerCase().includes(citySearchQuery.toLowerCase())
+                        )
+                        .map((city) => (
+                          <SelectItem key={city.id} value={city.name}>
+                            {city.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.kota && (
+                    <p className="text-red-500 text-xs mt-1">{errors.kota.message}</p>
+                  )}
+                </div>
+
+                {/* Date of Birth Field */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Tanggal Lahir*</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className={`w-full justify-start text-left font-normal ${!selectedDate ? 'text-gray-400' : ''
+                          } ${errors.tanggal_lahir ? 'border-red-500' : 'border-gray-200'}`}
+                        disabled={careerMutation.isPending || isSubmitting}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {selectedDate ? format(selectedDate, 'dd-MM-yyyy') : 'Pilih tanggal'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        captionLayout='dropdown'
+                        selected={selectedDate}
+                        onSelect={(date) => {
+                          setSelectedDate(date);
+                          if (date) {
+                            setValue('tanggal_lahir', date.toISOString().split('T')[0]);
+                          }
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {errors.tanggal_lahir && (
+                    <p className="text-red-500 text-xs mt-1">{errors.tanggal_lahir.message}</p>
                   )}
                 </div>
 

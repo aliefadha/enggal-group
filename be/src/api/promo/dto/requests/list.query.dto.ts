@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsDateString, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class PromoListQueryDto {
   @ApiPropertyOptional({ description: 'Page number (1-based)' })
@@ -36,6 +36,23 @@ export class PromoListQueryDto {
   @IsOptional()
   @IsDateString()
   endDate?: string;
+
+  @ApiPropertyOptional({
+    description: 'Sort by field (title, berlakuHingga, brand.nama, etc.)',
+    example: 'berlakuHingga',
+  })
+  @IsOptional()
+  @IsString()
+  sortBy?: string;
+
+  @ApiPropertyOptional({
+    enum: ['asc', 'desc'],
+    description: 'Sort order',
+    example: 'desc',
+  })
+  @IsOptional()
+  @IsEnum(['asc', 'desc'])
+  sortOrder?: 'asc' | 'desc';
 
   constructor(dto: PromoListQueryDto) {
     Object.assign(this, dto);

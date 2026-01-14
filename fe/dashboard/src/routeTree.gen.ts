@@ -17,6 +17,7 @@ import { Route as AuthenticatedUserCareerIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedTeamIndexRouteImport } from './routes/_authenticated/team/index'
 import { Route as AuthenticatedPromoIndexRouteImport } from './routes/_authenticated/promo/index'
 import { Route as AuthenticatedOutletIndexRouteImport } from './routes/_authenticated/outlet/index'
+import { Route as AuthenticatedMembershipIndexRouteImport } from './routes/_authenticated/membership/index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
 import { Route as AuthenticatedBrandIndexRouteImport } from './routes/_authenticated/brand/index'
 import { Route as AuthenticatedBeritaIndexRouteImport } from './routes/_authenticated/berita/index'
@@ -70,6 +71,12 @@ const AuthenticatedOutletIndexRoute =
   AuthenticatedOutletIndexRouteImport.update({
     id: '/outlet/',
     path: '/outlet/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedMembershipIndexRoute =
+  AuthenticatedMembershipIndexRouteImport.update({
+    id: '/membership/',
+    path: '/membership/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardIndexRoute =
@@ -161,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/berita': typeof AuthenticatedBeritaIndexRoute
   '/brand': typeof AuthenticatedBrandIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/membership': typeof AuthenticatedMembershipIndexRoute
   '/outlet': typeof AuthenticatedOutletIndexRoute
   '/promo': typeof AuthenticatedPromoIndexRoute
   '/team': typeof AuthenticatedTeamIndexRoute
@@ -183,6 +191,7 @@ export interface FileRoutesByTo {
   '/berita': typeof AuthenticatedBeritaIndexRoute
   '/brand': typeof AuthenticatedBrandIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/membership': typeof AuthenticatedMembershipIndexRoute
   '/outlet': typeof AuthenticatedOutletIndexRoute
   '/promo': typeof AuthenticatedPromoIndexRoute
   '/team': typeof AuthenticatedTeamIndexRoute
@@ -207,6 +216,7 @@ export interface FileRoutesById {
   '/_authenticated/berita/': typeof AuthenticatedBeritaIndexRoute
   '/_authenticated/brand/': typeof AuthenticatedBrandIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/membership/': typeof AuthenticatedMembershipIndexRoute
   '/_authenticated/outlet/': typeof AuthenticatedOutletIndexRoute
   '/_authenticated/promo/': typeof AuthenticatedPromoIndexRoute
   '/_authenticated/team/': typeof AuthenticatedTeamIndexRoute
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/berita'
     | '/brand'
     | '/dashboard'
+    | '/membership'
     | '/outlet'
     | '/promo'
     | '/team'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/berita'
     | '/brand'
     | '/dashboard'
+    | '/membership'
     | '/outlet'
     | '/promo'
     | '/team'
@@ -276,6 +288,7 @@ export interface FileRouteTypes {
     | '/_authenticated/berita/'
     | '/_authenticated/brand/'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/membership/'
     | '/_authenticated/outlet/'
     | '/_authenticated/promo/'
     | '/_authenticated/team/'
@@ -350,6 +363,13 @@ declare module '@tanstack/react-router' {
       path: '/outlet'
       fullPath: '/outlet'
       preLoaderRoute: typeof AuthenticatedOutletIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/membership/': {
+      id: '/_authenticated/membership/'
+      path: '/membership'
+      fullPath: '/membership'
+      preLoaderRoute: typeof AuthenticatedMembershipIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/': {
@@ -455,6 +475,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedBeritaIndexRoute: typeof AuthenticatedBeritaIndexRoute
   AuthenticatedBrandIndexRoute: typeof AuthenticatedBrandIndexRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedMembershipIndexRoute: typeof AuthenticatedMembershipIndexRoute
   AuthenticatedOutletIndexRoute: typeof AuthenticatedOutletIndexRoute
   AuthenticatedPromoIndexRoute: typeof AuthenticatedPromoIndexRoute
   AuthenticatedTeamIndexRoute: typeof AuthenticatedTeamIndexRoute
@@ -475,6 +496,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBeritaIndexRoute: AuthenticatedBeritaIndexRoute,
   AuthenticatedBrandIndexRoute: AuthenticatedBrandIndexRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+  AuthenticatedMembershipIndexRoute: AuthenticatedMembershipIndexRoute,
   AuthenticatedOutletIndexRoute: AuthenticatedOutletIndexRoute,
   AuthenticatedPromoIndexRoute: AuthenticatedPromoIndexRoute,
   AuthenticatedTeamIndexRoute: AuthenticatedTeamIndexRoute,

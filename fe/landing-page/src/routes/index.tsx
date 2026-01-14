@@ -8,6 +8,8 @@ import Career from "../pages/Career";
 import PromoDetail from "../pages/PromoDetail";
 import BeritaDetail from "../pages/BeritaDetail";
 
+import Membership from "../pages/Membership";
+
 export function AppRoutes() {
   return (
     <Routes>
@@ -19,6 +21,7 @@ export function AppRoutes() {
       <Route path="/promo" element={<Promo />} />,
       <Route path="/promo/:id" element={<PromoDetail />} />,
       <Route path="/career" element={<Career />} />,
+      <Route path="/membership" element={<Membership />} />,
     </Routes>
   );
 }

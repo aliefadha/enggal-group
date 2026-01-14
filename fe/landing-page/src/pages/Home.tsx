@@ -435,12 +435,20 @@ function Home() {
               Dari bakso prasmanan hingga kuliner Nusantara, kami hadirkan
               pengalaman makan otentik dan hangat untuk semua.
             </div>
-            <a
-              href="#brand"
-              className="mt-6 inline-flex w-fit items-center justify-center gap-2 rounded-md bg-white px-6 py-3 font-jakarta text-sm font-semibold  text-[#303030] transition hover:bg-[#FFB835] hover:text-[#6E0112]"
-            >
-              Jelajahi Brand
-            </a>
+            <div className="flex flex-col md:flex-row gap-2 mt-6">
+              <a
+                href="#brand"
+                className="inline-flex w-fit items-center justify-center gap-2 rounded-md bg-white px-6 py-3 font-jakarta text-sm font-semibold  text-[#303030] transition hover:bg-[#FFB835] hover:text-[#6E0112]"
+              >
+                Jelajahi Brand
+              </a>
+              <a
+                href="/membership"
+                className=" inline-flex w-fit items-center justify-center gap-2 rounded-md bg-transparent border border-white px-6 py-3 font-jakarta text-sm font-semibold  text-white transition hover:bg-[#6E0112] hover:border-[#6E0112] hover:text-white"
+              >
+                Join Membership
+              </a>
+            </div>
           </div>
         </div>
         <div className="bg-white border border-[#D9D9D9] rounded-md w-1/2 overflow-hidden h-[650px] hidden md:block">
@@ -1135,7 +1143,7 @@ function Home() {
                   key={brand.id}
                   type="button"
                   onClick={() => handleSelectBrand(brand)}
-                  className={`border border-gray-100 flex items-center justify-center w-full h-full cursor-pointer transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFB835] ${brand.rounded ? "rounded" : ""
+                  className={`border border-gray-100 flex items-center justify-center w-full h-full cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFB835] ${brand.rounded ? "rounded" : ""
                     } ${activeBrand?.id === brand.id
                       ? "bg-[#FFF4D6] shadow-sm"
                       : "bg-white hover:bg-gray-50"

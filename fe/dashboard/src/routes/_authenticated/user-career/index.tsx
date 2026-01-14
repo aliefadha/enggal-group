@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { createFileRoute } from "@tanstack/react-router";
-import { Calendar as CalendarIcon, Loader2, Search, MoreHorizontal, Trash2 } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Loader2, Search, MoreHorizontal, Trash2, ArrowUpDown } from "lucide-react";
 import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 
@@ -64,6 +64,9 @@ type CareerApplicant = {
   email: string;
   cv_link: string;
   status: CareerStatus;
+  jenis_kelamin?: string;
+  kota?: string;
+  tanggal_lahir?: string;
 };
 
 type CareerListMeta = {
@@ -79,12 +82,16 @@ async function fetchUserCareers({
   startDate,
   endDate,
   status,
+  sortBy,
+  sortOrder,
 }: {
   page: number;
   limit: number;
   startDate?: string;
   endDate?: string;
   status?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }) {
   const params = new URLSearchParams({
     page: String(page),
@@ -101,6 +108,14 @@ async function fetchUserCareers({
 
   if (status) {
     params.set("status", status);
+  }
+
+  if (sortBy) {
+    params.set("sortBy", sortBy);
+  }
+
+  if (sortOrder) {
+    params.set("sortOrder", sortOrder);
   }
 
   const response = await apiClient.get<CareerApplicant[], CareerListMeta>(
@@ -146,6 +161,39 @@ function StatusBadge({
     <div className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${statusInfo.color}`}>
       {statusInfo.label}
     </div>
+  );
+}
+
+function SortableHeader({
+  column,
+  label,
+  sortConfig,
+  onSort,
+}: {
+  column: string;
+  label: string;
+  sortConfig: { sortBy: string; sortOrder: 'asc' | 'desc' };
+  onSort: (column: string) => void;
+}) {
+  const isActive = sortConfig.sortBy === column;
+  
+  return (
+    <button
+      onClick={() => onSort(column)}
+      className="flex items-center gap-1 hover:text-[#6E0112] transition-colors"
+    >
+      {label}
+      {!isActive && (
+        <ArrowUpDown className="h-3 w-3 text-[#9C1A1C]/50" />
+      )}
+      {isActive && (
+        sortConfig.sortOrder === 'asc' ? (
+          <span className="text-[#6E0112]">↑</span>
+        ) : (
+          <span className="text-[#6E0112]">↓</span>
+        )
+      )}
+    </button>
   );
 }
 
@@ -289,8 +337,14 @@ function RouteComponent() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [pagination, setPagination] = React.useState({ page: 1, limit: 15 });
   const [statusFilter, setStatusFilter] = React.useState<string>("ALL");
+  const [sortConfig, setSortConfig] = React.useState<{ sortBy: string; sortOrder: 'asc' | 'desc' }>({ sortBy: 'tanggal', sortOrder: 'desc' });
 
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>();
+
+  const numberFormatter = React.useMemo(
+    () => new Intl.NumberFormat("id-ID"),
+    [],
+  );
 
   const startDateParam = dateRange?.from
     ? format(dateRange.from, "yyyy-MM-dd")
@@ -307,6 +361,8 @@ function RouteComponent() {
       startDateParam ?? null,
       endDateParam ?? null,
       statusFilter || null,
+      sortConfig.sortBy,
+      sortConfig.sortOrder,
     ],
     queryFn: () =>
       fetchUserCareers({
@@ -314,6 +370,8 @@ function RouteComponent() {
         startDate: startDateParam,
         endDate: endDateParam,
         status: statusFilter === "ALL" ? undefined : statusFilter || undefined,
+        sortBy: sortConfig.sortBy,
+        sortOrder: sortConfig.sortOrder,
       }),
   });
 
@@ -361,6 +419,18 @@ function RouteComponent() {
 
   const handleStatusFilterChange = (value: string) => {
     setStatusFilter(value);
+    setPagination((prev) => ({ ...prev, page: 1 }));
+  };
+
+  const handleSort = (column: string) => {
+    setSortConfig((prev) => {
+      if (prev.sortBy === column) {
+        // Toggle sort order if same column
+        return { sortBy: column, sortOrder: prev.sortOrder === 'asc' ? 'desc' : 'asc' };
+      }
+      // New column, default to ascending
+      return { sortBy: column, sortOrder: 'asc' };
+    });
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
@@ -454,7 +524,7 @@ function RouteComponent() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-3xl border border-[#F0F1F3] bg-white">
+          <div className="overflow-x-auto rounded-3xl border border-[#F0F1F3] bg-white max-w-[1000px] 2xl:max-w-none">
             <Table>
               <TableHeader className="bg-[#F6F7F9]">
                 <TableRow className="border-b border-[#F0F1F3]">
@@ -462,15 +532,68 @@ function RouteComponent() {
                     No
                   </TableHead>
                   <TableHead className="w-40 text-[#9C1A1C]">
-                    Tanggal Submit
+                    <SortableHeader 
+                      column="tanggal" 
+                      label="Tanggal Submit" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
                   </TableHead>
-                  <TableHead className="text-[#9C1A1C]">Nama</TableHead>
+                  <TableHead className="text-[#9C1A1C]">
+                    <SortableHeader 
+                      column="nama" 
+                      label="Nama" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
+                  </TableHead>
                   <TableHead className="w-40 text-[#9C1A1C]">
-                    Nomor Whatsapp
+                    <SortableHeader 
+                      column="no_hp" 
+                      label="Nomor Whatsapp" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
                   </TableHead>
-                  <TableHead className="text-[#9C1A1C]">Email</TableHead>
+                  <TableHead className="text-[#9C1A1C]">
+                    <SortableHeader 
+                      column="email" 
+                      label="Email" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
+                  </TableHead>
                   <TableHead className="w-28 text-center text-[#9C1A1C]">
-                    Status
+                    <SortableHeader 
+                      column="jenis_kelamin" 
+                      label="Jenis Kelamin" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
+                  </TableHead>
+                  <TableHead className="w-32 text-[#9C1A1C]">
+                    <SortableHeader 
+                      column="kota" 
+                      label="Kota" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
+                  </TableHead>
+                  <TableHead className="w-32 text-[#9C1A1C]">
+                    <SortableHeader 
+                      column="tanggal_lahir" 
+                      label="Tanggal Lahir" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
+                  </TableHead>
+                  <TableHead className="w-28 text-center text-[#9C1A1C]">
+                    <SortableHeader 
+                      column="status" 
+                      label="Status" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
                   </TableHead>
                   <TableHead className="w-28 text-center text-[#9C1A1C]">
                     CV
@@ -484,7 +607,7 @@ function RouteComponent() {
                 {isLoading ? (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={11}
                       className="py-12 text-center text-sm text-[#6B7280]"
                     >
                       <div className="flex items-center justify-center gap-2">
@@ -496,7 +619,7 @@ function RouteComponent() {
                 ) : isError ? (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={11}
                       className="py-12 text-center text-sm text-[#C1272D]"
                     >
                       Terjadi kesalahan saat memuat data.
@@ -509,7 +632,7 @@ function RouteComponent() {
                 ) : applicants.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={11}
                       className="py-12 text-center text-sm text-[#6B7280]"
                     >
                       Tidak ada data.
@@ -535,6 +658,15 @@ function RouteComponent() {
                       </TableCell>
                       <TableCell className="text-sm text-[#6B7280]">
                         {applicant.email}
+                      </TableCell>
+                      <TableCell className="text-sm text-[#4F4F4F]">
+                        {applicant.jenis_kelamin === 'LAKI_LAKI' ? 'Laki-laki' : applicant.jenis_kelamin === 'PEREMPUAN' ? 'Perempuan' : '-'}
+                      </TableCell>
+                      <TableCell className="text-sm text-[#4F4F4F]">
+                        {applicant.kota || '-'}
+                      </TableCell>
+                      <TableCell className="text-sm text-[#4F4F4F]">
+                        {formatDisplayDate(applicant.tanggal_lahir)}
                       </TableCell>
                       <TableCell className="text-center">
                         <StatusBadge status={applicant.status} />
@@ -578,6 +710,74 @@ function RouteComponent() {
                 )}
               </TableBody>
             </Table>
+          </div>
+
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-6 pt-4 border-t border-[#F0F1F3]">
+            <div className="text-sm text-[#6B7280]">
+              Menampilkan {(pagination.page - 1) * pagination.limit + 1} sampai{" "}
+              {Math.min(pagination.page * pagination.limit, data?.meta.total ?? 0)} dari{" "}
+              {numberFormatter.format(data?.meta.total ?? 0)} data
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
+                disabled={pagination.page === 1 || isLoading}
+                className="h-10 rounded-xl border border-[#F0F1F3] bg-[#F9FBFD] text-[#4F4F4F] hover:bg-[#f1f3f7]"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Sebelumnya</span>
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, Math.ceil((data?.meta.total ?? 0) / pagination.limit)) }, (_, i) => {
+                  const totalPages = Math.ceil((data?.meta.total ?? 0) / pagination.limit);
+                  let pageNumber;
+
+                  if (totalPages <= 5) {
+                    pageNumber = i + 1;
+                  } else if (pagination.page <= 3) {
+                    pageNumber = i + 1;
+                  } else if (pagination.page >= totalPages - 2) {
+                    pageNumber = totalPages - 4 + i;
+                  } else {
+                    pageNumber = pagination.page - 2 + i;
+                  }
+
+                  return (
+                    <Button
+                      key={pageNumber}
+                      type="button"
+                      variant={pagination.page === pageNumber ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPagination((prev) => ({ ...prev, page: pageNumber }))}
+                      disabled={isLoading}
+                      className={`h-10 w-10 rounded-xl ${pagination.page === pageNumber
+                        ? "bg-[#6E0112] text-white hover:bg-[#5a010e]"
+                        : "border border-[#F0F1F3] bg-[#F9FBFD] text-[#4F4F4F] hover:bg-[#f1f3f7]"
+                        }`}
+                    >
+                      {pageNumber}
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
+                disabled={pagination.page >= Math.ceil((data?.meta.total ?? 0) / pagination.limit) || isLoading}
+                className="h-10 rounded-xl border border-[#F0F1F3] bg-[#F9FBFD] text-[#4F4F4F] hover:bg-[#f1f3f7]"
+              >
+                <span className="hidden sm:inline">Selanjutnya</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

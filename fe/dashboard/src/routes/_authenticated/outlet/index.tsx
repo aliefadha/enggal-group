@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Filter, Loader2, Plus, Search, Trash2 } from "lucide-react";
+import { Filter, Loader2, Plus, Search, Trash2, ArrowUpDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -79,10 +79,14 @@ async function fetchOutlet({
   page,
   limit,
   brandId,
+  sortBy,
+  sortOrder,
 }: {
   page: number;
   limit: number;
   brandId?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }) {
   const params = new URLSearchParams({
     page: String(page),
@@ -91,6 +95,14 @@ async function fetchOutlet({
 
   if (brandId) {
     params.set("brandId", brandId);
+  }
+
+  if (sortBy) {
+    params.set("sortBy", sortBy);
+  }
+
+  if (sortOrder) {
+    params.set("sortOrder", sortOrder);
   }
 
   const response = await apiClient.get<OutletItem[], OutletListMeta>(
@@ -123,6 +135,39 @@ const fetchBrandOptions = async () => {
   return response.data ?? [];
 };
 
+function SortableHeader({
+  column,
+  label,
+  sortConfig,
+  onSort,
+}: {
+  column: string;
+  label: string;
+  sortConfig: { sortBy: string; sortOrder: 'asc' | 'desc' };
+  onSort: (column: string) => void;
+}) {
+  const isActive = sortConfig.sortBy === column;
+  
+  return (
+    <button
+      onClick={() => onSort(column)}
+      className="flex items-center gap-1 hover:text-[#6E0112] transition-colors"
+    >
+      {label}
+      {!isActive && (
+        <ArrowUpDown className="h-3 w-3 text-[#9C1A1C]/50" />
+      )}
+      {isActive && (
+        sortConfig.sortOrder === 'asc' ? (
+          <span className="text-[#6E0112]">↑</span>
+        ) : (
+          <span className="text-[#6E0112]">↓</span>
+        )
+      )}
+    </button>
+  );
+}
+
 function RouteComponent() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [pagination, setPagination] = React.useState({ page: 1, limit: 15 });
@@ -132,6 +177,7 @@ function RouteComponent() {
   const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(
     null,
   );
+  const [sortConfig, setSortConfig] = React.useState<{ sortBy: string; sortOrder: 'asc' | 'desc' }>({ sortBy: 'nama', sortOrder: 'asc' });
   const queryClient = useQueryClient();
   const { data: brandOptions = [], isLoading: isBrandLoading } = useQuery({
     queryKey: ["brands", "options"],
@@ -143,11 +189,15 @@ function RouteComponent() {
       pagination.page,
       pagination.limit,
       selectedBrandId ?? null,
+      sortConfig.sortBy,
+      sortConfig.sortOrder,
     ],
     queryFn: () =>
       fetchOutlet({
         ...pagination,
         brandId: selectedBrandId,
+        sortBy: sortConfig.sortBy,
+        sortOrder: sortConfig.sortOrder,
       }),
   });
 
@@ -181,6 +231,18 @@ function RouteComponent() {
 
   const handleBrandChange = (value: string) => {
     setSelectedBrandId(value === "all" ? undefined : value);
+    setPagination((prev) => ({ ...prev, page: 1 }));
+  };
+
+  const handleSort = (column: string) => {
+    setSortConfig((prev) => {
+      if (prev.sortBy === column) {
+        // Toggle sort order if same column
+        return { sortBy: column, sortOrder: prev.sortOrder === 'asc' ? 'desc' : 'asc' };
+      }
+      // New column, default to ascending
+      return { sortBy: column, sortOrder: 'asc' };
+    });
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
@@ -298,10 +360,29 @@ function RouteComponent() {
                   <TableHead className="w-16 text-center text-[#9C1A1C]">
                     No
                   </TableHead>
-                  <TableHead className="text-[#9C1A1C]">Nama Outlet</TableHead>
-                  <TableHead className="w-48 text-[#9C1A1C]">Brand</TableHead>
+                  <TableHead className="text-[#9C1A1C]">
+                    <SortableHeader 
+                      column="nama" 
+                      label="Nama Outlet" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
+                  </TableHead>
+                  <TableHead className="w-48 text-[#9C1A1C]">
+                    <SortableHeader 
+                      column="brand.nama" 
+                      label="Brand" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
+                  </TableHead>
                   <TableHead className="w-40 text-[#9C1A1C]">
-                    Jam Operasional
+                    <SortableHeader 
+                      column="jamOperasional" 
+                      label="Jam Operasional" 
+                      sortConfig={sortConfig} 
+                      onSort={handleSort} 
+                    />
                   </TableHead>
                   <TableHead className="w-32 text-center text-[#9C1A1C]">
                     Aksi

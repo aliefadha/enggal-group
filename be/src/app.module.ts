@@ -17,6 +17,9 @@ import { DashboardModule } from './api/dashboard/dashboard.module';
 import { AuthModule } from './api/auth/auth.module';
 import { GalleryModule } from './api/gallery/gallery.module';
 import { GoogleAuthModule } from './api/google-auth/google-auth.module';
+import { MembershipModule } from './api/membership/membership.module';
+import { EmailModule } from 'src/common/email/email.module';
+import { PdfModule } from 'src/common/pdf/pdf.module';
 
 @Module({
   imports: [
@@ -36,6 +39,9 @@ import { GoogleAuthModule } from './api/google-auth/google-auth.module';
     AuthModule,
     GalleryModule,
     GoogleAuthModule,
+    MembershipModule,
+    EmailModule,
+    PdfModule,
   ],
   controllers: [AppController],
   providers: [

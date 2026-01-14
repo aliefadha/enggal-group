@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import type { Prisma } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { GoogleSheetsService } from 'src/common/google-sheets/google-sheets.service';
-import { GoogleDriveService } from 'src/common/google-drive/google-drive.service';
-import { RequestUserCareerCreateDto } from 'src/api/user-career/dto/requests/create.dto';
-import { RequestUserCareerUpdateDto } from 'src/api/user-career/dto/requests/update.dto';
+import { Injectable, NotFoundException, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import type { Prisma } from "@prisma/client";
+import { PrismaService } from "src/prisma/prisma.service";
+import { GoogleSheetsService } from "src/common/google-sheets/google-sheets.service";
+import { GoogleDriveService } from "src/common/google-drive/google-drive.service";
+import { RequestUserCareerCreateDto } from "src/api/user-career/dto/requests/create.dto";
+import { RequestUserCareerUpdateDto } from "src/api/user-career/dto/requests/update.dto";
 
 @Injectable()
 export class UserCareerService {
@@ -16,7 +16,7 @@ export class UserCareerService {
     private googleSheets: GoogleSheetsService,
     private googleDrive: GoogleDriveService,
     private configService: ConfigService,
-  ) { }
+  ) {}
 
   async create(dto: RequestUserCareerCreateDto) {
     const createdCareer = await this.prisma.userCareer.create({
@@ -28,79 +28,112 @@ export class UserCareerService {
         alamat: dto.alamat,
         cv_link: dto.cv_link,
         status: dto.status,
+        jenis_kelamin: dto.jenis_kelamin,
+        kota: dto.kota,
+        tanggal_lahir: dto.tanggal_lahir
+          ? new Date(dto.tanggal_lahir)
+          : new Date(),
       },
     });
 
-    // Append to Google Sheets in the background
     this.appendToGoogleSheets(createdCareer).catch((error) => {
-      this.logger.error('Failed to append to Google Sheets', error);
+      this.logger.error("Failed to append to Google Sheets", error);
     });
 
     return createdCareer;
   }
 
   private async appendToGoogleSheets(career: any) {
-    const spreadsheetId = this.configService.get<string>('GOOGLE_SHEETS_CAREER_SPREADSHEET_ID');
-    const range = this.configService.get<string>('GOOGLE_SHEETS_CAREER_RANGE') || 'Sheet1!A:H';
+    const spreadsheetId = this.configService.get<string>(
+      "GOOGLE_SHEETS_CAREER_SPREADSHEET_ID",
+    );
+    const range =
+      this.configService.get<string>("GOOGLE_SHEETS_CAREER_RANGE") ||
+      "Sheet1!A:K";
 
     if (!spreadsheetId) {
-      this.logger.warn('Google Sheets spreadsheet ID not configured, skipping append');
+      this.logger.warn(
+        "Google Sheets spreadsheet ID not configured, skipping append",
+      );
       return;
     }
 
     const row = [
       [
-        career.id, // HIDDEN: Database ID in Column A
-        `${String(career.tanggal.getMonth() + 1).padStart(2, '0')}-${String(career.tanggal.getDate()).padStart(2, '0')}-${career.tanggal.getFullYear()}`,
+        career.id,
+        `${String(career.tanggal.getMonth() + 1).padStart(2, "0")}-${String(career.tanggal.getDate()).padStart(2, "0")}-${career.tanggal.getFullYear()}`,
         career.nama,
         `0${career.no_hp}`,
         career.email,
         career.alamat,
         career.cv_link,
         career.status,
+        career.jenis_kelamin,
+        career.kota,
+        `${String(career.tanggal_lahir.getMonth() + 1).padStart(2, "0")}-${String(career.tanggal_lahir.getDate()).padStart(2, "0")}-${career.tanggal_lahir.getFullYear()}`,
       ],
     ];
 
-    await this.googleSheets.appendRow(spreadsheetId, range, row);
-    this.logger.log(`Career application appended to Google Sheets: ${career.id}`);
+    await this.googleSheets.appendRowToTable(spreadsheetId, range, row);
+    this.logger.log(
+      `Career application appended to Google Sheets: ${career.id}`,
+    );
   }
 
   private async updateGoogleSheets(career: any): Promise<void> {
-    const spreadsheetId = this.configService.get<string>('GOOGLE_SHEETS_CAREER_SPREADSHEET_ID');
-    const range = this.configService.get<string>('GOOGLE_SHEETS_CAREER_RANGE') || 'Sheet1!A:H';
+    const spreadsheetId = this.configService.get<string>(
+      "GOOGLE_SHEETS_CAREER_SPREADSHEET_ID",
+    );
+    const range =
+      this.configService.get<string>("GOOGLE_SHEETS_CAREER_RANGE") ||
+      "Sheet1!A:K";
 
     if (!spreadsheetId) {
-      this.logger.warn('Google Sheets spreadsheet ID not configured, skipping update');
+      this.logger.warn(
+        "Google Sheets spreadsheet ID not configured, skipping update",
+      );
       return;
     }
 
     try {
-      // Find the row by database ID (hidden in Column A)
-      const rowIndex = await this.googleSheets.findRowById(spreadsheetId, range, career.id);
+      const rowIndex = await this.googleSheets.findRowById(
+        spreadsheetId,
+        range,
+        career.id,
+      );
 
       if (rowIndex === -1) {
-        this.logger.warn(`Row not found for career ID: ${career.id}, will append as new row`);
+        this.logger.warn(
+          `Row not found for career ID: ${career.id}, will append as new row`,
+        );
         await this.appendToGoogleSheets(career);
         return;
       }
 
-      // Prepare updated row data (visible columns B-H)
       const updatedRow = [
-        `${String(career.tanggal.getMonth() + 1).padStart(2, '0')}-${String(career.tanggal.getDate()).padStart(2, '0')}-${career.tanggal.getFullYear()}`,
+        `${String(career.tanggal.getMonth() + 1).padStart(2, "0")}-${String(career.tanggal.getDate()).padStart(2, "0")}-${career.tanggal.getFullYear()}`,
         career.nama,
         `0${career.no_hp}`,
         career.email,
         career.alamat,
         career.cv_link,
         career.status,
+        career.jenis_kelamin,
+        career.kota,
+        `${String(career.tanggal_lahir.getMonth() + 1).padStart(2, "0")}-${String(career.tanggal_lahir.getDate()).padStart(2, "0")}-${career.tanggal_lahir.getFullYear()}`,
       ];
 
-      // Update the row (columns B-H, maintaining hidden ID in A)
-      await this.googleSheets.updateRow(spreadsheetId, range, rowIndex, updatedRow);
-      this.logger.log(`Career application updated in Google Sheets: ${career.id}`);
-
+      await this.googleSheets.updateRow(
+        spreadsheetId,
+        range,
+        rowIndex,
+        updatedRow,
+      );
+      this.logger.log(
+        `Career application updated in Google Sheets: ${career.id}`,
+      );
     } catch (error) {
-      this.logger.error('Failed to update Google Sheets', error);
+      this.logger.error("Failed to update Google Sheets", error);
     }
   }
 
@@ -110,12 +143,16 @@ export class UserCareerService {
     startDate,
     endDate,
     status,
+    sortBy,
+    sortOrder = 'desc',
   }: {
     page?: number;
     limit?: number;
     startDate?: Date;
     endDate?: Date;
     status?: any;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
   }) {
     const skip = (page - 1) * limit;
     const where: Prisma.UserCareerWhereInput = {};
@@ -134,12 +171,26 @@ export class UserCareerService {
       where.status = status;
     }
 
+    // Build orderBy clause dynamically
+    const orderBy: Prisma.UserCareerOrderByWithRelationInput = {};
+    if (sortBy) {
+      // Map frontend field names to Prisma fields if needed
+      const validSortFields = ['tanggal', 'nama', 'no_hp', 'email', 'status', 'jenis_kelamin', 'kota', 'tanggal_lahir'];
+      if (validSortFields.includes(sortBy)) {
+        orderBy[sortBy as keyof Prisma.UserCareerOrderByWithRelationInput] = sortOrder;
+      } else {
+        orderBy.tanggal = 'desc'; // Fallback to default
+      }
+    } else {
+      orderBy.tanggal = 'desc'; // Default sorting
+    }
+
     const [total, data] = await this.prisma.$transaction([
       this.prisma.userCareer.count({ where }),
       this.prisma.userCareer.findMany({
         skip,
         take: limit,
-        orderBy: { tanggal: 'desc' },
+        orderBy,
         where,
       }),
     ]);
@@ -158,7 +209,7 @@ export class UserCareerService {
   async findOne(id: string) {
     const item = await this.prisma.userCareer.findUnique({ where: { id } });
     if (!item) {
-      throw new NotFoundException('UserCareer not found');
+      throw new NotFoundException("UserCareer not found");
     }
     return item;
   }
@@ -166,7 +217,7 @@ export class UserCareerService {
   async update(id: string, dto: RequestUserCareerUpdateDto) {
     const existing = await this.prisma.userCareer.findUnique({ where: { id } });
     if (!existing) {
-      throw new NotFoundException('UserCareer not found');
+      throw new NotFoundException("UserCareer not found");
     }
 
     const updatedCareer = await this.prisma.userCareer.update({
@@ -182,9 +233,8 @@ export class UserCareerService {
       },
     });
 
-    // Update Google Sheets in background
     this.updateGoogleSheets(updatedCareer).catch((error) => {
-      this.logger.error('Failed to update Google Sheets', error);
+      this.logger.error("Failed to update Google Sheets", error);
     });
 
     return updatedCareer;
@@ -193,19 +243,16 @@ export class UserCareerService {
   async remove(id: string) {
     const existing = await this.prisma.userCareer.findUnique({ where: { id } });
     if (!existing) {
-      throw new NotFoundException('UserCareer not found');
+      throw new NotFoundException("UserCareer not found");
     }
 
     try {
-      // Delete from Google Sheets
       await this.deleteFromGoogleSheets(existing.id);
 
-      // Delete CV file from Google Drive
       if (existing.cv_link) {
         await this.deleteFromGoogleDrive(existing.cv_link);
       }
 
-      // Finally delete from database
       await this.prisma.userCareer.delete({ where: { id } });
 
       this.logger.log(`UserCareer ${id} deleted successfully from all sources`);
@@ -218,34 +265,42 @@ export class UserCareerService {
 
   private async deleteFromGoogleSheets(dbId: string): Promise<void> {
     try {
-      const spreadsheetId = this.configService.get<string>('GOOGLE_SHEETS_CAREER_SPREADSHEET_ID');
-      const range = this.configService.get<string>('GOOGLE_SHEETS_CAREER_RANGE') || 'Sheet1!A:H';
+      const spreadsheetId = this.configService.get<string>(
+        "GOOGLE_SHEETS_CAREER_SPREADSHEET_ID",
+      );
+      const range =
+        this.configService.get<string>("GOOGLE_SHEETS_CAREER_RANGE") ||
+        "Sheet1!A:K";
 
       if (!spreadsheetId) {
-        this.logger.warn('Google Sheets spreadsheet ID not configured, skipping sheet deletion');
+        this.logger.warn(
+          "Google Sheets spreadsheet ID not configured, skipping sheet deletion",
+        );
         return;
       }
 
-      // Find the row by database ID
-      const rowIndex = await this.googleSheets.findRowById(spreadsheetId, range, dbId);
+      const rowIndex = await this.googleSheets.findRowById(
+        spreadsheetId,
+        range,
+        dbId,
+      );
 
       if (rowIndex === -1) {
-        this.logger.warn(`Row not found for career ID: ${dbId} in Google Sheets`);
+        this.logger.warn(
+          `Row not found for career ID: ${dbId} in Google Sheets`,
+        );
         return;
       }
 
-      // Delete the row
       await this.googleSheets.deleteRow(spreadsheetId, range, rowIndex);
       this.logger.log(`Career application deleted from Google Sheets: ${dbId}`);
     } catch (error) {
-      this.logger.error('Failed to delete from Google Sheets', error);
-      // Don't throw here as this is not critical for the overall deletion
+      this.logger.error("Failed to delete from Google Sheets", error);
     }
   }
 
   private async deleteFromGoogleDrive(cvLink: string): Promise<void> {
     try {
-      // Extract file ID from the Google Drive URL
       const fileId = this.googleDrive.extractFileIdFromUrl(cvLink);
 
       if (!fileId) {
@@ -253,12 +308,19 @@ export class UserCareerService {
         return;
       }
 
-      // Delete the file from Google Drive
-      await this.googleDrive.deleteFile(fileId);
-      this.logger.log(`CV file deleted from Google Drive: ${fileId}`);
+      const fileName = await this.googleDrive.getFileNameById(fileId);
+
+      if (!fileName) {
+        this.logger.warn(`Could not get filename for file ID: ${fileId}`);
+        return;
+      }
+
+      await this.googleDrive.deleteFile(fileName);
+      this.logger.log(
+        `CV file deleted from Google Drive: ${fileName} (${fileId})`,
+      );
     } catch (error) {
-      this.logger.error('Failed to delete CV file from Google Drive', error);
-      // Don't throw here as this is not critical for the overall deletion
+      this.logger.error("Failed to delete CV file from Google Drive", error);
     }
   }
 }

@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsDateString, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class OutletListQueryDto {
   @ApiPropertyOptional({ description: 'Page number (1-based)' })
@@ -16,6 +16,23 @@ export class OutletListQueryDto {
   @IsOptional()
   @IsUUID()
   brandId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Sort by field (nama, kota, jamOperasional, brand.nama, etc.)',
+    example: 'nama',
+  })
+  @IsOptional()
+  @IsString()
+  sortBy?: string;
+
+  @ApiPropertyOptional({
+    enum: ['asc', 'desc'],
+    description: 'Sort order',
+    example: 'asc',
+  })
+  @IsOptional()
+  @IsEnum(['asc', 'desc'])
+  sortOrder?: 'asc' | 'desc';
 
   constructor(dto: OutletListQueryDto) {
     Object.assign(this, dto);

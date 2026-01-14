@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsEmail, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
-import { CareerStatus } from '@prisma/client';
+import { IsDateString, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { CareerStatus, Gender } from '@prisma/client';
 
 export class RequestUserCareerCreateDto {
   @ApiProperty({ example: '2024-05-20' })
@@ -36,6 +36,20 @@ export class RequestUserCareerCreateDto {
   @IsOptional()
   @IsEnum(CareerStatus)
   status?: CareerStatus
+
+  @ApiProperty({ enum: Gender, example: Gender.LAKI_LAKI, description: 'Gender of the applicant' })
+  @IsEnum(Gender)
+  jenis_kelamin!: Gender
+
+  @ApiProperty({ example: 'Jakarta' })
+  @IsNotEmpty()
+  @IsString()
+  kota!: string
+
+  @ApiPropertyOptional({ example: '1995-05-20' })
+  @IsOptional()
+  @IsDateString()
+  tanggal_lahir?: string
 
   constructor(dto: RequestUserCareerCreateDto) {
     Object.assign(this, dto);
