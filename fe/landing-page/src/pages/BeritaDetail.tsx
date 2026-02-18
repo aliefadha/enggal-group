@@ -364,7 +364,7 @@ function BeritaDetail() {
             <img
               src={getImageUrl(berita.image)}
               alt={berita.judul}
-              className="mx-auto w-full object-cover rounded-md max-h-[450px] aspect-[4/3]"
+              className="mx-auto w-full object-cover rounded-md max-h-full aspect-[4/3]"
             />
             <div className="my-9 flex flex-col gap-y-8">
               <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-7">
