@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { apiClient, API_BASE_URL } from '../lib/api-client';
+import { fetchProvinces, fetchRegenciesByProvince } from '../lib/wilayah';
 import brandIcon from '../assets/images/brand_icon.svg';
 import outletIcon from '../assets/images/outlet_icon.svg';
 import cityIcon from '../assets/images/city_icon.svg';
@@ -56,29 +57,6 @@ type BrandListMeta = {
   totalPages?: number;
 };
 
-type ProvinceData = {
-  id: string;
-  name: string;
-};
-
-type CityData = {
-  id: string;
-  id_provinsi: string;
-  name: string;
-};
-
-type ProvincesApiResponse = {
-  code: string;
-  messages: string;
-  value: ProvinceData[];
-};
-
-type CitiesApiResponse = {
-  code: string;
-  messages: string;
-  value: CityData[];
-};
-
 // Zod validation schema
 const careerFormSchema = z.object({
   name: z.string()
@@ -124,18 +102,6 @@ async function fetchBrands() {
       limit: 100
     },
   };
-}
-
-async function fetchProvinces(): Promise<ProvinceData[]> {
-  const response = await fetch(`https://api.binderbyte.com/wilayah/provinsi?api_key=${import.meta.env.VITE_WILAYAH_API_KEY}`);
-  const data: ProvincesApiResponse = await response.json();
-  return data.value;
-}
-
-async function fetchCitiesByProvince(provinceId: string): Promise<CityData[]> {
-  const response = await fetch(`https://api.binderbyte.com/wilayah/kabupaten?api_key=${import.meta.env.VITE_WILAYAH_API_KEY}&id_provinsi=${provinceId}`);
-  const data: CitiesApiResponse = await response.json();
-  return data.value;
 }
 
 type UserCareerFormData = {
@@ -202,7 +168,7 @@ function Career() {
 
   const { data: cities = [] } = useQuery({
     queryKey: ["cities", selectedProvince],
-    queryFn: () => fetchCitiesByProvince(selectedProvince),
+    queryFn: () => fetchRegenciesByProvince(selectedProvince),
     enabled: !!selectedProvince,
     refetchOnWindowFocus: false,
     refetchOnMount: false,

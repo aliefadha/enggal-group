@@ -28,6 +28,7 @@ import {
 } from '../components/ui/popover';
 import { Button } from '../components/ui/button';
 import { apiClient } from '../lib/api-client';
+import { fetchProvinces, fetchRegenciesByProvince } from '../lib/wilayah';
 import outletIcon from '../assets/images/outlet_icon.svg';
 import brandIcon from '../assets/images/brand_icon.svg';
 import cityIcon from '../assets/images/city_icon.svg';
@@ -51,41 +52,6 @@ const membershipFormSchema = z.object({
 });
 
 type MembershipFormData = z.infer<typeof membershipFormSchema>;
-
-type ProvinceData = {
-    id: string;
-    name: string;
-};
-
-type CityData = {
-    id: string;
-    id_provinsi: string;
-    name: string;
-};
-
-type ProvincesApiResponse = {
-    code: string;
-    messages: string;
-    value: ProvinceData[];
-};
-
-type CitiesApiResponse = {
-    code: string;
-    messages: string;
-    value: CityData[];
-};
-
-async function fetchProvinces(): Promise<ProvinceData[]> {
-    const response = await fetch(`https://api.binderbyte.com/wilayah/provinsi?api_key=${import.meta.env.VITE_WILAYAH_API_KEY}`);
-    const data: ProvincesApiResponse = await response.json();
-    return data.value;
-}
-
-async function fetchCitiesByProvince(provinceId: string): Promise<CityData[]> {
-    const response = await fetch(`https://api.binderbyte.com/wilayah/kabupaten?api_key=${import.meta.env.VITE_WILAYAH_API_KEY}&id_provinsi=${provinceId}`);
-    const data: CitiesApiResponse = await response.json();
-    return data.value;
-}
 
 async function submitMembershipApplication(data: MembershipFormData) {
     const response = await apiClient.post('/membership', data);
@@ -132,7 +98,7 @@ function Membership() {
 
     const { data: cities = [] } = useQuery({
         queryKey: ["cities", selectedProvince],
-        queryFn: () => fetchCitiesByProvince(selectedProvince),
+        queryFn: () => fetchRegenciesByProvince(selectedProvince),
         enabled: !!selectedProvince,
         refetchOnWindowFocus: false,
         refetchOnMount: false,
