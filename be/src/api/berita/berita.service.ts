@@ -1,36 +1,76 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import type { Prisma } from '@prisma/client';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RequestBeritaCreateDto } from 'src/api/berita/dto/requests/create.dto';
 import { RequestBeritaUpdateDto } from 'src/api/berita/dto/requests/update.dto';
 
 @Injectable()
 export class BeritaService {
+  private static readonly MAX_SLUG_ATTEMPTS = 1_000;
+
   constructor(private prisma: PrismaService) { }
 
   private generateSlug(title: string): string {
-    return title
+    const slug = title
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-+|-+$/g, '');
+
+    return slug || 'berita';
+  }
+
+  private isSlugConflict(error: unknown): boolean {
+    if (
+      !(error instanceof Prisma.PrismaClientKnownRequestError) ||
+      error.code !== 'P2002'
+    ) {
+      return false;
+    }
+
+    const target = error.meta?.target;
+    return (
+      target === 'slug' ||
+      (Array.isArray(target) && target.includes('slug'))
+    );
   }
 
   async create(dto: RequestBeritaCreateDto) {
-    const slug = this.generateSlug(dto.judul);
+    const baseSlug = this.generateSlug(dto.judul);
+    const data = {
+      judul: dto.judul,
+      image: dto.image ?? undefined,
+      createdDate: new Date(dto.createdDate),
+      penulis: dto.penulis,
+      content: dto.content,
+    };
 
-    return this.prisma.berita.create({
-      data: {
-        judul: dto.judul,
-        slug,
-        image: dto.image ?? undefined,
-        createdDate: new Date(dto.createdDate),
-        penulis: dto.penulis,
-        content: dto.content,
-      },
-    });
+    for (let attempt = 0; attempt < BeritaService.MAX_SLUG_ATTEMPTS; attempt++) {
+      const slug = attempt === 0 ? baseSlug : `${baseSlug}-${attempt + 1}`;
+
+      try {
+        return await this.prisma.berita.create({
+          data: {
+            ...data,
+            slug,
+          },
+        });
+      } catch (error) {
+        // The unique index remains the source of truth, so this also handles
+        // two requests trying to create the same slug at the same time.
+        if (!this.isSlugConflict(error)) {
+          throw error;
+        }
+      }
+    }
+
+    throw new ConflictException('Could not generate a unique berita slug');
   }
 
   async findAll({
